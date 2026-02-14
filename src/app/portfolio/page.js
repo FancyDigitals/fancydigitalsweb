@@ -24,7 +24,7 @@ const projects = [
     title: "TODMA Brand Identity",
     category: "Graphics Design",
     desc: "A premium visual identity system for long-term brand trust.",
-    image: "/portfolio/branding.png",
+    image: "/portfolio/todma/cover.jpg",
   },
   {
   slug: "sibgahtullah",
@@ -35,12 +35,13 @@ const projects = [
 },
 
   {
-    slug: "landing-page-design",
-    title: "Landing Page Design",
-    category: "UI / UX",
-    desc: "High-converting landing page with clear messaging hierarchy.",
-    image: "/portfolio/landing.png",
-  },
+  slug: "tejurolex",
+  title: "Tejurolex Global Consult",
+  category: "Website & SEO",
+  desc: "A professional website and SEO system built to drive visibility, trust, and qualified inquiries for a leading travel and language agency.",
+  image: "/portfolio/tejurolex/logo.jpg",
+},
+
   {
     slug: "marketing-website",
     title: "Marketing Website",

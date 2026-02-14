@@ -26,8 +26,8 @@ export function generateStaticParams() {
    METADATA
 ================================ */
 
-export function generateMetadata({ params }) {
-  const slug = params?.slug;
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
   const base = Array.isArray(portfolio) ? portfolio.find((p) => p.slug === slug) : null;
   const detail = portfolioDetails?.[slug];
 
@@ -48,8 +48,9 @@ export function generateMetadata({ params }) {
    PAGE
 ================================ */
 
-export default function PortfolioDetailPage({ params }) {
-  const slug = params?.slug;
+export default async function PortfolioDetailPage({ params }) {
+  const { slug } = await params;
+
 
   const base = Array.isArray(portfolio) ? portfolio.find((p) => p.slug === slug) : null;
   if (!base) notFound();

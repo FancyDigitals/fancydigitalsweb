@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 /* =====================================================
    HEADER — PREMIUM, STATIC, AGENCY-LEVEL
 ===================================================== */
@@ -11,6 +15,21 @@ const NAV = [
 ];
 
 export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // lock scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   return (
     <header className="sticky top-0 z-50">
       {/* Glass + brand gradient layer */}
@@ -44,18 +63,14 @@ export default function Header() {
           </a>
 
           {/* DESKTOP NAV */}
-          <nav
-            aria-label="Primary navigation"
-            className="hidden items-center gap-10 text-sm font-semibold text-gray-700 md:flex"
-          >
+          <nav className="hidden items-center gap-10 text-sm font-semibold text-gray-700 md:flex">
             {NAV.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 className="relative transition hover:text-black"
               >
-                <span>{item.label}</span>
-                <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-gradient-to-r from-[#075a01] to-[#ff914d] transition-all group-hover:w-full" />
+                {item.label}
               </a>
             ))}
           </nav>
@@ -86,78 +101,82 @@ export default function Header() {
             </a>
           </div>
 
-          {/* MOBILE MENU — STATIC */}
-          <details className="relative md:hidden">
-            <summary
-              aria-label="Open menu"
-              className="cursor-pointer list-none rounded-xl border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-gray-900"
-            >
-              Menu
-            </summary>
-
-            {/* Backdrop */}
-            <div className="fixed inset-0 z-40 bg-black/50" />
-
-            {/* Drawer */}
-            <div className="fixed right-0 top-0 z-50 h-full w-[88%] max-w-sm bg-white shadow-2xl">
-              <div className="border-b border-black/10 px-5 py-4">
-                <p className="text-sm font-semibold text-gray-800">
-                  Fancy Digitals
-                </p>
-                <p className="text-xs text-gray-500">
-                  Premium digital studio
-                </p>
-              </div>
-
-              <div className="px-5 py-6">
-                <nav
-                  aria-label="Mobile navigation"
-                  className="flex flex-col gap-3 text-sm font-semibold text-gray-800"
-                >
-                  {NAV.map((item) => (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      className="rounded-xl border border-black/10 px-4 py-3 transition hover:bg-gray-50"
-                    >
-                      {item.label}
-                    </a>
-                  ))}
-                </nav>
-
-                <div className="mt-8 flex flex-col gap-3">
-                  <a
-                    href="https://wa.me/2349034360785"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-xl border border-black/10 px-4 py-3 text-center text-sm font-semibold"
-                  >
-                    WhatsApp
-                  </a>
-
-                  <a
-                    href="tel:+2349045547761"
-                    className="rounded-xl border border-black/10 px-4 py-3 text-center text-sm font-semibold"
-                  >
-                    Call
-                  </a>
-
-                  <a
-                    href="/contact"
-                    className="rounded-xl bg-gradient-to-r from-[#075a01] to-[#ff914d] px-4 py-3 text-center text-sm font-semibold text-white"
-                  >
-                    Start a Project
-                  </a>
-                </div>
-
-                <p className="mt-10 text-xs text-gray-500">
-                  Calm systems • Premium execution • Long-term thinking
-                </p>
-              </div>
-            </div>
-          </details>
+          {/* MOBILE MENU BUTTON */}
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="rounded-xl border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-gray-900 md:hidden"
+          >
+            Menu
+          </button>
         </div>
       </div>
+
+      {/* MOBILE OVERLAY */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[9999]">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
+          />
+
+          {/* Drawer */}
+          <div className="absolute right-0 top-0 h-full w-[88%] max-w-sm bg-white shadow-2xl">
+            <div className="border-b border-black/10 px-5 py-4">
+              <p className="text-sm font-semibold text-gray-800">
+                Fancy Digitals
+              </p>
+              <p className="text-xs text-gray-500">
+                Premium digital studio
+              </p>
+            </div>
+
+            <div className="px-5 py-6">
+              <nav className="flex flex-col gap-3 text-sm font-semibold text-gray-800">
+                {NAV.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl border border-black/10 px-4 py-3 transition hover:bg-gray-50"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+
+              <div className="mt-8 flex flex-col gap-3">
+                <a
+                  href="https://wa.me/2349034360785"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-xl border border-black/10 px-4 py-3 text-center text-sm font-semibold"
+                >
+                  WhatsApp
+                </a>
+
+                <a
+                  href="tel:+2349045547761"
+                  className="rounded-xl border border-black/10 px-4 py-3 text-center text-sm font-semibold"
+                >
+                  Call
+                </a>
+
+                <a
+                  href="/contact"
+                  className="rounded-xl bg-gradient-to-r from-[#075a01] to-[#ff914d] px-4 py-3 text-center text-sm font-semibold text-white"
+                >
+                  Start a Project
+                </a>
+              </div>
+
+              <p className="mt-10 text-xs text-gray-500">
+                Calm systems • Premium execution • Long-term thinking
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

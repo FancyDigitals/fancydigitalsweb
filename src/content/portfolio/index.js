@@ -14,7 +14,7 @@ export const portfolio = [
   slug: "todma-brand-identity",
   title: "Todma Automotive Brand Identity",
   category: "Brand Identity",
-  coverImage: "/portfolio/brand-system.jpg",
+  coverImage: "/portfolio/todma/cover.jpg",
   description:
   "A premium automotive brand identity system crafted to build trust, credibility, and recognition for a modern car sales brand.",
   published: true,
