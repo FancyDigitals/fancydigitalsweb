@@ -1,6 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 /* =====================================================
    STATIC TOOLS DATA
 ===================================================== */
@@ -63,8 +60,6 @@ const TOOLS = [
 export default function ToolsPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      <Header />
-
       {/* HERO */}
       <section className="mx-auto max-w-6xl px-5 pt-36 pb-24 md:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gray-500">
@@ -93,19 +88,16 @@ export default function ToolsPage() {
               href={`/tools/${tool.slug}`}
               className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_14px_40px_rgba(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(0,0,0,0.16)]"
             >
-              {/* Accent bar */}
               <div
                 className="absolute left-0 top-0 h-full w-1"
                 style={{ backgroundColor: tool.accent }}
               />
 
-              {/* Image */}
               <div
                 className="h-[180px] bg-contain bg-center bg-no-repeat"
                 style={{ backgroundImage: `url(${tool.image})` }}
               />
 
-              {/* Content */}
               <div className="p-6">
                 <p
                   className="text-xs font-semibold uppercase tracking-wide"
@@ -136,8 +128,6 @@ export default function ToolsPage() {
           ))}
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }

@@ -1,6 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 /* =====================================================
    BRAND TOKENS
 ===================================================== */
@@ -21,7 +18,8 @@ const TOOLS = {
     accent: BRAND.green,
     gradient:
       "linear-gradient(135deg, rgba(7,90,1,1) 0%, rgba(7,90,1,0.85) 55%, rgba(255,145,77,0.25) 100%)",
-    tagline: "Generate clear, conversion-focused landing page structures in minutes.",
+    tagline:
+      "Generate clear, conversion-focused landing page structures in minutes.",
     intro:
       "A practical tool designed to remove guesswork from landing page structure and messaging.",
     problem:
@@ -53,7 +51,7 @@ const TOOLS = {
 };
 
 /* =====================================================
-   STATIC PARAMS (CRITICAL)
+   STATIC PARAMS
 ===================================================== */
 
 export function generateStaticParams() {
@@ -81,7 +79,6 @@ export default function ToolDetailPage({ params }) {
   if (!tool) {
     return (
       <main className="min-h-screen bg-white text-gray-900">
-        <Header />
         <section className="mx-auto max-w-6xl px-5 pt-40 pb-28 md:px-10">
           <h1 className="text-3xl font-semibold">Tool not found</h1>
           <p className="mt-4 max-w-xl text-gray-600">
@@ -94,15 +91,12 @@ export default function ToolDetailPage({ params }) {
             Back to tools
           </a>
         </section>
-        <Footer />
       </main>
     );
   }
 
   return (
     <main className="relative min-h-screen bg-white text-gray-900">
-      <Header />
-
       {/* HERO */}
       <section
         className="relative overflow-hidden"
@@ -194,8 +188,6 @@ export default function ToolDetailPage({ params }) {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }

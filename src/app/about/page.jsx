@@ -1,5 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import Image from "next/image";
 
 /* =====================================================
@@ -20,7 +18,7 @@ const founder = {
   name: "Bashir Ismail",
   alias: "Fancy",
   role: "Founder & Digital Architect",
-  image: "/images/founder.jpg", // ensure this exists in /public
+  image: "/images/founder.jpg",
   bio: [
     "Bashir Ismail, widely known as Fancy, is the founder of Fancy Digitals — a premium digital studio focused on building calm, scalable, and intentional digital systems.",
     "With years of hands-on experience across design, frontend engineering, and digital strategy, he helps businesses replace chaos with structure and long-term clarity.",
@@ -72,12 +70,9 @@ const signature = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      <Header />
-
       {/* INTRO / IDENTITY */}
       <section className="mx-auto max-w-6xl px-5 pt-32 pb-28 md:px-10">
         <div className="grid gap-20 md:grid-cols-[0.85fr_1.15fr] md:items-center">
-          {/* Founder Image */}
           <div className="relative">
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-[#f1f2f1] shadow-[0_32px_90px_rgba(0,0,0,0.10)]">
               <Image
@@ -90,7 +85,6 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Founder Identity */}
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.45em] text-gray-500">
               {founder.role}
@@ -208,8 +202,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }

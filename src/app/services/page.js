@@ -1,6 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 /* =====================================================
    METADATA
 ===================================================== */
@@ -90,8 +87,6 @@ const SERVICES = [
 export default function ServicesPage() {
   return (
     <main className="relative min-h-screen bg-white text-gray-900">
-      <Header />
-
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-[#075a01]/10 blur-[160px]" />
@@ -122,13 +117,8 @@ export default function ServicesPage() {
             <section
               key={service.title}
               aria-labelledby={`service-${index}`}
-              className="
-                rounded-3xl border border-black/10 bg-white
-                p-10
-                shadow-[0_20px_60px_rgba(0,0,0,0.08)]
-              "
+              className="rounded-3xl border border-black/10 bg-white p-10 shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
             >
-              {/* Header */}
               <header className="max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Service {String(index + 1).padStart(2, "0")}
@@ -146,12 +136,10 @@ export default function ServicesPage() {
                 </p>
               </header>
 
-              {/* Description */}
               <p className="mt-6 max-w-3xl text-base leading-relaxed text-gray-600">
                 {service.description}
               </p>
 
-              {/* Includes */}
               <div className="mt-8">
                 <p className="mb-4 text-sm font-semibold text-gray-900">
                   Scope includes
@@ -170,8 +158,6 @@ export default function ServicesPage() {
           ))}
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }

@@ -1,6 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 /* ===============================
    SEO METADATA (SERVER ONLY)
 ================================ */
@@ -20,7 +17,7 @@ export const metadata = {
     title: "Contact Fancy Digitals",
     description:
       "Let’s build something intentional. Contact Fancy Digitals for premium digital solutions.",
-    url: "https://fancydigitals.com/contact",
+    url: "https://fancydigitals.com.ng/contact",
     siteName: "Fancy Digitals",
     type: "website",
   },
@@ -37,7 +34,7 @@ export default function ContactPage() {
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "Fancy Digitals",
-            url: "https://fancydigitals.com",
+            url: "https://fancydigitals.com.ng",
             areaServed: "NG",
             contactPoint: {
               "@type": "ContactPoint",
@@ -47,8 +44,6 @@ export default function ContactPage() {
           }),
         }}
       />
-
-      <Header />
 
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -109,7 +104,7 @@ export default function ContactPage() {
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#075a01] to-[#ff914d]" />
 
             <form
-              action="mailto:hello@fancydigitals.com"
+              action="mailto:hello@fancydigitals.com.ng"
               method="post"
               encType="text/plain"
               className="space-y-6"
@@ -164,8 +159,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }

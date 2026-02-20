@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { portfolio } from "@/content/portfolio/index";
 import { portfolioDetails } from "@/content/portfolio/details";
 
@@ -27,8 +25,11 @@ export function generateStaticParams() {
 ================================ */
 
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
-  const base = Array.isArray(portfolio) ? portfolio.find((p) => p.slug === slug) : null;
+  const { slug } = params;
+  const base = Array.isArray(portfolio)
+    ? portfolio.find((p) => p.slug === slug)
+    : null;
+
   const detail = portfolioDetails?.[slug];
 
   if (!base) {
@@ -48,11 +49,13 @@ export async function generateMetadata({ params }) {
    PAGE
 ================================ */
 
-export default async function PortfolioDetailPage({ params }) {
-  const { slug } = await params;
+export default function PortfolioDetailPage({ params }) {
+  const { slug } = params;
 
+  const base = Array.isArray(portfolio)
+    ? portfolio.find((p) => p.slug === slug)
+    : null;
 
-  const base = Array.isArray(portfolio) ? portfolio.find((p) => p.slug === slug) : null;
   if (!base) notFound();
 
   const detail = portfolioDetails?.[slug];
@@ -61,14 +64,13 @@ export default async function PortfolioDetailPage({ params }) {
   const tagline = detail?.hero?.tagline || base.description;
   const overview = detail?.overview || base.description;
 
-  const gallery = Array.isArray(detail?.gallery) && detail.gallery.length
-    ? detail.gallery
-    : [base.coverImage];
+  const gallery =
+    Array.isArray(detail?.gallery) && detail.gallery.length
+      ? detail.gallery
+      : [base.coverImage];
 
   return (
     <main className="relative min-h-screen bg-white text-gray-900">
-      <Header />
-
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
           className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full blur-[140px] opacity-20"
@@ -112,7 +114,8 @@ export default async function PortfolioDetailPage({ params }) {
               {overview}
             </p>
 
-            {Array.isArray(detail?.objectives) && detail.objectives.length ? (
+            {Array.isArray(detail?.objectives) &&
+            detail.objectives.length ? (
               <>
                 <h3 className="mt-10 text-lg font-semibold">Objectives</h3>
                 <ul className="mt-4 space-y-3 text-sm text-gray-600">
@@ -126,13 +129,16 @@ export default async function PortfolioDetailPage({ params }) {
               </>
             ) : null}
 
-            {Array.isArray(detail?.approach) && detail.approach.length ? (
+            {Array.isArray(detail?.approach) &&
+            detail.approach.length ? (
               <>
                 <h3 className="mt-10 text-lg font-semibold">Approach</h3>
                 <div className="mt-4 space-y-6">
                   {detail.approach.map((a) => (
                     <div key={a.title}>
-                      <p className="text-sm font-semibold text-gray-900">{a.title}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {a.title}
+                      </p>
                       <p className="mt-2 text-sm leading-relaxed text-gray-600">
                         {a.description}
                       </p>
@@ -144,26 +150,37 @@ export default async function PortfolioDetailPage({ params }) {
           </div>
 
           <aside className="rounded-3xl border border-black/10 bg-gray-50 p-7">
-            <p className="text-sm font-semibold text-gray-900">Project details</p>
+            <p className="text-sm font-semibold text-gray-900">
+              Project details
+            </p>
 
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
               <li className="flex justify-between gap-6">
                 <span>Category</span>
-                <span className="font-semibold text-gray-900">{base.category}</span>
+                <span className="font-semibold text-gray-900">
+                  {base.category}
+                </span>
               </li>
               <li className="flex justify-between gap-6">
                 <span>Status</span>
-                <span className="font-semibold text-gray-900">Completed</span>
+                <span className="font-semibold text-gray-900">
+                  Completed
+                </span>
               </li>
               <li className="flex justify-between gap-6">
                 <span>Type</span>
-                <span className="font-semibold text-gray-900">Client work</span>
+                <span className="font-semibold text-gray-900">
+                  Client work
+                </span>
               </li>
             </ul>
 
-            {Array.isArray(detail?.deliverables) && detail.deliverables.length ? (
+            {Array.isArray(detail?.deliverables) &&
+            detail.deliverables.length ? (
               <>
-                <p className="mt-8 text-sm font-semibold text-gray-900">Deliverables</p>
+                <p className="mt-8 text-sm font-semibold text-gray-900">
+                  Deliverables
+                </p>
                 <ul className="mt-4 space-y-3 text-sm text-gray-600">
                   {detail.deliverables.map((d) => (
                     <li key={d} className="flex gap-3">
@@ -210,7 +227,8 @@ export default async function PortfolioDetailPage({ params }) {
           </h2>
 
           <p className="mt-4 max-w-2xl text-sm text-white/90">
-            We design and build premium digital experiences with clarity, structure, and conversion in mind.
+            We design and build premium digital experiences with clarity,
+            structure, and conversion in mind.
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -230,8 +248,6 @@ export default async function PortfolioDetailPage({ params }) {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }

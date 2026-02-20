@@ -1,6 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 /* =====================================================
    PORTFOLIO — MODERN, PREMIUM, STATIC
 ===================================================== */
@@ -12,13 +9,13 @@ const BRAND = {
 
 const projects = [
   {
-  slug: "feast-basket-ecommerce",
-  title: "Feast Basket E-commerce Website",
-  category: "Web Development",
-  desc:
-    "A grocery-focused e-commerce platform designed for trust, speed, and seamless ordering.",
-  image: "/portfolio/feast-basket/cover.jpg",
-},
+    slug: "feast-basket-ecommerce",
+    title: "Feast Basket E-commerce Website",
+    category: "Web Development",
+    desc:
+      "A grocery-focused e-commerce platform designed for trust, speed, and seamless ordering.",
+    image: "/portfolio/feast-basket/cover.jpg",
+  },
   {
     slug: "todma-brand-identity",
     title: "TODMA Brand Identity",
@@ -27,40 +24,43 @@ const projects = [
     image: "/portfolio/todma/cover.jpg",
   },
   {
-  slug: "sibgahtullah",
-  title: "Sibgahtullah Foundation",
-  category: "Media & Outreach",
-  desc: "A faith-driven foundation amplified through animation, faceless videos, and modern digital storytelling.",
-  image: "/portfolio/sibgahtullah/logo.jpg",
-},
-
+    slug: "sibgahtullah",
+    title: "Sibgahtullah Foundation",
+    category: "Media & Outreach",
+    desc:
+      "A faith-driven foundation amplified through animation, faceless videos, and modern digital storytelling.",
+    image: "/portfolio/sibgahtullah/logo.jpg",
+  },
   {
-  slug: "tejurolex",
-  title: "Tejurolex Global Consult",
-  category: "Website & SEO",
-  desc: "A professional website and SEO system built to drive visibility, trust, and qualified inquiries for a leading travel and language agency.",
-  image: "/portfolio/tejurolex/logo.jpg",
-},
-
+    slug: "tejurolex",
+    title: "Tejurolex Global Consult",
+    category: "Website & SEO",
+    desc:
+      "A professional website and SEO system built to drive visibility, trust, and qualified inquiries for a leading travel and language agency.",
+    image: "/portfolio/tejurolex/logo.jpg",
+  },
   {
     slug: "marketing-website",
     title: "Marketing Website",
     category: "Web Design",
-    desc: "Professional marketing site built for credibility and clarity.",
+    desc:
+      "Professional marketing site built for credibility and clarity.",
     image: "/portfolio/marketing.png",
   },
   {
     slug: "email-campaign-system",
     title: "Email Campaign System",
     category: "Email Marketing",
-    desc: "Structured email flows focused on retention and engagement.",
+    desc:
+      "Structured email flows focused on retention and engagement.",
     image: "/portfolio/email.png",
   },
   {
     slug: "seo-optimization-project",
     title: "SEO Optimization Project",
     category: "SEO",
-    desc: "Technical and on-page SEO improvements for organic growth.",
+    desc:
+      "Technical and on-page SEO improvements for organic growth.",
     image: "/portfolio/seo.png",
   },
 ];
@@ -68,8 +68,6 @@ const projects = [
 export default function PortfolioPage() {
   return (
     <main className="relative min-h-screen bg-white text-gray-900">
-      <Header />
-
       {/* Background accents */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
@@ -110,21 +108,15 @@ export default function PortfolioPage() {
               href={`/portfolio/${project.slug}`}
               className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_14px_40px_rgba(0,0,0,0.10)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.18)]"
             >
-              {/* Image */}
               <div className="relative h-[240px] overflow-hidden">
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-[800ms] ease-out group-hover:scale-[1.08]"
                   style={{ backgroundImage: `url(${project.image})` }}
                 />
-
-                {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                {/* Accent bar */}
                 <div className="absolute bottom-0 left-0 h-[3px] w-full scale-x-0 bg-[#075a01] transition-transform duration-500 group-hover:scale-x-100 origin-left" />
               </div>
 
-              {/* Content */}
               <div className="relative p-6">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                   {project.category}
@@ -178,8 +170,6 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }
