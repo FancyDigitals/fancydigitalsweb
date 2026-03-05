@@ -12,6 +12,7 @@ const NAV = [
   { label: "Tools", href: "/tools" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export default function Header() {
@@ -31,7 +32,7 @@ export default function Header() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="fixed top-0 left-0 w-full z-50">
       {/* Glass + brand gradient layer */}
       <div className="relative border-b border-black/10 bg-white/70 backdrop-blur-xl">
         {/* Subtle brand glow */}
