@@ -2,9 +2,7 @@ import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import FeaturedTool from "@/components/FeaturedTool";
 import PortfolioPreview from "@/components/PortfolioPreview";
-import ToolsPreview from "@/components/ToolsPreview";
 import FinalCTA from "@/components/FinalCTA";
-import ContactSection from "@/components/ContactSection";
 
 import { homePage } from "@/content/pages/home";
 
@@ -50,27 +48,12 @@ export default function HomePage() {
         />
       </section>
 
-      <section className="relative" id="tools">
-        <ToolsPreview
-          title={homePage.toolsPreview.title}
-          maxItems={homePage.toolsPreview.maxItems}
-        />
-      </section>
-
       <section className="relative">
         <FinalCTA
           title={homePage.finalCTA.title}
           description={homePage.finalCTA.description}
           primaryAction={homePage.finalCTA.primaryAction}
           secondaryAction={homePage.finalCTA.secondaryAction}
-        />
-      </section>
-
-      <section className="relative" id="contact">
-        <ContactSection
-          title={homePage.contactSection.title}
-          description={homePage.contactSection.description}
-          trustNote={homePage.contactSection.trustNote}
         />
       </section>
     </main>

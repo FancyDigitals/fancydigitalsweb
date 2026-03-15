@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 /* =====================================================
    METADATA
@@ -16,185 +15,730 @@ export const metadata = {
 ===================================================== */
 
 export default function TejurolexGlobalConsultCaseStudy() {
+  const galleryImages = [
+    { src: "/portfolio/tejurolex/visual-1.jpg", label: "Homepage Design" },
+    { src: "/portfolio/tejurolex/visual-2.jpg", label: "Services Section" },
+    { src: "/portfolio/tejurolex/visual-3.jpg", label: "SEO Dashboard" },
+  ];
+
+  const objectives = [
+    { text: "Design a professional, trust-driven website", icon: "🌐" },
+    { text: "Improve search engine visibility for travel and language services", icon: "🔍" },
+    { text: "Increase qualified inquiries through SEO", icon: "📈" },
+    { text: "Support long-term digital growth and authority", icon: "🚀" },
+  ];
+
+  const deliverables = [
+    "Custom Website Design",
+    "Responsive Development",
+    "SEO Strategy & Implementation",
+    "Content Optimization",
+    "Performance Optimization",
+    "Analytics Setup",
+  ];
+
+  const process = [
+    {
+      phase: "01",
+      title: "Discovery & Analysis",
+      description: "Researched the travel and education industry, analyzed competitors, and identified key opportunities for Tejurolex's digital presence.",
+    },
+    {
+      phase: "02",
+      title: "Strategy & Planning",
+      description: "Developed a comprehensive website structure and SEO strategy focused on high-intent keywords and local search optimization.",
+    },
+    {
+      phase: "03",
+      title: "Design & Development",
+      description: "Created a professional, trust-building website with clear service presentation, intuitive navigation, and conversion-focused layouts.",
+    },
+    {
+      phase: "04",
+      title: "SEO & Optimization",
+      description: "Implemented technical SEO, on-page optimization, and ongoing content strategy for sustained organic growth and visibility.",
+    },
+  ];
+
   return (
-    <main className="relative min-h-screen bg-white text-gray-900">
+    <main className="relative min-h-screen bg-gradient-to-b from-gray-950 via-[#0a0a0a] to-gray-950 text-white overflow-hidden">
       <Header />
 
-      {/* Ambient background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-48 -left-48 h-[520px] w-[520px] rounded-full bg-[#1e3a8a]/10 blur-[160px]" />
-        <div className="absolute top-32 -right-48 h-[520px] w-[520px] rounded-full bg-[#075a01]/10 blur-[180px]" />
-      </div>
+      {/* Large ambient glows - Blue theme */}
+      <div className="pointer-events-none absolute -top-48 left-1/4 h-[800px] w-[800px] rounded-full bg-[#1e3a8a]/25 blur-[200px] animate-[pulse_8s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute top-1/4 right-0 h-[700px] w-[700px] rounded-full bg-[#075a01]/15 blur-[180px] animate-[pulse_10s_ease-in-out_infinite_2s]" />
+      <div className="pointer-events-none absolute bottom-1/3 -left-32 h-[600px] w-[600px] rounded-full bg-[#1e3a8a]/15 blur-[160px] animate-[pulse_12s_ease-in-out_infinite_1s]" />
+      <div className="pointer-events-none absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#075a01]/10 blur-[140px]" />
 
-      {/* HERO */}
-      <section className="mx-auto max-w-6xl px-5 pt-36 pb-20 md:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-gray-500">
-          Portfolio • Case Study
-        </p>
+      {/* Floating particles */}
+      <div className="pointer-events-none absolute top-32 left-[10%] h-4 w-4 rounded-full bg-[#1e3a8a]/50 animate-[float_5s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute top-48 right-[15%] h-3 w-3 rounded-full bg-[#075a01]/40 animate-[float_7s_ease-in-out_infinite_1s]" />
+      <div className="pointer-events-none absolute top-1/3 left-[5%] h-2 w-2 rounded-full bg-white/20 animate-[float_6s_ease-in-out_infinite_2s]" />
+      <div className="pointer-events-none absolute top-1/2 right-[8%] h-3 w-3 rounded-full bg-[#1e3a8a]/40 animate-[float_8s_ease-in-out_infinite_0.5s]" />
+      <div className="pointer-events-none absolute bottom-1/4 left-[20%] h-2.5 w-2.5 rounded-full bg-[#075a01]/30 animate-[float_9s_ease-in-out_infinite_1.5s]" />
+      <div className="pointer-events-none absolute top-2/3 right-[25%] h-2 w-2 rounded-full bg-white/15 animate-[float_6s_ease-in-out_infinite_3s]" />
 
-        <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">
-          Tejurolex Global Consult
-        </h1>
+      {/* Grid pattern */}
+      <div
+        className="
+          pointer-events-none absolute inset-0 opacity-[0.02]
+          [background-image:linear-gradient(to_right,rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.5)_1px,transparent_1px)]
+          [background-size:60px_60px]
+        "
+      />
 
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-600">
-          A prominent Lagos-based travel agency and language school providing
-          structured international pathways for education, migration, and
-          professional advancement.
-        </p>
+      {/* Radial spotlight */}
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-[800px] w-full bg-[radial-gradient(ellipse_at_top,rgba(30,58,138,0.15),transparent_60%)]" />
+
+      {/* HERO SECTION */}
+      <section className="relative mx-auto max-w-7xl px-5 pt-8 pb-12 md:px-10 md:pt-12">
+        {/* Breadcrumb */}
+        <nav className="mb-10 animate-[fadeIn_0.6s_ease-out]">
+          <div className="inline-flex items-center rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+            <ol className="flex flex-wrap items-center gap-2 text-sm">
+              <li className="flex items-center gap-2">
+                <a href="/" className="group flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                  <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-white/[0.05] border border-white/[0.08] group-hover:bg-[#1e3a8a]/20 group-hover:border-[#1e3a8a]/30 transition-all">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  </span>
+                </a>
+              </li>
+              <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+              <li>
+                <a href="/portfolio" className="text-gray-400 hover:text-white transition-colors">
+                  Portfolio
+                </a>
+              </li>
+              <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+              <li className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1e3a8a] opacity-50"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-gradient-to-r from-[#1e3a8a] to-[#3b82f6]"></span>
+                </span>
+                <span className="font-semibold text-white">Tejurolex Global Consult</span>
+              </li>
+            </ol>
+          </div>
+        </nav>
+
+        {/* Hero Content */}
+        <div className="relative animate-[fadeUp_1s_ease-out]">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10">
+            {/* Left side - Main content */}
+            <div className="max-w-2xl">
+              {/* Category & Type badges */}
+              <div className="flex flex-wrap items-center gap-3 mb-8">
+                <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#1e3a8a]/20 to-[#1e3a8a]/10 backdrop-blur-sm px-4 py-2 border border-[#1e3a8a]/30 shadow-[0_0_20px_rgba(30,58,138,0.2)]">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1e3a8a] opacity-60"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-gradient-to-r from-[#1e3a8a] to-[#3b82f6]"></span>
+                  </span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-300">
+                    Case Study
+                  </span>
+                </div>
+                
+                <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#075a01]/20 to-[#075a01]/10 backdrop-blur-sm px-4 py-2 border border-[#075a01]/30">
+                  <svg className="w-3.5 h-3.5 text-[#0a9001]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  </svg>
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-300">
+                    Website & SEO
+                  </span>
+                </div>
+              </div>
+
+              {/* Title with gradient */}
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
+                <span className="block bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                  Tejurolex
+                </span>
+                <span className="block mt-1 bg-gradient-to-r from-[#3b82f6] via-[#0a9001] to-[#3b82f6] bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient_6s_ease-in-out_infinite]">
+                  Global Consult
+                </span>
+              </h1>
+
+              {/* Description */}
+              <p className="text-base sm:text-lg md:text-xl text-gray-400 leading-relaxed max-w-xl">
+                A prominent Lagos-based travel agency and language school providing
+                structured international pathways for education, migration, and
+                professional advancement.
+              </p>
+            </div>
+
+            {/* Right side - Quick info card */}
+            <div className="lg:w-[320px] animate-[fadeUp_1s_ease-out_0.2s_both]">
+              <div className="relative group">
+                <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-br from-[#1e3a8a]/40 via-[#075a01]/30 to-[#1e3a8a]/40 opacity-60" />
+                
+                <div className="relative rounded-[23px] bg-gradient-to-br from-gray-900/95 to-gray-950/95 backdrop-blur-xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] shadow-[0_4px_15px_rgba(30,58,138,0.4)]">
+                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Active Project</p>
+                      <p className="text-xs text-gray-500">Ongoing partnership</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {[
+                      { label: "Industry", value: "Travel & Education", color: "text-[#3b82f6]" },
+                      { label: "Scope", value: "Website & SEO", color: "text-[#0a9001]" },
+                      { label: "Status", value: "Ongoing", color: "text-white" },
+                    ].map((item, index) => (
+                      <div key={index} className="flex justify-between items-center py-2 border-b border-white/[0.06] last:border-0">
+                        <span className="text-sm text-gray-500">{item.label}</span>
+                        <span className={`text-sm font-semibold ${item.color}`}>{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* HERO IMAGE */}
-      <section className="mx-auto max-w-6xl px-5 pb-20 md:px-10">
-        <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-[0_24px_70px_rgba(0,0,0,0.1)]">
+      <section className="relative mx-auto max-w-7xl px-5 pb-20 md:px-10 animate-[fadeUp_1s_ease-out_0.3s_both]">
+        <div className="group relative">
+          {/* Outer glow */}
+          <div className="absolute -inset-4 rounded-[40px] bg-gradient-to-r from-[#1e3a8a]/20 via-[#075a01]/15 to-[#1e3a8a]/20 opacity-60 blur-2xl" />
+          
+          {/* Frame border */}
+          <div className="absolute -inset-[2px] rounded-[36px] bg-gradient-to-br from-[#1e3a8a]/50 via-[#075a01]/40 to-[#1e3a8a]/50 opacity-80" />
+
           <div
-            className="h-[420px] bg-cover bg-center md:h-[520px]"
-            style={{
-              backgroundImage:
-                "url(/portfolio/tejurolex/cover.jpg)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            className="
+              relative overflow-hidden rounded-[34px]
+              bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900
+              shadow-[0_40px_120px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)]
+            "
+          >
+            {/* Image */}
+            <div
+              className="
+                h-[350px] sm:h-[450px] md:h-[550px] lg:h-[650px]
+                bg-cover bg-center
+                transition-transform duration-[2s] ease-out
+                group-hover:scale-105
+              "
+              style={{ backgroundImage: "url(/portfolio/tejurolex/cover.jpg)" }}
+            />
+
+            {/* Gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent opacity-70" />
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-950/40 via-transparent to-gray-950/40" />
+
+            {/* Grid texture */}
+            <div
+              className="
+                pointer-events-none absolute inset-0 opacity-[0.03]
+                [background-image:linear-gradient(to_right,rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,1)_1px,transparent_1px)]
+                [background-size:50px_50px]
+              "
+            />
+
+            {/* Corner frames */}
+            <svg className="absolute top-6 left-6 w-12 h-12 text-white/20 transition-all duration-500 group-hover:text-white/40 group-hover:scale-110 z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M0 10V0h10" />
+              <circle cx="10" cy="10" r="2" fill="currentColor" />
+            </svg>
+            <svg className="absolute top-6 right-6 w-12 h-12 text-white/20 transition-all duration-500 group-hover:text-white/40 group-hover:scale-110 z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M24 10V0h-10" />
+              <circle cx="14" cy="10" r="2" fill="currentColor" />
+            </svg>
+            <svg className="absolute bottom-6 left-6 w-12 h-12 text-white/20 transition-all duration-500 group-hover:text-white/40 group-hover:scale-110 z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M0 14v10h10" />
+              <circle cx="10" cy="14" r="2" fill="currentColor" />
+            </svg>
+            <svg className="absolute bottom-6 right-6 w-12 h-12 text-white/20 transition-all duration-500 group-hover:text-white/40 group-hover:scale-110 z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M24 14v10h-10" />
+              <circle cx="14" cy="14" r="2" fill="currentColor" />
+            </svg>
+
+            {/* Bottom info strip */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 z-10 bg-gradient-to-t from-gray-950/90 to-transparent">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  {/* Brand mark */}
+                  <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] shadow-[0_8px_30px_rgba(30,58,138,0.5)] border border-white/10">
+                    <span className="text-xl font-bold text-white">T</span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wider">Client</p>
+                    <p className="text-lg font-bold text-white">Tejurolex Global</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-white">
+                    <span className="h-2 w-2 rounded-full bg-[#3b82f6] animate-pulse" />
+                    Active Partnership
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* OVERVIEW */}
-      <section className="mx-auto max-w-6xl px-5 pb-24 md:px-10">
-        <div className="grid gap-14 lg:grid-cols-[1.3fr_0.7fr]">
-          <div>
-            <h2 className="text-2xl font-semibold">Project overview</h2>
+      {/* OVERVIEW SECTION */}
+      <section className="relative mx-auto max-w-7xl px-5 pb-24 md:px-10">
+        <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
+          {/* Main content */}
+          <div className="animate-[fadeUp_1s_ease-out_0.4s_both]">
+            {/* Section header */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1e3a8a]/20 to-[#1e3a8a]/10 border border-[#1e3a8a]/30 shadow-[0_0_30px_rgba(30,58,138,0.2)]">
+                <svg className="w-7 h-7 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white">Project Overview</h2>
+                <p className="text-sm text-gray-500">The vision and scope</p>
+              </div>
+            </div>
 
-            <p className="mt-6 max-w-2xl text-sm leading-relaxed text-gray-600">
-  Tejurolex Global Consult is a well-established travel agency and language
-  training institution based in Lagos, Nigeria. Founded by Mr. Olalekan
-  Arowosaye, the organization provides structured services for international
-  travel, study abroad, visa processing, and language proficiency programs.
-</p>
+            {/* Overview card */}
+            <div className="relative p-8 rounded-3xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">
+              <div className="absolute top-0 left-0 h-32 w-32 bg-gradient-to-br from-[#1e3a8a]/10 to-transparent rounded-tl-3xl" />
+              
+              <div className="relative space-y-6 text-base md:text-lg leading-relaxed text-gray-300">
+                <p>
+                  Tejurolex Global Consult is a well-established <span className="text-white font-semibold">travel agency</span> and <span className="text-[#3b82f6] font-semibold">language training institution</span> based in Lagos, Nigeria. Founded by <span className="text-[#0a9001] font-semibold">Mr. Olalekan Arowosaye</span>, the organization provides structured services for international travel, study abroad, visa processing, and language proficiency programs.
+                </p>
+                <p>
+                  Fancy Digitals was responsible for the design, development, and ongoing SEO strategy of the Tejurolex Global Consult website — ensuring strong online visibility, clear service presentation, and consistent lead generation through search.
+                </p>
+              </div>
 
-<p className="mt-4 max-w-2xl text-sm leading-relaxed text-gray-600">
-  Fancy Digitals was responsible for the design, development, and ongoing SEO
-  strategy of the Tejurolex Global Consult website ensuring strong online
-  visibility, clear service presentation, and consistent lead generation
-  through search.
-</p>
-
+              {/* Highlight stats */}
+              <div className="mt-10 grid grid-cols-3 gap-4">
+                {[
+                  { value: "↑ 180%", label: "Organic Traffic" },
+                  { value: "Top 10", label: "Keyword Rankings" },
+                  { value: "24/7", label: "Lead Generation" },
+                ].map((stat, index) => (
+                  <div key={index} className="text-center p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                    <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#3b82f6] to-[#0a9001] bg-clip-text text-transparent">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <aside className="rounded-3xl border border-black/10 bg-gray-50 p-6">
-            <p className="text-sm font-semibold text-gray-900">
-              Project snapshot
-            </p>
+          {/* Sidebar - Deliverables */}
+          <div className="animate-[fadeUp_1s_ease-out_0.5s_both]">
+            <div className="sticky top-8">
+              <div className="relative group">
+                <div className="absolute -inset-[1px] rounded-3xl bg-gradient-to-br from-[#075a01]/40 via-transparent to-[#1e3a8a]/40 opacity-60" />
+                
+                <div className="relative rounded-[23px] bg-gradient-to-br from-gray-900/95 to-gray-950/95 backdrop-blur-xl p-7 shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#075a01] to-[#0a9001] shadow-[0_4px_15px_rgba(7,90,1,0.4)]">
+                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Deliverables</h3>
+                  </div>
 
-            <ul className="mt-4 space-y-3 text-sm text-gray-600">
-  <li className="flex justify-between">
-    <span>Industry</span>
-    <span className="font-semibold text-gray-900">
-      Travel & Education
-    </span>
-  </li>
-  <li className="flex justify-between">
-    <span>Founder</span>
-    <span className="font-semibold text-gray-900">
-      Mr. Olalekan Arowosaye
-    </span>
-  </li>
-  <li className="flex justify-between">
-    <span>Scope</span>
-    <span className="font-semibold text-gray-900">
-      Website & SEO
-    </span>
-  </li>
-  <li className="flex justify-between">
-    <span>Status</span>
-    <span className="font-semibold text-gray-900">
-      Ongoing
-    </span>
-  </li>
-</ul>
+                  <ul className="space-y-3">
+                    {deliverables.map((item, index) => (
+                      <li
+                        key={index}
+                        className="
+                          group/item flex items-center gap-3 p-3 rounded-xl
+                          bg-white/[0.02] border border-white/[0.04]
+                          transition-all duration-300
+                          hover:bg-white/[0.05] hover:border-white/[0.08]
+                        "
+                      >
+                        <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg bg-[#0a9001]/20 text-[#0a9001] text-xs font-bold">
+                          ✓
+                        </span>
+                        <span className="text-sm text-gray-300 group-hover/item:text-white transition-colors">
+                          {item}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
 
-          </aside>
+                  {/* Founder info */}
+                  <div className="mt-6 pt-6 border-t border-white/[0.06]">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Founder</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-[#1e3a8a]/20 to-[#1e3a8a]/10 border border-[#1e3a8a]/30">
+                        <svg className="w-5 h-5 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">Mr. Olalekan Arowosaye</p>
+                        <p className="text-xs text-gray-500">CEO & Founder</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* OBJECTIVES */}
-      <section className="mx-auto max-w-6xl px-5 pb-24 md:px-10">
-        <h2 className="text-2xl font-semibold">Project objectives</h2>
+      {/* OBJECTIVES SECTION */}
+      <section className="relative mx-auto max-w-7xl px-5 pb-24 md:px-10 animate-[fadeUp_1s_ease-out_0.5s_both]">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#075a01]/20 to-[#075a01]/10 border border-[#075a01]/30 shadow-[0_0_30px_rgba(7,90,1,0.2)]">
+            <svg className="w-7 h-7 text-[#0a9001]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">Project Objectives</h2>
+            <p className="text-sm text-gray-500">What we aimed to achieve</p>
+          </div>
+        </div>
 
-        <ul className="mt-8 max-w-3xl space-y-3 text-sm text-gray-600">
-          {[
-  "Design a professional, trust-driven website",
-  "Improve search engine visibility for travel and language services",
-  "Increase qualified inquiries through SEO",
-  "Support long-term digital growth and authority",
-].map((item) => (
-  <li key={item} className="flex gap-3">
-    <span className="mt-[6px] h-2 w-2 rounded-full bg-[#1e3a8a]" />
-    <span>{item}</span>
-  </li>
-))}
-
-        </ul>
-      </section>
-
-      {/* GALLERY */}
-      <section className="mx-auto max-w-6xl px-5 pb-28 md:px-10">
-        <h2 className="text-2xl font-semibold">Website & SEO visuals</h2>
-
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            "/portfolio/tejurolex/visual-1.jpg",
-            "/portfolio/tejurolex/visual-2.jpg",
-            "/portfolio/tejurolex/visual-3.jpg",
-          ].map((img) => (
+        <div className="grid gap-5 sm:grid-cols-2">
+          {objectives.map((item, index) => (
             <div
-              key={img}
-              className="relative overflow-hidden rounded-2xl border border-black/10 shadow-[0_14px_40px_rgba(0,0,0,0.08)]"
+              key={index}
+              className="
+                group relative flex items-start gap-5 p-6 rounded-3xl
+                bg-white/[0.02] border border-white/[0.06]
+                backdrop-blur-sm
+                transition-all duration-500
+                hover:bg-white/[0.05] hover:border-white/[0.12]
+                hover:-translate-y-2
+                hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]
+              "
             >
-              <div
-                className="h-[220px] bg-cover bg-center transition-transform duration-700 hover:scale-[1.05]"
-                style={{ backgroundImage: `url(${img})` }}
-              />
+              {/* Gradient glow on hover */}
+              <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-[#1e3a8a]/20 to-[#075a01]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              <span className="relative flex-shrink-0 flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] text-white text-2xl shadow-[0_8px_25px_rgba(30,58,138,0.4)] group-hover:scale-110 transition-transform duration-500">
+                {item.icon}
+              </span>
+              
+              <div className="relative flex-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2 block">
+                  Objective {String(index + 1).padStart(2, "0")}
+                </span>
+                <p className="text-base md:text-lg font-medium text-gray-200 group-hover:text-white transition-colors">
+                  {item.text}
+                </p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-6xl px-5 pb-32 md:px-10">
-        <div
-          className="rounded-3xl p-12 text-white shadow-[0_26px_80px_rgba(0,0,0,0.18)]"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(30,58,138,1) 0%, rgba(30,58,138,0.95) 55%, rgba(7,90,1,0.35) 100%)",
-          }}
-        >
-          <h2 className="max-w-2xl text-2xl font-semibold md:text-3xl">
-            Need a trusted travel or education partner?
-          </h2>
+      {/* PROCESS SECTION */}
+      <section className="relative mx-auto max-w-7xl px-5 pb-24 md:px-10 animate-[fadeUp_1s_ease-out_0.6s_both]">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1e3a8a]/20 via-[#075a01]/10 to-[#075a01]/20 border border-white/10 shadow-[0_0_30px_rgba(30,58,138,0.15)]">
+            <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">Our Process</h2>
+            <p className="text-sm text-gray-500">How we brought it to life</p>
+          </div>
+        </div>
 
-          <p className="mt-4 max-w-2xl text-sm text-white/90">
-            Fancy Digitals helps agencies and institutions present their services
-            with clarity, credibility, and global appeal.
-          </p>
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="absolute left-7 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#1e3a8a] via-[#075a01] to-[#1e3a8a] opacity-30" />
 
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-            <a
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#1e3a8a]"
-            >
-              Work with us
-            </a>
+          <div className="space-y-8">
+            {process.map((step, index) => (
+              <div
+                key={index}
+                className={`
+                  relative flex flex-col md:flex-row gap-8
+                  ${index % 2 === 1 ? "md:flex-row-reverse" : ""}
+                `}
+              >
+                {/* Timeline dot */}
+                <div className="absolute left-7 md:left-1/2 -translate-x-1/2 top-0 z-10">
+                  <div className="relative flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] text-white text-lg font-bold shadow-[0_0_30px_rgba(30,58,138,0.5)] border-4 border-gray-950">
+                    {step.phase}
+                  </div>
+                </div>
 
-            <a
-              href="/portfolio"
-              className="inline-flex items-center justify-center rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white"
-            >
-              Back to portfolio
-            </a>
+                {/* Content card */}
+                <div className={`
+                  flex-1 ml-20 md:ml-0
+                  ${index % 2 === 0 ? "md:pr-16 md:text-right" : "md:pl-16"}
+                `}>
+                  <div
+                    className="
+                      group p-6 rounded-3xl
+                      bg-white/[0.02] border border-white/[0.06]
+                      backdrop-blur-sm
+                      transition-all duration-500
+                      hover:bg-white/[0.05] hover:border-white/[0.12]
+                      hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]
+                    "
+                  >
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#3b82f6] transition-colors">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-gray-400 group-hover:text-gray-300 transition-colors">
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Spacer for alternate layout */}
+                <div className="hidden md:block flex-1" />
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <Footer />
+      {/* GALLERY SECTION */}
+      <section className="relative mx-auto max-w-7xl px-5 pb-28 md:px-10 animate-[fadeUp_1s_ease-out_0.7s_both]">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-[#075a01]/20 to-[#075a01]/10 border border-[#075a01]/30 shadow-[0_0_30px_rgba(7,90,1,0.2)]">
+            <svg className="w-7 h-7 text-[#0a9001]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">Website & SEO Visuals</h2>
+            <p className="text-sm text-gray-500">The complete digital presence</p>
+          </div>
+        </div>
+
+        {/* Gallery grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {galleryImages.map((img, index) => (
+            <div
+              key={index}
+              className={`
+                group relative overflow-hidden rounded-3xl
+                bg-white/[0.02] border border-white/[0.06]
+                shadow-[0_20px_50px_rgba(0,0,0,0.3)]
+                transition-all duration-700
+                hover:-translate-y-2
+                hover:shadow-[0_30px_70px_rgba(0,0,0,0.4),0_0_40px_rgba(30,58,138,0.15)]
+                hover:border-white/[0.12]
+                cursor-pointer
+              `}
+            >
+              <div
+                className="
+                  h-[260px] bg-cover bg-center
+                  transition-all duration-[1200ms] ease-out
+                  group-hover:scale-110
+                "
+                style={{ backgroundImage: `url(${img.src})` }}
+              />
+
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-500" />
+
+              {/* Hover overlay with zoom icon */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 bg-black/30 backdrop-blur-sm">
+                <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-white/20 border border-white/30 backdrop-blur-md transform scale-75 group-hover:scale-100 transition-transform duration-500">
+                  <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Label */}
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/10 text-xs font-bold text-white">
+                    {img.label}
+                  </span>
+                  <span className="px-2 py-1 rounded-md bg-white/10 backdrop-blur-md text-[10px] font-bold text-white/70">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Corner accent */}
+              <svg className="absolute top-4 right-4 w-6 h-6 text-white/20 group-hover:text-white/40 transition-colors duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M24 8V0h-8" />
+              </svg>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA SECTION - Blue theme */}
+      <section className="relative mx-auto max-w-7xl px-5 pb-32 md:px-10 animate-[fadeUp_1s_ease-out_0.8s_both]">
+        <div className="group relative">
+          {/* Outer glow */}
+          <div className="absolute -inset-6 rounded-[48px] bg-gradient-to-r from-[#1e3a8a]/30 via-[#075a01]/25 to-[#1e3a8a]/30 opacity-60 blur-3xl animate-[pulse_5s_ease-in-out_infinite]" />
+          
+          {/* Animated border */}
+          <div className="absolute -inset-[3px] rounded-[44px] bg-gradient-to-br from-[#1e3a8a] via-[#075a01] to-[#1e3a8a] opacity-80 animate-[gradient_5s_ease-in-out_infinite] bg-[length:200%_200%]" />
+
+          <div
+            className="
+              relative overflow-hidden rounded-[41px]
+              bg-gradient-to-br from-[#1e3a8a] via-[#1e3a8a]/95 to-[#0f172a]
+              px-8 py-14 md:px-16 md:py-20
+              shadow-[0_40px_100px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)]
+            "
+          >
+            {/* Inner glows */}
+            <div className="pointer-events-none absolute -top-32 -left-32 h-[400px] w-[400px] rounded-full bg-white/[0.08] blur-[100px]" />
+            <div className="pointer-events-none absolute -bottom-32 -right-32 h-[350px] w-[350px] rounded-full bg-[#075a01]/20 blur-[120px]" />
+
+            {/* Pattern */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.03] [background-image:linear-gradient(to_right,rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,1)_1px,transparent_1px)] [background-size:40px_40px]" />
+
+            {/* Corner frames */}
+            <svg className="absolute top-8 left-8 w-10 h-10 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+              <path d="M0 10V0h10" />
+            </svg>
+            <svg className="absolute top-8 right-8 w-10 h-10 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+              <path d="M24 10V0h-10" />
+            </svg>
+            <svg className="absolute bottom-8 left-8 w-10 h-10 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+              <path d="M0 14v10h10" />
+            </svg>
+            <svg className="absolute bottom-8 right-8 w-10 h-10 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+              <path d="M24 14v10h-10" />
+            </svg>
+
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
+              <div className="max-w-xl">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 mb-6 border border-white/20">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-50"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-white"></span>
+                  </span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-white/90">
+                    Global Reach
+                  </span>
+                </div>
+
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4">
+                  Need a trusted digital partner?
+                </h2>
+
+                <p className="text-base text-white/80 leading-relaxed">
+                  Fancy Digitals helps agencies and institutions present their services
+                  with clarity, credibility, and global appeal.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="/contact"
+                  className="
+                    group/btn relative inline-flex items-center justify-center
+                    rounded-xl bg-white
+                    px-8 py-4
+                    text-base font-bold text-[#1e3a8a]
+                    shadow-[0_15px_40px_rgba(0,0,0,0.2)]
+                    transition-all duration-300
+                    hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]
+                    hover:scale-105
+                    active:scale-95
+                    overflow-hidden
+                  "
+                >
+                  <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-[#1e3a8a]/10 to-transparent skew-x-12" />
+                  <span className="relative flex items-center gap-2">
+                    Work with Us
+                    <svg className="w-5 h-5 transition-transform duration-300 group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </a>
+
+                <a
+                  href="/portfolio"
+                  className="
+                    inline-flex items-center justify-center
+                    rounded-xl border-2 border-white/30 bg-white/5
+                    px-8 py-4
+                    text-base font-bold text-white
+                    transition-all duration-300
+                    hover:bg-white/15 hover:border-white/50
+                    hover:scale-105
+                    active:scale-95
+                  "
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Portfolio
+                </a>
+              </div>
+            </div>
+
+            {/* Animated bottom line */}
+            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3b82f6] via-white to-[#0a9001] bg-[length:200%_100%] animate-[gradient_4s_linear_infinite] rounded-b-[41px]" />
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom decorative */}
+      <div className="pb-16 flex justify-center">
+        <div className="flex items-center gap-4">
+          <div className="h-px w-20 bg-gradient-to-r from-transparent to-white/20" />
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-[#1e3a8a] animate-pulse" />
+            <div className="h-3 w-3 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#0a9001] animate-pulse" style={{ animationDelay: '0.2s' }} />
+            <div className="h-2 w-2 rounded-full bg-[#0a9001] animate-pulse" style={{ animationDelay: '0.4s' }} />
+          </div>
+          <div className="h-px w-20 bg-gradient-to-l from-transparent to-white/20" />
+        </div>
+      </div>
+
+      {/* CSS animations */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.5; }
+          50% { transform: translateY(-25px) rotate(180deg) scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.05); }
+        }
+
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </main>
   );
 }
