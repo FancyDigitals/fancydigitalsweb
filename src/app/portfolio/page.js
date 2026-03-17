@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect, useMemo } from "react";
 import { getPortfolio } from "@/lib/wordpress";
 
 /* =====================================================
@@ -20,8 +22,42 @@ const stats = [
   { value: "3x", label: "Average ROI" },
 ];
 
-export default async function PortfolioPage() {
-  const wpProjects = await getPortfolio();
+export default function PortfolioPage() {
+  // State management
+  const [projects, setProjects] = useState([]);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch projects on mount
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const wpProjects = await getPortfolio();
+        setProjects(wpProjects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchProjects();
+  }, []);
+
+  // Filter projects based on active category
+  const normalize = (str) => str?.toLowerCase().trim();
+
+const filteredProjects = useMemo(() => {
+  if (activeCategory === "All") return projects;
+
+  return projects.filter((project) => {
+    const categories =
+      project._embedded?.["wp:term"]?.[0]?.map((term) =>
+        normalize(term.name)
+      ) || [];
+
+    return categories.includes(normalize(activeCategory));
+  });
+}, [projects, activeCategory]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
@@ -171,27 +207,40 @@ export default async function PortfolioPage() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-wrap justify-center gap-3">
             {categories.map((category, index) => (
-              <button
-                key={category.name}
-                className={`group flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 ${
-                  index === 0
-                    ? "bg-gradient-to-r from-[#075a01] to-[#0a8f01] text-white shadow-lg shadow-[#075a01]/25"
-                    : "border-2 border-gray-100 bg-white text-gray-600 hover:border-[#075a01]/20 hover:bg-[#075a01]/5 hover:text-[#075a01]"
-                }`}
-              >
-                <span className="text-base">{category.icon}</span>
-                <span>{category.name}</span>
-              </button>
-            ))}
+  <button
+    key={category.name}
+    onClick={() => setActiveCategory(category.name)}
+    className={`group flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-300 ${
+      activeCategory === category.name
+        ? "bg-gradient-to-r from-[#075a01] to-[#0a8f01] text-white shadow-lg shadow-[#075a01]/25"
+        : "border-2 border-gray-100 bg-white text-gray-600 hover:border-[#075a01]/20 hover:bg-[#075a01]/5 hover:text-[#075a01]"
+    }`}
+  >
+    <span className="text-base">{category.icon}</span>
+    <span>{category.name}</span>
+  </button>
+))}
           </div>
         </div>
       </section>
 
       {/* PORTFOLIO GRID */}
       <section className="relative px-5 pb-24 md:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {wpProjects.map((project, index) => {
+  <div className="mx-auto max-w-7xl">
+    {isLoading ? (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-[#075a01]"></div>
+      </div>
+    ) : filteredProjects.length === 0 ? (
+      <div className="py-20 text-center">
+        <p className="text-lg text-gray-500">No projects found in this category.</p>
+      </div>
+    ) : (
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredProjects.map((project, index) => {
+
+          const projectCategories =
+  project._embedded?.["wp:term"]?.[0]?.map((term) => term.name) || [];
               const image =
                 project._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
               const title = project.title?.rendered || "";
@@ -215,12 +264,12 @@ export default async function PortfolioPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent opacity-60" />
 
                       {/* Category badge */}
-                      <div className="absolute left-4 top-4">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#075a01]"></span>
-                          Web Development
-                        </span>
-                      </div>
+<div className="absolute left-4 top-4">
+  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
+    <span className="h-1.5 w-1.5 rounded-full bg-[#075a01]"></span>
+    {projectCategories[0] || "Uncategorized"}
+  </span>
+</div>
 
                       {/* Hover overlay with icon */}
                       <div className="absolute inset-0 flex items-center justify-center bg-[#075a01]/80 opacity-0 transition-all duration-300 group-hover:opacity-100">
@@ -291,6 +340,7 @@ export default async function PortfolioPage() {
               );
             })}
           </div>
+        )}
 
           {/* Load more button */}
           <div className="mt-16 flex justify-center">
