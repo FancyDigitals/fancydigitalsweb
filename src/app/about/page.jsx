@@ -18,8 +18,8 @@ const founder = {
 };
 
 const experience = [
-  { years: 7, label: "Digital Experience", icon: "💡" },
-  { years: 6, label: "Frontend Engineering", icon: "⚡" },
+  { years: 11, label: "Digital Experience", icon: "💡" },
+  { years: 7, label: "Frontend Engineering", icon: "⚡" },
   { years: 5, label: "Product Design", icon: "🎨" },
   { years: 4, label: "System Architecture", icon: "🏗️" },
   { years: 3, label: "Agency Leadership", icon: "🚀" },
@@ -55,7 +55,7 @@ const clientTypes = [
 
 const journey = [
   {
-    year: "2017",
+    year: "2015",
     title: "Started in Digital",
     desc: "Began exploring web design and development as a self-taught enthusiast.",
     icon: "🌱",
@@ -67,13 +67,13 @@ const journey = [
     icon: "💼",
   },
   {
-    year: "2021",
+    year: "2020",
     title: "Freelance Journey",
     desc: "Launched independent practice, working directly with founders and brands.",
     icon: "🚀",
   },
   {
-    year: "2023",
+    year: "2022",
     title: "Founded Fancy Digitals",
     desc: "Established the studio to deliver premium, systems-focused digital work.",
     icon: "⭐",
@@ -259,7 +259,7 @@ export default function AboutPage() {
                 {/* Floating badges */}
                 <div className="absolute -bottom-4 -right-4 rounded-2xl border-2 border-white bg-white px-5 py-4 shadow-xl md:-right-8">
                   <p className="bg-gradient-to-r from-[#075a01] to-[#ff914d] bg-clip-text text-3xl font-bold text-transparent">
-                    7+
+                    10+
                   </p>
                   <p className="text-xs font-medium text-gray-500">Years Exp.</p>
                 </div>
@@ -471,11 +471,6 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl">
           {/* Section header */}
           <div className="mb-12 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#ff914d]/10 px-4 py-2">
-              <span className="text-sm font-semibold text-[#ff914d]">
-                Core Values
-              </span>
-            </div>
             <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
               What drives my work
             </h2>
