@@ -255,24 +255,6 @@ export default async function PortfolioPreview() {
           })}
         </ul>
 
-        {/* Stats Row */}
-        <div className="mt-16 grid grid-cols-2 gap-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:grid-cols-4 md:p-8">
-          {[
-            { value: "50+", label: "Projects Completed", icon: "📁" },
-            { value: "98%", label: "Client Satisfaction", icon: "⭐" },
-            { value: "15+", label: "Industries Served", icon: "🎯" },
-            { value: "3x", label: "Average ROI", icon: "📈" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="mb-2 text-2xl">{stat.icon}</div>
-              <p className="bg-gradient-to-r from-[#075a01] to-[#ff914d] bg-clip-text text-2xl font-bold text-transparent md:text-3xl">
-                {stat.value}
-              </p>
-              <p className="text-xs text-gray-500 md:text-sm">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-
         {/* CTA */}
         <div className="relative mt-12 flex flex-col items-center gap-6 md:mt-16 md:flex-row md:justify-center">
           {/* Primary CTA */}
