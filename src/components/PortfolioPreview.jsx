@@ -359,7 +359,7 @@ export default async function PortfolioPreview() {
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300" />
                 <div>
                   <p className="font-semibold text-gray-900">Happy Client</p>
-                  <p className="text-sm text-gray-500">CEO, TechStart</p>
+                  <p className="text-sm text-gray-500">CEO, FeastBasket</p>
                 </div>
               </div>
             </div>

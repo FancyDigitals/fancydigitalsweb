@@ -175,19 +175,6 @@ export default function ToolsPage() {
             </div>
           </nav>
 
-          {/* Badge */}
-          <div className="mb-8 flex justify-center">
-            <div className="group inline-flex items-center gap-3 rounded-full border border-[#075a01]/20 bg-white px-5 py-2.5 shadow-lg shadow-[#075a01]/5 transition-all duration-300 hover:border-[#075a01]/30 hover:shadow-xl">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#075a01] opacity-75"></span>
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#075a01]"></span>
-              </span>
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">
-                Free Digital Tools
-              </span>
-            </div>
-          </div>
-
           {/* Main headline */}
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
@@ -211,28 +198,6 @@ export default function ToolsPage() {
               <span className="font-semibold text-gray-900">branding</span> and{" "}
               <span className="font-semibold text-gray-900">launches</span>.
             </p>
-          </div>
-
-          {/* Quick stats */}
-          <div className="mx-auto mt-12 grid max-w-3xl grid-cols-3 gap-4">
-            {[
-              { value: "6+", label: "Free Tools", icon: "🛠️" },
-              { value: "100%", label: "Free Forever", icon: "🎁" },
-              { value: "0", label: "Sign-up Required", icon: "🚫" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="group rounded-2xl border border-gray-100 bg-white p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#075a01]/20 hover:shadow-lg"
-              >
-                <span className="mb-2 block text-2xl">{stat.icon}</span>
-                <p className="bg-gradient-to-r from-[#075a01] to-[#ff914d] bg-clip-text text-2xl font-bold text-transparent md:text-3xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-xs text-gray-500 md:text-sm">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

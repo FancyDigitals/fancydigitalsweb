@@ -219,19 +219,6 @@ export default function ServicesPage() {
             </div>
           </nav>
 
-          {/* Badge */}
-          <div className="mb-8 flex justify-center">
-            <div className="group inline-flex items-center gap-3 rounded-full border border-[#075a01]/20 bg-white px-5 py-2.5 shadow-lg shadow-[#075a01]/5 transition-all duration-300 hover:border-[#075a01]/30 hover:shadow-xl">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#075a01] opacity-75"></span>
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#075a01]"></span>
-              </span>
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-600">
-                Our Services
-              </span>
-            </div>
-          </div>
-
           {/* Main headline */}
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl lg:text-6xl">

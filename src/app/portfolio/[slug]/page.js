@@ -1,3 +1,5 @@
+"use client";
+
 import { getPortfolio } from "@/lib/wordpress";
 import Link from "next/link";
 import GalleryWithModal from "@/components/GalleryWithModal";
@@ -7,6 +9,30 @@ export default async function PortfolioSingle({ params }) {
   const { slug } = await params;
   const project = projects.find(p => p.slug === slug);
   console.log(project);
+
+  const shareProject = async (type) => {
+  const url = window.location.href;
+  const text = "Check out this project on my portfolio";
+
+  if (type === "twitter") {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+      "_blank"
+    );
+  }
+
+  if (type === "linkedin") {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+      "_blank"
+    );
+  }
+
+  if (type === "copy") {
+    await navigator.clipboard.writeText(url);
+    alert("Link copied");
+  }
+};
 
   if (!project) {
     return (
@@ -189,30 +215,6 @@ export default async function PortfolioSingle({ params }) {
         </div>
       </section>
 
-
-      {/* ==================== ELEGANT STATS ==================== */}
-      <section className="relative z-20 -mt-10 max-w-7xl mx-auto px-6 lg:px-12 mb-20">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 md:p-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { value: "6", label: "Weeks", desc: "Delivery Time", color: "#4e9559" },
-              { value: "+180%", label: "", desc: "Traffic Growth", color: "#f6b05a" },
-              { value: "100%", label: "", desc: "Client Satisfaction", color: "#4e9559" },
-              { value: "98", label: "/100", desc: "Performance Score", color: "#f6b05a" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center group hover:scale-105 transition-transform duration-300">
-                <div className="flex items-baseline justify-center mb-2">
-                  <span className="text-4xl md:text-5xl font-bold" style={{ color: stat.color }}>{stat.value}</span>
-                  <span className="text-lg font-semibold text-gray-400 ml-1">{stat.label}</span>
-                </div>
-                <p className="text-sm font-medium text-gray-600">{stat.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
       {/* ==================== OVERVIEW - Sophisticated ==================== */}
       <section className="py-20 bg-gradient-to-b from-white to-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -252,62 +254,6 @@ export default async function PortfolioSingle({ params }) {
                   <p className="text-sm text-gray-500">{card.desc}</p>
                 </div>
               ))}
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* ==================== CHALLENGE & SOLUTION - Refined ==================== */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid md:grid-cols-2 gap-8">
-
-            {/* Challenge */}
-            <div className="relative p-8 bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-100 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-red-100/50 rounded-full blur-3xl" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center mb-6">
-                  <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">The Challenge</h3>
-                <p className="text-gray-600 mb-6">The existing platform faced significant issues impacting user engagement and business goals.</p>
-                <ul className="space-y-3">
-                  {["Poor user experience", "Slow performance", "Low conversion rates", "Outdated technology"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-gray-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                      <span className="text-sm font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Solution */}
-            <div className="relative p-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-100 overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[#4e9559]/10 rounded-full blur-3xl" />
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-[#4e9559]/10 flex items-center justify-center mb-6">
-                  <svg className="w-6 h-6 text-[#4e9559]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Solution</h3>
-                <p className="text-gray-600 mb-6">A comprehensive redesign focused on performance, usability, and modern web standards.</p>
-                <ul className="space-y-3">
-                  {["Modern, intuitive interface", "Optimized performance", "Conversion-focused design", "Latest technologies"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-gray-700">
-                      <svg className="w-5 h-5 text-[#4e9559] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
 
           </div>
@@ -362,8 +308,7 @@ export default async function PortfolioSingle({ params }) {
                     {[
                       { label: "Client", value: client },
                       { label: "Year", value: year },
-                      { label: "Category", value: project.type || "Web Development" },
-                      { label: "Duration", value: "6 Weeks" },
+                      { label: "Category", value: project.type || "Web Development" }
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
                         <span className="text-sm text-gray-600">{item.label}</span>
@@ -377,15 +322,34 @@ export default async function PortfolioSingle({ params }) {
                 <div className="p-6 bg-slate-50 rounded-2xl border border-gray-100">
                   <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Share Project</h3>
                   <div className="flex gap-2">
-                    {[
-                      { icon: "𝕏", bg: "bg-gray-800" },
-                      { icon: "in", bg: "bg-blue-600" },
-                      { icon: "🔗", bg: "bg-[#4e9559]" }
-                    ].map((btn, i) => (
-                      <button key={i} className={`w-10 h-10 rounded-xl ${btn.bg} flex items-center justify-center text-white font-bold hover:scale-110 transition-transform shadow-sm`}>
-                        {btn.icon}
-                      </button>
-                    ))}
+                    <div className="p-6 bg-slate-50 rounded-2xl border border-gray-100">
+  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+    Share Project
+  </h3>
+
+  <div className="flex gap-2">
+    <button
+      onClick={() => shareProject("twitter")}
+      className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-white font-bold hover:scale-110 transition-transform shadow-sm"
+    >
+      𝕏
+    </button>
+
+    <button
+      onClick={() => shareProject("linkedin")}
+      className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold hover:scale-110 transition-transform shadow-sm"
+    >
+      in
+    </button>
+
+    <button
+      onClick={() => shareProject("copy")}
+      className="w-10 h-10 rounded-xl bg-[#4e9559] flex items-center justify-center text-white font-bold hover:scale-110 transition-transform shadow-sm"
+    >
+      🔗
+    </button>
+  </div>
+</div>
                   </div>
                 </div>
               </div>
@@ -452,86 +416,6 @@ export default async function PortfolioSingle({ params }) {
           )}
         </div>
       </section>
-
-
-      {/* ==================== RESULTS - Clean Stats ==================== */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-[#4e9559]/10 text-[#4e9559] rounded-full text-sm font-semibold mb-4">
-              Results
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Measurable Impact</h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { before: "2.5s", after: "0.8s", label: "Load Time", change: "68% faster", color: "#f6b05a" },
-              { before: "1.2%", after: "4.8%", label: "Conversion Rate", change: "300% increase", color: "#4e9559" },
-              { before: "45", after: "98", label: "Performance Score", change: "118% improvement", color: "#f6b05a" },
-            ].map((item, i) => (
-              <div key={i} className="p-8 bg-slate-50 rounded-2xl border border-gray-100 text-center hover:shadow-lg transition-shadow">
-                <div className="flex items-center justify-center gap-4 mb-4">
-                  <div>
-                    <p className="text-xs text-gray-500 font-medium mb-1">Before</p>
-                    <p className="text-xl font-bold text-gray-400 line-through">{item.before}</p>
-                  </div>
-                  <svg className="w-6 h-6" style={{ color: item.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                  <div>
-                    <p className="text-xs text-gray-500 font-medium mb-1">After</p>
-                    <p className="text-2xl font-bold" style={{ color: item.color }}>{item.after}</p>
-                  </div>
-                </div>
-                <p className="font-semibold text-gray-900 mb-2">{item.label}</p>
-                <span className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold" style={{ backgroundColor: `${item.color}15`, color: item.color }}>
-                  {item.change}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* ==================== TESTIMONIAL - Elegant ==================== */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-12">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 md:p-14 text-center">
-
-            <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-[#4e9559] to-[#f6b05a] flex items-center justify-center mb-8">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-              </svg>
-            </div>
-
-            <div className="flex gap-1 justify-center mb-6">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-5 h-5 text-[#f6b05a]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-
-            <blockquote className="text-2xl md:text-3xl font-semibold text-gray-900 leading-relaxed mb-8">
-              "Exceptional work that exceeded all our expectations. The attention to detail and professionalism is outstanding."
-            </blockquote>
-
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4e9559] to-[#f6b05a] flex items-center justify-center text-white text-lg font-bold">
-                {client.charAt(0)}
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-gray-900">{client}</p>
-                <p className="text-sm text-gray-500">Project Lead</p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
 
       {/* ==================== CTA - Premium ==================== */}
       <section className="py-20 bg-white">
