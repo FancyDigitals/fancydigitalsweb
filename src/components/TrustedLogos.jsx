@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
-
 export default function TrustedLogos() {
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const logos = [
     { src: "/logos/al-amanah.jpg", name: "Partner 1" },
