@@ -92,11 +92,6 @@ const BENEFITS = [
     icon: "📐",
   },
   {
-    title: "Completely Free",
-    desc: "All tools are free to use — no sign-up required, no hidden costs.",
-    icon: "🎁",
-  },
-  {
     title: "Always Improving",
     desc: "We continuously update tools based on feedback and best practices.",
     icon: "🔄",
@@ -180,7 +175,7 @@ export default function ToolsPage() {
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
               Practical tools built to
               <span className="relative mx-2 mt-3 block">
-                <span className="bg-gradient-to-r from-[#075a01] via-[#ff914d] to-[#0ea5e9] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#075a01] via-[#075a01] to-[#075a01] bg-clip-text text-transparent">
                   save time
                 </span>
                 <span className="mx-2 text-gray-900">&</span>
@@ -192,7 +187,7 @@ export default function ToolsPage() {
 
             <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl">
               These tools are designed to remove guesswork from common digital
-              decisions — from{" "}
+              decisions from{" "}
               <span className="font-semibold text-gray-900">marketing</span> and{" "}
               <span className="font-semibold text-gray-900">SEO</span> to{" "}
               <span className="font-semibold text-gray-900">branding</span> and{" "}
@@ -520,14 +515,14 @@ export default function ToolsPage() {
         <div className="mx-auto max-w-7xl">
           {/* Section header */}
           <div className="mb-12 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#0ea5e9]/10 px-4 py-2">
-              <span className="text-sm font-semibold text-[#0ea5e9]">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#075a01]/10 px-4 py-2">
+              <span className="text-sm font-semibold text-[#075a01]">
                 How It Works
               </span>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
               Get results in{" "}
-              <span className="text-[#0ea5e9]">3 simple steps</span>
+              <span className="text-[#075a01]">3 simple steps</span>
             </h2>
           </div>
 
@@ -554,18 +549,18 @@ export default function ToolsPage() {
             ].map((item, idx) => (
               <div
                 key={item.step}
-                className="group relative rounded-2xl border-2 border-gray-100 bg-white p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#0ea5e9]/20 hover:shadow-xl"
+                className="group relative rounded-2xl border-2 border-gray-100 bg-white p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-[#075a01]/20 hover:shadow-xl"
               >
                 {/* Connector line */}
                 {idx < 2 && (
-                  <div className="absolute -right-4 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-[#0ea5e9]/30 to-transparent md:block" />
+                  <div className="absolute -right-4 top-1/2 hidden h-0.5 w-8 bg-gradient-to-r from-[#075a01]/30 to-transparent md:block" />
                 )}
 
-                <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#0ea5e9]">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#075a01]">
                   Step {item.step}
                 </span>
 
-                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0ea5e9]/10 text-3xl transition-all duration-300 group-hover:scale-110 group-hover:bg-[#0ea5e9] group-hover:shadow-lg">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#075a01]/10 text-3xl transition-all duration-300 group-hover:scale-110 group-hover:bg-[#075a01] group-hover:shadow-lg">
                   <span className="transition-all group-hover:grayscale-0 group-hover:brightness-0 group-hover:invert">
                     {item.icon}
                   </span>

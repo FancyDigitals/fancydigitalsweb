@@ -93,6 +93,39 @@ const SERVICES = [
     color: "from-[#ff914d] to-[#075a01]",
     lightColor: "from-[#ff914d]/10 to-[#075a01]/10",
   },
+  {
+  title: "AI Automation",
+  focus: "Efficiency, scalability, and smart systems",
+  description:
+    "We implement AI-powered systems that automate repetitive tasks, improve response time, and streamline operations. The goal is to reduce manual work while increasing speed, accuracy, and scalability.",
+  includes: [
+    "AI chatbot integration",
+    "Workflow automation systems",
+    "Smart response handling",
+    "Process optimization",
+    "Automation strategy setup",
+  ],
+  icon: "🤖",
+  color: "from-[#075a01] to-[#0a8f01]",
+  lightColor: "from-[#075a01]/10 to-[#0a8f01]/10",
+},
+
+{
+  title: "Social Media Management (SMM)",
+  focus: "Consistency, growth, and engagement",
+  description:
+    "We manage and grow your social presence with structured content, consistent branding, and performance-driven execution designed to increase visibility and audience engagement.",
+  includes: [
+    "Content planning and strategy",
+    "Post design and scheduling",
+    "Audience engagement",
+    "Growth optimization",
+    "Brand consistency across platforms",
+  ],
+  icon: "📱",
+  color: "from-[#ff914d] to-[#ff6b1a]",
+  lightColor: "from-[#ff914d]/10 to-[#ff6b1a]/10",
+},
 ];
 
 const APPROACH = [

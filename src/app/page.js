@@ -3,6 +3,7 @@ import Services from "@/components/Services";
 import FeaturedTool from "@/components/FeaturedTool";
 import PortfolioPreview from "@/components/PortfolioPreview";
 import FinalCTA from "@/components/FinalCTA";
+import TrustedLogos from "@/components/TrustedLogos";
 
 import { homePage } from "@/content/pages/home";
 
@@ -34,6 +35,7 @@ export default function HomePage() {
           items={homePage.servicesPreview.items}
         />
       </section>
+      <TrustedLogos />
 
       {homePage.featuredTool.enabled && (
         <section className="relative">

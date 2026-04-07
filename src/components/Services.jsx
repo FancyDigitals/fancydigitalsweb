@@ -196,30 +196,7 @@ export default function ServicesPreview() {
             </li>
           ))}
         </ul>
-
-        {/* Feature highlights */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { icon: "⚡", label: "Fast Delivery", desc: "Quick turnaround times" },
-            { icon: "💎", label: "Premium Quality", desc: "Top-tier execution" },
-            { icon: "🔄", label: "Unlimited Revisions", desc: "Until you're satisfied" },
-            { icon: "🛡️", label: "100% Secure", desc: "Your data is safe" },
-          ].map((feature) => (
-            <div
-              key={feature.label}
-              className="group flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#075a01]/20 hover:shadow-lg"
-            >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#075a01]/10 to-[#ff914d]/10 text-2xl transition-transform duration-300 group-hover:scale-110">
-                {feature.icon}
-              </span>
-              <div>
-                <p className="font-bold text-gray-900">{feature.label}</p>
-                <p className="text-sm text-gray-500">{feature.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
+        
         {/* CTA Button */}
         <div className="relative mt-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
