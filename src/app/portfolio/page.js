@@ -1,18 +1,55 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { getPortfolio } from "@/lib/wordpress";
+import { WebIcon, EmailIcon, SEOIcon, DesignIcon } from "@/components/icons/ServiceIcons";
 
 /* =====================================================
    PORTFOLIO PAGE — BRIGHT, CREATIVE, PREMIUM
 ===================================================== */
 
 const categories = [
-  { name: "All", icon: "✨" },
-  { name: "Web Development", icon: "🌐" },
-  { name: "Graphics Design", icon: "🎨" },
-  { name: "SEO", icon: "📈" },
-  { name: "Email Marketing", icon: "📧" },
-  { name: "Media & Outreach", icon: "📣" },
+  {
+    name: "All",
+    icon: (
+      <span className="text-lg">✨</span>
+    ),
+  },
+  {
+    name: "Web Development",
+    icon: <WebIcon />,
+  },
+  {
+    name: "Graphics Design",
+    icon: <DesignIcon />,
+  },
+  {
+    name: "SEO Services",
+    icon: <SEOIcon />,
+  },
+  {
+    name: "Email Marketing",
+    icon: <EmailIcon />,
+  },
+  {
+    name: "Media & Outreach",
+    icon: (
+      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 12H20"
+          stroke="#075a01"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M14 6L20 12L14 18"
+          stroke="#ff914d"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
 ];
 
 const stats = [

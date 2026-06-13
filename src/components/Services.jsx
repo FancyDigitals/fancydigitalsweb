@@ -4,35 +4,81 @@
 
 export default function ServicesPreview() {
   const SERVICES = [
-    {
-      title: "Web Design & Development",
-      desc: "High-performance websites built with clarity, speed, and long-term scalability in mind.",
-      icon: "🌐",
-      emoji: "💻",
-      gradient: "from-[#075a01] to-[#0a8f01]",
-      lightGradient: "from-[#075a01]/10 to-[#0a8f01]/10",
-      delay: "0s",
-    },
-    {
-      title: "Brand Identity & Design",
-      desc: "Cohesive brand systems that communicate trust, consistency, and authority.",
-      icon: "🎨",
-      emoji: "✨",
-      gradient: "from-[#ff914d] to-[#ff6b1a]",
-      lightGradient: "from-[#ff914d]/10 to-[#ff6b1a]/10",
-      delay: "0.1s",
-    },
-    {
-      title: "UI / UX Design",
-      desc: "User-centered interfaces engineered for usability, clarity, and conversion.",
-      icon: "🎯",
-      emoji: "💡",
-      gradient: "from-[#075a01] via-[#0a8f01] to-[#ff914d]",
-      lightGradient: "from-[#075a01]/10 via-[#0a8f01]/10 to-[#ff914d]/10",
-      delay: "0.2s",
-    },
-  ];
-
+  {
+    title: "Web Design & Development",
+    desc: "High-performance websites built with clarity, speed, and long-term scalability in mind.",
+    icon: (
+      <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none">
+        <rect
+          x="3"
+          y="4"
+          width="18"
+          height="14"
+          rx="2"
+          stroke="#075a01"
+          strokeWidth="2"
+        />
+        <path
+          d="M8 20H16"
+          stroke="#ff914d"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M12 18V20"
+          stroke="#ff914d"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+    gradient: "from-[#075a01] to-[#0a8f01]",
+    lightGradient: "from-[#075a01]/10 to-[#0a8f01]/10",
+    delay: "0s",
+  },
+  {
+    title: "Brand Identity & Design",
+    desc: "Cohesive brand systems that communicate trust, consistency, and authority.",
+    icon: (
+      <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="#075a01" strokeWidth="2" />
+        <path
+          d="M12 3V21"
+          stroke="#ff914d"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M3 12H21"
+          stroke="#ff914d"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+    gradient: "from-[#ff914d] to-[#ff6b1a]",
+    lightGradient: "from-[#ff914d]/10 to-[#ff6b1a]/10",
+    delay: "0.1s",
+  },
+  {
+    title: "UI / UX Design",
+    desc: "User-centered interfaces engineered for usability, clarity, and conversion.",
+    icon: (
+      <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 6H20M4 12H20M4 18H20"
+          stroke="#075a01"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <circle cx="8" cy="12" r="2" fill="#ff914d" />
+      </svg>
+    ),
+    gradient: "from-[#075a01] via-[#0a8f01] to-[#ff914d]",
+    lightGradient: "from-[#075a01]/10 via-[#0a8f01]/10 to-[#ff914d]/10",
+    delay: "0.2s",
+  },
+];
   return (
     <section
       aria-labelledby="services-heading"
@@ -136,14 +182,9 @@ export default function ServicesPreview() {
                     <div
                       className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${service.lightGradient} text-3xl transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg`}
                     >
-                      <span
-                        className={`transition-all duration-300 group-hover:scale-110`}
-                        style={{
-                          filter: "grayscale(0)",
-                        }}
-                      >
-                        {service.icon}
-                      </span>
+                      <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#075a01]/10 to-[#ff914d]/10 group-hover:scale-110 transition">
+  {service.icon}
+</span>
                     </div>
 
                     {/* Number badge */}
@@ -196,7 +237,7 @@ export default function ServicesPreview() {
             </li>
           ))}
         </ul>
-        
+
         {/* CTA Button */}
         <div className="relative mt-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a

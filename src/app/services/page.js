@@ -8,6 +8,7 @@ export const metadata = {
     "A structured overview of the services offered by Fancy Digitals, outlining scope, focus, and delivery philosophy.",
 };
 
+import { WebIcon, EmailIcon, SEOIcon, DesignIcon } from "../../components/icons/ServiceIcons";
 /* =====================================================
    SERVICES DATA
 ===================================================== */

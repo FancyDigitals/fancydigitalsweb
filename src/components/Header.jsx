@@ -7,7 +7,15 @@ import { useEffect, useState } from "react";
 ===================================================== */
 
 const NAV = [
-  { label: "Services", href: "/services" },
+  {
+    label: "Services",
+    children: [
+      { label: "SEO Services", href: "/seo-services-nigeria" },
+      { label: "Web Development", href: "/web-development-nigeria" },
+      { label: "Email Marketing", href: "/email-marketing-nigeria" },
+      { label: "Graphics Design", href: "/graphics-design-nigeria" },
+    ],
+  },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Tools", href: "/tools" },
   { label: "About", href: "/about" },
@@ -96,22 +104,45 @@ export default function Header() {
 
           {/* DESKTOP NAV */}
           <nav className="hidden items-center gap-1 lg:flex">
-            {NAV.map((item) => (
+  {NAV.map((item, i) => (
+    <div key={i} className="relative group">
+
+      {/* MAIN LINK */}
+      {item.href ? (
+        <a
+          href={item.href}
+          className="px-4 py-2.5 text-sm font-semibold text-gray-600 hover:text-[#075a01]"
+        >
+          {item.label}
+        </a>
+      ) : (
+        <span className="px-4 py-2.5 text-sm font-semibold text-gray-600 cursor-pointer group-hover:text-[#075a01]">
+          {item.label}
+        </span>
+      )}
+
+      {/* DROPDOWN */}
+      {item.children && (
+        <div className="absolute left-0 top-full mt-2 w-64 rounded-2xl bg-white shadow-xl border opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-300">
+
+          <div className="p-3 space-y-1">
+            {item.children.map((sub, j) => (
               <a
-                key={item.label}
-                href={item.href}
-                className="group relative px-4 py-2.5 text-sm font-semibold text-gray-600 transition-all duration-300 hover:text-[#075a01]"
+                key={j}
+                href={sub.href}
+                className="block px-4 py-3 rounded-xl text-sm text-gray-700 hover:bg-gray-50 hover:text-[#075a01] transition"
               >
-                <span className="relative z-10">{item.label}</span>
-                {/* Hover background */}
-                <div className="absolute inset-0 scale-90 rounded-xl bg-[#075a01]/5 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
-                {/* Active indicator */}
-                <div className="absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#075a01] to-[#ff914d] transition-all duration-300 group-hover:w-6" />
-                {/* Floating dot on hover */}
-                <div className="absolute -right-1 top-1 h-1.5 w-1.5 scale-0 rounded-full bg-[#ff914d] transition-transform duration-300 group-hover:scale-100" />
+                {sub.label}
               </a>
             ))}
-          </nav>
+          </div>
+
+        </div>
+      )}
+
+    </div>
+  ))}
+</nav>
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden items-center gap-3 lg:flex">
@@ -239,28 +270,41 @@ export default function Header() {
           <div className="relative px-4 py-6">
             <nav className="space-y-1">
               {NAV.map((item, i) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="group flex items-center justify-between rounded-xl px-4 py-4 transition-all duration-300 hover:bg-gradient-to-r hover:from-[#075a01]/5 hover:to-transparent"
-                  style={{
-                    transitionDelay: menuOpen ? `${i * 50}ms` : "0ms",
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 transition-all duration-300 group-hover:from-[#075a01]/10 group-hover:to-[#ff914d]/10">
-                      <div className="h-1.5 w-1.5 rounded-full bg-[#075a01]/40 transition-all duration-300 group-hover:bg-[#075a01]" />
-                    </div>
-                    <span className="text-base font-semibold text-gray-700 transition-colors group-hover:text-[#075a01]">
-                      {item.label}
-                    </span>
-                  </div>
-                  <svg className="h-4 w-4 text-gray-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-[#075a01]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              ))}
+  <div key={i}>
+
+    {/* MAIN ITEM */}
+    {item.href ? (
+      <a
+        href={item.href}
+        onClick={() => setMenuOpen(false)}
+        className="block px-4 py-4 text-base font-semibold text-gray-700"
+      >
+        {item.label}
+      </a>
+    ) : (
+      <div className="px-4 py-4 text-base font-semibold text-gray-900">
+        {item.label}
+      </div>
+    )}
+
+    {/* SUBMENU */}
+    {item.children && (
+      <div className="pl-6 pb-2 space-y-1">
+        {item.children.map((sub, j) => (
+          <a
+            key={j}
+            href={sub.href}
+            onClick={() => setMenuOpen(false)}
+            className="block px-4 py-2 text-sm text-gray-600 hover:text-[#075a01]"
+          >
+            {sub.label}
+          </a>
+        ))}
+      </div>
+    )}
+
+  </div>
+))}
             </nav>
 
             {/* Divider */}
