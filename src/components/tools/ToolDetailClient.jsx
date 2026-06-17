@@ -52,20 +52,22 @@ export default function ToolDetailClient({ slug, defaultIndex }) {
     return (
       <main className="min-h-screen bg-white">
         <Header />
-        <section className="mx-auto max-w-6xl px-5 pt-40 md:px-10">
-          <h1 className="text-3xl font-semibold">Tool not found</h1>
-          <p className="mt-3 text-sm text-gray-600">
-            {hydrated
-              ? "This tool does not exist or is unpublished."
-              : "Loading tool data…"}
-          </p>
-          <Link
-            href="/tools"
-            className="mt-6 inline-block text-sm font-semibold text-[#075a01]"
-          >
-            ← Back to tools
-          </Link>
-        </section>
+        {/* TOOL INTERFACE OR IMAGE */}
+<section className="mx-auto max-w-6xl px-5 pb-20 md:px-10">
+  {tool.isRealTool ? (
+    <div className="mt-10">
+       {/* If we build more tools, we switch them here */}
+       {tool.slug === "seo-meta-tag-generator" && <SEOMetaGenerator />}
+    </div>
+  ) : (
+    <div className="relative h-[420px] overflow-hidden rounded-3xl border border-black/10 bg-gray-50 shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
+      <div
+        className="absolute inset-0 bg-contain bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${tool.image || "/tools/placeholder.png"})` }}
+      />
+    </div>
+  )}
+</section>
         <Footer />
       </main>
     );

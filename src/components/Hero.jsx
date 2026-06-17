@@ -1,10 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-/* =====================================================
-   HERO — BRIGHT, CREATIVE, STUNNING
-===================================================== */
+import {
+  Globe,
+  Palette,
+  TrendingUp,
+  Wrench,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Images,
+} from "lucide-react";
 
 export default function Hero({
   slides = [
@@ -27,435 +33,221 @@ export default function Hero({
   if (!slides.length) return null;
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
-      {/* Decorative Background Elements */}
+    <section className="relative min-h-screen overflow-hidden bg-[#050a0f]">
+
+      {/* ── Noise texture ── */}
+      <div className="pointer-events-none absolute inset-0 opacity-[0.03] [background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E')]" />
+
+      {/* ── Glow orbs ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Large gradient blobs */}
-        <div className="absolute -left-40 -top-40 h-[700px] w-[700px] animate-pulse rounded-full bg-[#075a01]/10 blur-[120px]" />
-        <div className="absolute -right-40 top-1/4 h-[600px] w-[600px] animate-pulse rounded-full bg-[#ff914d]/10 blur-[100px]" />
-        <div className="absolute bottom-0 left-1/3 h-[500px] w-[500px] animate-pulse rounded-full bg-[#075a01]/5 blur-[80px]" />
-        <div className="absolute -bottom-40 right-0 h-[600px] w-[600px] animate-pulse rounded-full bg-[#ff914d]/8 blur-[100px]" />
-
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-[size:50px_50px]" />
-
-        {/* Radial light burst */}
-        <div className="absolute left-1/2 top-0 h-[800px] w-full -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(7,90,1,0.08),transparent_50%)]" />
-
-        {/* Floating shapes */}
-        <div className="absolute left-[5%] top-24 h-4 w-4 animate-bounce rounded-full bg-[#075a01]/30" />
-        <div
-          className="absolute right-[10%] top-32 h-5 w-5 animate-bounce rounded-full border-2 border-[#ff914d]/30"
-          style={{ animationDelay: "0.3s" }}
-        />
-        <div
-          className="absolute left-[15%] top-[40%] h-3 w-3 animate-bounce rounded-full bg-[#ff914d]/25"
-          style={{ animationDelay: "0.7s" }}
-        />
-        <div
-          className="absolute right-[20%] top-[30%] h-6 w-6 rotate-45 animate-pulse rounded-lg border-2 border-dashed border-[#075a01]/20"
-          style={{ animationDelay: "0.5s" }}
-        />
-        <div
-          className="absolute bottom-[30%] left-[8%] h-4 w-4 animate-bounce rounded-full bg-[#075a01]/20"
-          style={{ animationDelay: "1s" }}
-        />
-        <div
-          className="absolute bottom-[40%] right-[12%] h-3 w-3 animate-bounce rounded-full bg-[#ff914d]/20"
-          style={{ animationDelay: "1.2s" }}
-        />
-
-        {/* Decorative lines */}
-        <div className="absolute left-0 top-1/4 h-px w-32 bg-gradient-to-r from-transparent via-[#075a01]/20 to-transparent" />
-        <div className="absolute right-0 top-1/3 h-px w-40 bg-gradient-to-r from-transparent via-[#ff914d]/20 to-transparent" />
+        <div className="absolute -top-40 left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-[#075a01] opacity-[0.07] blur-[120px] md:-top-60 md:h-[700px] md:w-[700px] md:blur-[140px]" />
+        <div className="absolute top-1/3 -left-20 h-[300px] w-[300px] rounded-full bg-[#075a01] opacity-[0.05] blur-[100px] md:-left-40 md:h-[500px] md:w-[500px] md:blur-[120px]" />
+        <div className="absolute top-1/4 -right-20 h-[300px] w-[300px] rounded-full bg-[#ff914d] opacity-[0.05] blur-[100px] md:-right-40 md:h-[500px] md:w-[500px] md:blur-[120px]" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-28 md:px-10 md:pt-32 lg:pt-36">
+      {/* ── Top border ── */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#075a01]/60 to-transparent" />
 
-        {/* Main headline */}
-        <div className="mx-auto mb-12 max-w-5xl text-center">
-          <h1 className="text-4xl font-bold leading-tight tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-7xl">
-            <span className="block">Where Vision Meets</span>
-            <span className="relative mt-2 block">
-              <span className="bg-gradient-to-r from-[#075a01] via-[#ff914d] to-[#075a01] bg-[length:200%_auto] bg-clip-text text-transparent">
-                Digital Excellence
-              </span>
-              {/* Decorative underline */}
-              <svg
-                className="absolute -bottom-4 left-1/2 w-64 -translate-x-1/2 md:w-80"
-                viewBox="0 0 300 12"
-                fill="none"
-              >
-                <path
-                  d="M2 10C60 4 240 4 298 10"
-                  stroke="url(#hero-underline)"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-                <defs>
-                  <linearGradient
-                    id="hero-underline"
-                    x1="0"
-                    y1="0"
-                    x2="300"
-                    y2="0"
-                  >
-                    <stop stopColor="#075a01" />
-                    <stop offset="0.5" stopColor="#ff914d" />
-                    <stop offset="1" stopColor="#075a01" />
-                  </linearGradient>
-                </defs>
-              </svg>
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-28 md:px-10 md:pb-24 md:pt-36 lg:pt-40">
+
+        {/* ── Eyebrow ── */}
+        <div className="mb-6 flex justify-center sm:mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm sm:gap-2.5 sm:px-5 sm:py-2">
+            <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#075a01] opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#075a01] sm:h-2 sm:w-2" />
             </span>
-          </h1>
-
-          <p className="mx-auto mt-10 max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl">
-            We craft{" "}
-            <span className="font-semibold text-gray-900">
-              premium digital experiences
-            </span>{" "}
-            that captivate, convert, and inspire —{" "}
-            <span className="font-semibold text-gray-900">
-              websites, brands, and systems
-            </span>{" "}
-            built for long-term success.
-          </p>
-        </div>
-
-        {/* Trust indicators */}
-        <div className="mb-12 flex flex-wrap items-center justify-center gap-6 md:gap-10">
-          {[
-            { value: "50+", label: "Projects" },
-            { value: "98%", label: "Satisfaction" },
-            { value: "7+", label: "Years" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="bg-gradient-to-r from-[#075a01] to-[#ff914d] bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
-                {stat.value}
-              </p>
-              <p className="text-sm text-gray-500">{stat.label}</p>
-            </div>
-          ))}
-
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className="h-10 w-10 rounded-full border-2 border-white bg-gradient-to-br from-gray-200 to-gray-300 shadow-sm"
-                />
-              ))}
-            </div>
-            <div className="text-left">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <svg
-                    key={i}
-                    className="h-4 w-4 text-[#ff914d]"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500">Trusted by brands</p>
-            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/60 sm:text-xs sm:tracking-[0.2em]">
+              Digital Agency · Nigeria
+            </span>
           </div>
         </div>
 
-        {/* Creative Slider Frame */}
+        {/* ── Headline ── */}
+        <div className="mx-auto mb-6 max-w-4xl text-center sm:mb-8">
+          <h1 className="text-4xl font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+            <span className="block text-white/90">Where Vision</span>
+            <span className="block bg-gradient-to-r from-[#075a01] via-[#4ade80] to-[#ff914d] bg-clip-text text-transparent">
+              Meets Excellence
+            </span>
+          </h1>
+        </div>
+
+        {/* ── Subheadline ── */}
+        <p className="mx-auto mb-10 max-w-sm text-center text-sm leading-relaxed text-white/40 sm:max-w-lg sm:text-base md:mb-12 md:max-w-xl md:text-lg">
+          Premium websites, brands, and digital systems —
+          built for founders and businesses who demand clarity and performance.
+        </p>
+
+        {/* ── CTA Buttons ── */}
+        <div className="mb-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4 md:mb-20">
+          <a
+            href="/contact"
+            className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#075a01] px-7 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#0a8f01] hover:shadow-[0_0_40px_rgba(7,90,1,0.4)] sm:w-auto sm:px-8 sm:py-4"
+          >
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            <span className="relative">Start Your Project</span>
+            <ArrowRight className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </a>
+
+          <a
+            href="/portfolio"
+            className="inline-flex w-full items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white sm:w-auto sm:px-8 sm:py-4"
+          >
+            View Portfolio
+            <Images className="h-4 w-4" />
+          </a>
+        </div>
+
+        {/* ── Slider ── */}
         <div
-          className="group relative mx-auto max-w-6xl"
+          className="group relative mx-auto max-w-5xl"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* Outer decorative frame */}
-          <div className="absolute -inset-4 rounded-[40px] bg-gradient-to-r from-[#075a01]/20 via-[#ff914d]/20 to-[#075a01]/20 opacity-50 blur-2xl transition-all duration-700 group-hover:opacity-80" />
+          {/* Glow */}
+          <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-[#075a01]/40 via-[#ff914d]/20 to-[#075a01]/40 opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-100 md:rounded-[28px]" />
 
-          {/* Animated border */}
-          <div className="absolute -inset-[3px] rounded-[36px] bg-gradient-to-r from-[#075a01] via-[#ff914d] to-[#075a01] bg-[length:200%_100%] opacity-60 transition-all duration-500 group-hover:opacity-100" />
+          {/* Border */}
+          <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-[#075a01]/30 via-white/5 to-[#ff914d]/20 md:rounded-[28px]" />
 
-          {/* Main slider container */}
-          <div className="relative overflow-hidden rounded-[33px] border-4 border-white bg-white shadow-2xl shadow-gray-200/50 transition-all duration-500 group-hover:shadow-[0_40px_100px_rgba(7,90,1,0.15)]">
-            {/* Slides container */}
-            <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50">
+          {/* Container */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#0a1015] md:rounded-[26px]">
+            <div className="relative aspect-[4/3] sm:aspect-[16/9]">
               {slides.map((src, index) => (
                 <div
                   key={src}
                   className={`absolute inset-0 transition-all duration-1000 ease-out ${
                     index === currentSlide
-                      ? "scale-100 opacity-100"
-                      : "scale-105 opacity-0"
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-[1.02]"
                   }`}
                 >
                   <img
                     src={src}
                     alt={`Slide ${index + 1}`}
                     loading={index === 0 ? "eager" : "lazy"}
-                    className="h-full w-full object-cover transition-transform duration-[3s] ease-out group-hover:scale-[1.02]"
+                    className="h-full w-full object-cover sm:object-cover object-contain bg-[#0a1015]"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
                 </div>
               ))}
 
-              {/* Gradient overlay */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-
-              {/* Grid pattern overlay */}
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-[size:40px_40px] opacity-50" />
-
-              {/* Corner frames */}
-              <svg
-                className="absolute left-6 top-6 h-10 w-10 text-white/60 transition-all duration-500 group-hover:text-white/90"
-                viewBox="0 0 40 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M0 15V0h15" />
+              {/* Corner frames — hidden on very small screens */}
+              <svg className="absolute left-3 top-3 h-6 w-6 text-white/30 sm:left-5 sm:top-5 sm:h-8 sm:w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M0 12V0h12" />
               </svg>
-              <svg
-                className="absolute right-6 top-6 h-10 w-10 text-white/60 transition-all duration-500 group-hover:text-white/90"
-                viewBox="0 0 40 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M40 15V0h-15" />
+              <svg className="absolute right-3 top-3 h-6 w-6 text-white/30 sm:right-5 sm:top-5 sm:h-8 sm:w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M32 12V0H20" />
               </svg>
-              <svg
-                className="absolute bottom-6 left-6 h-10 w-10 text-white/60 transition-all duration-500 group-hover:text-white/90"
-                viewBox="0 0 40 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M0 25v15h15" />
+              <svg className="absolute bottom-3 left-3 h-6 w-6 text-white/30 sm:bottom-5 sm:left-5 sm:h-8 sm:w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M0 20v12h12" />
               </svg>
-              <svg
-                className="absolute bottom-6 right-6 h-10 w-10 text-white/60 transition-all duration-500 group-hover:text-white/90"
-                viewBox="0 0 40 40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M40 25v15h-15" />
+              <svg className="absolute bottom-3 right-3 h-6 w-6 text-white/30 sm:bottom-5 sm:right-5 sm:h-8 sm:w-8" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M32 20v12H20" />
               </svg>
 
-              {/* Play button overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-full border-4 border-white/80 bg-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/30">
-                  <svg
-                    className="ml-1 h-8 w-8 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
+              {/* Slide counter */}
+              <div className="absolute left-3 top-3 rounded-md border border-white/10 bg-black/40 px-2 py-1 backdrop-blur-sm sm:left-5 sm:top-5 sm:px-3 sm:py-1.5">
+                <span className="font-mono text-[10px] font-medium text-white/60 sm:text-xs">
+                  {String(currentSlide + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+                </span>
+              </div>
+
+              {/* Nav arrows */}
+              <button
+                onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+                className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-black/60 hover:text-white sm:left-4 sm:h-10 sm:w-10"
+              >
+                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+              <button
+                onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-black/60 hover:text-white sm:right-4 sm:h-10 sm:w-10"
+              >
+                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+              </button>
+
+              {/* Dots */}
+              <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 sm:bottom-5 sm:gap-1.5">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`rounded-full transition-all duration-300 ${
+                      index === currentSlide
+                        ? "h-1 w-5 bg-white sm:h-1.5 sm:w-6"
+                        : "h-1 w-1 bg-white/30 hover:bg-white/60 sm:h-1.5 sm:w-1.5"
+                    }`}
+                  />
+                ))}
               </div>
             </div>
 
             {/* Progress bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gray-100">
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-white/5">
               <div
-                className="h-full bg-gradient-to-r from-[#075a01] via-[#ff914d] to-[#075a01] transition-all duration-500 ease-out"
-                style={{
-                  width: `${((currentSlide + 1) / slides.length) * 100}%`,
-                }}
+                className="h-full bg-gradient-to-r from-[#075a01] to-[#ff914d] transition-all duration-500 ease-out"
+                style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
               />
-            </div>
-
-            {/* Slide indicators */}
-            <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === currentSlide
-                      ? "w-8 bg-gradient-to-r from-[#075a01] to-[#ff914d]"
-                      : "w-2 bg-white/60 hover:bg-white"
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Navigation arrows */}
-            <button
-              onClick={() =>
-                setCurrentSlide(
-                  (prev) => (prev - 1 + slides.length) % slides.length
-                )
-              }
-              className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/50 bg-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/30"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5L8.25 12l7.5-7.5"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={() =>
-                setCurrentSlide((prev) => (prev + 1) % slides.length)
-              }
-              className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/50 bg-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white/30"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Floating feature badges */}
-          <div className="absolute -left-4 top-1/4 hidden rounded-2xl border-2 border-white bg-white px-4 py-3 shadow-xl md:block lg:-left-8">
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#075a01]/10 text-xl">
-                🎨
-              </span>
-              <div>
-                <p className="text-sm font-bold text-gray-900">Design</p>
-                <p className="text-xs text-gray-500">Premium Quality</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute -right-4 bottom-1/4 hidden rounded-2xl border-2 border-white bg-white px-4 py-3 shadow-xl md:block lg:-right-8">
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff914d]/10 text-xl">
-                ⚡
-              </span>
-              <div>
-                <p className="text-sm font-bold text-gray-900">Fast</p>
-                <p className="text-xs text-gray-500">Delivery</p>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="mt-14 flex flex-col items-center justify-center gap-4 sm:flex-row md:mt-16">
-          <a
-            href="/contact"
-            className="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-10 py-5 text-lg font-bold text-white shadow-xl shadow-[#075a01]/25 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#075a01]/30"
-          >
-            {/* Shine effect */}
-            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
-            <span className="relative">Start Your Project</span>
-            <svg
-              className="relative h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
+        {/* ── Stats row ── */}
+        <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:mt-12 sm:grid-cols-4 md:mt-16">
+          {[
+            { value: "50+", label: "Projects Delivered" },
+            { value: "98%", label: "Client Satisfaction" },
+            { value: "7+", label: "Years Experience" },
+            { value: "24h", label: "Response Time" },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="flex flex-col items-center justify-center gap-1 bg-[#050a0f] px-4 py-5 text-center sm:px-6 sm:py-6 md:px-8"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-              />
-            </svg>
-          </a>
-
-          <a
-            href="/portfolio"
-            className="group inline-flex items-center justify-center gap-3 rounded-2xl border-2 border-gray-200 bg-white px-10 py-5 text-lg font-bold text-gray-700 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#075a01]/30 hover:shadow-lg"
-          >
-            <svg
-              className="h-5 w-5 text-[#ff914d] transition-transform duration-300 group-hover:scale-110"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            View Portfolio
-          </a>
+              <p className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-xl font-bold text-transparent sm:text-2xl md:text-3xl">
+                {stat.value}
+              </p>
+              <p className="text-[10px] text-white/30 sm:text-xs">{stat.label}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Services preview */}
-        <div className="mt-20">
-          <p className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-gray-400">
-            What we create
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                icon: "🌐",
-                title: "Websites",
-                desc: "Modern, fast, conversion-ready",
-              },
-              {
-                icon: "🎨",
-                title: "Branding",
-                desc: "Identity that stands out",
-              },
-              { icon: "📈", title: "SEO", desc: "Organic growth systems" },
-              {
-                icon: "🛠️",
-                title: "Tools",
-                desc: "Custom digital solutions",
-              },
-            ].map((item) => (
+        {/* ── Services mini grid ── */}
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+          {[
+            { icon: Globe, title: "Websites", desc: "Modern & conversion-ready" },
+            { icon: Palette, title: "Branding", desc: "Identity that stands out" },
+            { icon: TrendingUp, title: "SEO", desc: "Organic growth systems" },
+            { icon: Wrench, title: "Tools", desc: "Custom digital solutions" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
               <a
                 key={item.title}
                 href="/services"
-                className="group flex items-center gap-4 rounded-2xl border-2 border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#075a01]/20 hover:shadow-lg"
+                className="group flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3.5 backdrop-blur-sm transition-all duration-300 hover:border-[#075a01]/30 hover:bg-white/[0.06] sm:gap-4 sm:px-5 sm:py-4"
               >
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#075a01]/10 to-[#ff914d]/10 text-2xl transition-all duration-300 group-hover:scale-110 group-hover:from-[#075a01] group-hover:to-[#ff914d]">
-                  <span className="transition-all group-hover:grayscale-0 group-hover:brightness-0 group-hover:invert">
-                    {item.icon}
-                  </span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 transition-all duration-300 group-hover:bg-[#075a01]/20 sm:h-10 sm:w-10">
+                  <Icon className="h-4 w-4 text-white/50 transition-colors duration-300 group-hover:text-[#4ade80] sm:h-5 sm:w-5" />
                 </span>
-                <div>
-                  <p className="font-bold text-gray-900">{item.title}</p>
-                  <p className="text-sm text-gray-500">{item.desc}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-white/80 group-hover:text-white sm:text-sm">
+                    {item.title}
+                  </p>
+                  <p className="truncate text-[10px] text-white/30 sm:text-xs">{item.desc}</p>
                 </div>
-                <svg
-                  className="ml-auto h-5 w-5 text-gray-300 transition-all duration-300 group-hover:translate-x-1 group-hover:text-[#075a01]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/20 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-[#075a01] sm:h-4 sm:w-4" />
               </a>
-            ))}
-          </div>
+            );
+          })}
         </div>
+
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
+      {/* ── Bottom fade ── */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#050a0f] to-transparent md:h-40" />
     </section>
   );
 }

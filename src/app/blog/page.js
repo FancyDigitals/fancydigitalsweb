@@ -35,7 +35,13 @@ async function getPosts() {
 
     if (!res.ok) return [];
 
-    return res.json();
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) return [];
+
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+
+    return data;
   } catch {
     return [];
   }
@@ -55,7 +61,6 @@ function formatDate(dateString) {
 
 function extractCategories(posts) {
   const map = new Map();
-
   posts.forEach((post) => {
     const terms = post._embedded?.["wp:term"]?.[0] || [];
     terms.forEach((term) => {
@@ -64,16 +69,11 @@ function extractCategories(posts) {
       }
     });
   });
-
-  return Array.from(map.entries()).map(([slug, name]) => ({
-    slug,
-    name,
-  }));
+  return Array.from(map.entries()).map(([slug, name]) => ({ slug, name }));
 }
 
 export default async function BlogPage(props) {
   const posts = await getPosts();
-
   const searchParams = await props.searchParams;
   const selectedCategory = searchParams?.category;
 
@@ -85,8 +85,7 @@ export default async function BlogPage(props) {
     ? posts.filter((post) =>
         post._embedded?.["wp:term"]?.[0]?.some(
           (term) =>
-            term.taxonomy === "category" &&
-            term.slug === selectedCategory
+            term.taxonomy === "category" && term.slug === selectedCategory
         )
       )
     : posts;
@@ -119,7 +118,6 @@ export default async function BlogPage(props) {
             >
               All
             </Link>
-
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
@@ -139,23 +137,25 @@ export default async function BlogPage(props) {
         {/* Grid */}
         {filteredPosts.length === 0 ? (
           <div className="py-20 text-center text-gray-500">
-            No articles found for this category.
+            <p className="text-lg font-medium text-gray-700 mb-2">
+              No articles found
+            </p>
+            <p className="text-sm text-gray-400">
+              Articles will appear here once published.
+            </p>
           </div>
         ) : (
           <div className="grid gap-14 md:grid-cols-2 lg:grid-cols-3">
             {filteredPosts.map((post) => {
               const image =
                 post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-
-              const categories =
+              const postCategories =
                 post._embedded?.["wp:term"]?.[0]?.filter(
                   (term) => term.taxonomy === "category"
                 ) || [];
-
-              const primaryCategory = categories[0];
-
-              const cleanTitle = stripHTML(post.title.rendered);
-              const cleanExcerpt = stripHTML(post.excerpt.rendered);
+              const primaryCategory = postCategories[0];
+              const cleanTitle = stripHTML(post.title?.rendered || "");
+              const cleanExcerpt = stripHTML(post.excerpt?.rendered || "");
 
               return (
                 <article
@@ -177,25 +177,20 @@ export default async function BlogPage(props) {
                   </Link>
 
                   <div className="p-6">
-
                     {primaryCategory && (
                       <span className="text-xs uppercase tracking-wide text-gray-500">
                         {primaryCategory.name}
                       </span>
                     )}
-
                     <h2 className="text-lg font-semibold leading-snug mt-3 mb-3 group-hover:underline">
                       {cleanTitle}
                     </h2>
-
                     <p className="text-sm text-gray-600 mb-5 line-clamp-3">
                       {cleanExcerpt}
                     </p>
-
                     <div className="flex items-center justify-between text-xs text-gray-400 mb-5">
                       <span>{formatDate(post.date)}</span>
                     </div>
-
                     <Link
                       href={`/blog/${post.slug}`}
                       className="text-sm font-medium underline underline-offset-4"
@@ -211,9 +206,7 @@ export default async function BlogPage(props) {
 
         {/* Conversion Section */}
         <div className="mt-32 pt-20 border-t text-center">
-          <h3 className="text-3xl font-semibold mb-6">
-            Need expert guidance?
-          </h3>
+          <h3 className="text-3xl font-semibold mb-6">Need expert guidance?</h3>
           <p className="text-gray-600 mb-10 max-w-xl mx-auto text-lg">
             We build scalable digital systems that convert traffic into
             measurable revenue.
@@ -225,7 +218,6 @@ export default async function BlogPage(props) {
             Start a Project
           </Link>
         </div>
-
       </section>
     </main>
   );

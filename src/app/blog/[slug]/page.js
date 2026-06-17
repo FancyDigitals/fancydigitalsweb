@@ -4,21 +4,30 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const API_BASE =
-  "https://blog.fancydigitals.com.ng/wp-json/wp/v2/posts";
+const API_BASE = "https://blog.fancydigitals.com.ng/wp-json/wp/v2/posts";
 
 /* ===============================
    Data Fetching
 ================================= */
+
+async function safeJson(res) {
+  try {
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
 async function getAllPosts() {
   try {
     const res = await fetch(`${API_BASE}?_embed&per_page=50`, {
       next: { revalidate: 600 },
     });
-
     if (!res.ok) return [];
-    return res.json();
+    const data = await safeJson(res);
+    return Array.isArray(data) ? data : [];
   } catch {
     return [];
   }
@@ -26,14 +35,12 @@ async function getAllPosts() {
 
 async function getPost(slug) {
   try {
-    const res = await fetch(
-      `${API_BASE}?slug=${slug}&_embed`,
-      { next: { revalidate: 600 } }
-    );
-
+    const res = await fetch(`${API_BASE}?slug=${slug}&_embed`, {
+      next: { revalidate: 600 },
+    });
     if (!res.ok) return null;
-
-    const data = await res.json();
+    const data = await safeJson(res);
+    if (!Array.isArray(data)) return null;
     return data[0] || null;
   } catch {
     return null;
@@ -42,9 +49,7 @@ async function getPost(slug) {
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 /* ===============================
@@ -79,10 +84,9 @@ export async function generateMetadata(props) {
   const post = await getPost(params.slug);
   if (!post) return {};
 
-  const title = stripHTML(post.title.rendered);
-  const description = stripHTML(post.excerpt.rendered);
-  const image =
-    post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+  const title = stripHTML(post.title?.rendered || "");
+  const description = stripHTML(post.excerpt?.rendered || "");
+  const image = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
 
   return {
     title: `${title} | Fancy Digitals`,
@@ -117,9 +121,7 @@ export default async function PostPage(props) {
 
   const posts = await getAllPosts();
 
-  const image =
-    post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-
+  const image = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
   const author = post._embedded?.author?.[0];
 
   const categories =
@@ -129,15 +131,9 @@ export default async function PostPage(props) {
 
   const primaryCategory = categories[0];
 
-  const cleanTitle = stripHTML(post.title.rendered);
-  const cleanExcerpt = stripHTML(post.excerpt.rendered);
-  const readingTime = calculateReadingTime(
-    post.content.rendered
-  );
-
-  /* ===============================
-     Related Posts
-  ================================= */
+  const cleanTitle = stripHTML(post.title?.rendered || "");
+  const cleanExcerpt = stripHTML(post.excerpt?.rendered || "");
+  const readingTime = calculateReadingTime(post.content?.rendered || "");
 
   const related = posts
     .filter(
@@ -151,10 +147,6 @@ export default async function PostPage(props) {
         )
     )
     .slice(0, 3);
-
-  /* ===============================
-     Schemas
-  ================================= */
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -205,23 +197,17 @@ export default async function PostPage(props) {
     <main className="bg-white pt-28 pb-32">
       <article className="max-w-4xl mx-auto px-6">
 
-        {/* JSON-LD Schemas */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(articleSchema),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(breadcrumbSchema),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
 
         {/* Hero */}
         <header className="mb-14">
-
           {primaryCategory && (
             <span className="text-xs uppercase tracking-wide text-gray-500">
               {primaryCategory.name}
@@ -233,7 +219,7 @@ export default async function PostPage(props) {
           </h1>
 
           <p className="text-sm text-gray-400 mb-8">
-            {formatDate(post.date)} • {readingTime}
+            {formatDate(post.date)} · {readingTime}
           </p>
 
           {image && (
@@ -253,9 +239,7 @@ export default async function PostPage(props) {
         {/* Content */}
         <div
           className="prose prose-neutral max-w-none mb-16"
-          dangerouslySetInnerHTML={{
-            __html: post.content.rendered,
-          }}
+          dangerouslySetInnerHTML={{ __html: post.content?.rendered || "" }}
         />
 
         {/* Mid CTA */}
@@ -264,8 +248,8 @@ export default async function PostPage(props) {
             Need help implementing this?
           </h3>
           <p className="text-gray-600 mb-6">
-            We build performance-driven websites and SEO systems that
-            generate measurable growth.
+            We build performance-driven websites and SEO systems that generate
+            measurable growth.
           </p>
           <Link
             href="/contact"
@@ -275,7 +259,7 @@ export default async function PostPage(props) {
           </Link>
         </div>
 
-        {/* Author Block */}
+        {/* Author */}
         {author && (
           <div className="flex items-center gap-4 border-t pt-8 mb-20">
             {author.avatar_urls?.["96"] && (
@@ -299,10 +283,7 @@ export default async function PostPage(props) {
         {/* Related */}
         {related.length > 0 && (
           <section>
-            <h2 className="text-2xl font-semibold mb-8">
-              Related Articles
-            </h2>
-
+            <h2 className="text-2xl font-semibold mb-8">Related Articles</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {related.map((item) => (
                 <Link
@@ -311,7 +292,7 @@ export default async function PostPage(props) {
                   className="group border border-gray-100 rounded-xl p-6 hover:shadow-sm transition"
                 >
                   <h3 className="font-medium group-hover:underline">
-                    {stripHTML(item.title.rendered)}
+                    {stripHTML(item.title?.rendered || "")}
                   </h3>
                 </Link>
               ))}
@@ -319,7 +300,7 @@ export default async function PostPage(props) {
           </section>
         )}
 
-        {/* Strong End CTA */}
+        {/* End CTA */}
         <div className="mt-32 pt-20 border-t text-center">
           <h3 className="text-3xl font-semibold mb-6">
             Ready to grow your business?
@@ -331,7 +312,6 @@ export default async function PostPage(props) {
             Start Your Project
           </Link>
         </div>
-
       </article>
     </main>
   );

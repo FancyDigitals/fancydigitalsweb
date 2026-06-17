@@ -6,12 +6,12 @@ import Footer from "@/components/Footer";
 import MobileContactFloat from "@/components/MobileContactFloat";
 import NewYearPopup from "@/components/NewYearPopup";
 import GalleryLightbox from "@/components/GalleryLightbox";
+import LayoutShell from "@/components/LayoutShell";
 
 export const metadata = {
   metadataBase: new URL("https://fancydigitals.com.ng"),
   title: {
-    default:
-      "Fancy Digitals — Web Design, SEO & Digital Marketing Agency",
+    default: "Fancy Digitals — Web Design, SEO & Digital Marketing Agency",
     template: "%s | Fancy Digitals",
   },
   description:
@@ -25,7 +25,7 @@ export const metadata = {
     "web developer Lagos",
     "digital marketing agency",
     "ecommerce web design",
-    "branding agency Nigeria"
+    "branding agency Nigeria",
   ],
   alternates: {
     canonical: "/",
@@ -33,18 +33,15 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: "https://fancydigitals.com.ng",
-    title:
-      "Fancy Digitals — Web Design & Digital Marketing Agency",
+    title: "Fancy Digitals — Web Design & Digital Marketing Agency",
     description:
       "Professional web design, SEO, branding and digital marketing services worldwide with focus on Nigeria.",
     siteName: "Fancy Digitals",
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Fancy Digitals — Web Design & Digital Marketing Agency",
-    description:
-      "Professional web design, SEO and branding services.",
+    title: "Fancy Digitals — Web Design & Digital Marketing Agency",
+    description: "Professional web design, SEO and branding services.",
   },
   robots: {
     index: true,
@@ -72,8 +69,6 @@ export default function RootLayout({ children }) {
       <body className="min-h-screen bg-[#050705] text-white antialiased">
         <NewYearPopup />
 
-        <Header />
-
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -81,12 +76,14 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        {children}
-
-        <Footer />
-
-        <MobileContactFloat />
-        <GalleryLightbox />
+        <LayoutShell
+          header={<Header />}
+          footer={<Footer />}
+          float={<MobileContactFloat />}
+          lightbox={<GalleryLightbox />}
+        >
+          {children}
+        </LayoutShell>
       </body>
     </html>
   );
