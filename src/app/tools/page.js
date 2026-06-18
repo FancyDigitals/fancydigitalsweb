@@ -271,8 +271,6 @@ export default function ToolsPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 }
