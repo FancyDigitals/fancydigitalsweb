@@ -1,31 +1,115 @@
 import { tools } from "@/content/tools";
 
+const BASE_URL = "https://fancydigitals.com.ng";
+
 export default async function sitemap() {
-  const baseUrl = "https://fancydigitals.com.ng";
 
   const staticPages = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/services`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/portfolio`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${baseUrl}/tools`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.95 },
+    {
+      url: BASE_URL,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 1.0,
+    },
+    {
+      url: `${BASE_URL}/tools`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.98,
+    },
+    {
+      url: `${BASE_URL}/services`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.92,
+    },
+    {
+      url: `${BASE_URL}/portfolio`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.88,
+    },
+    {
+      url: `${BASE_URL}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.80,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.80,
+    },
+    {
+      url: `${BASE_URL}/web-design-nigeria`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/web-development-nigeria`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/seo-services-nigeria`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/graphics-design-nigeria`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.82,
+    },
+    {
+      url: `${BASE_URL}/email-marketing-nigeria`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.82,
+    },
   ];
 
+  // Tool pages — live tools get highest priority
   const toolPages = tools
     .filter((t) => t.published)
+    .sort((a, b) => a.order - b.order)
     .map((t) => ({
-      url: `${baseUrl}/tools/${t.slug}`,
+      url: `${BASE_URL}/tools/${t.slug}`,
       lastModified: new Date(),
       changeFrequency: t.isLive ? "weekly" : "monthly",
-      priority: t.isLive ? 0.9 : 0.6,
+      priority: t.isLive ? 0.95 : 0.65,
     }));
 
+  // Portfolio static pages
+  const portfolioPages = [
+    "fancy-digitals-website",
+    "feast-basket-ecommerce",
+    "sibgahtullah",
+    "tejurolex",
+    "todma-brand-identity",
+    "client-brand-system",
+  ].map((slug) => ({
+    url: `${BASE_URL}/portfolio/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.70,
+  }));
+
+  // Blog posts from WordPress
   let blogUrls = [];
   try {
     const res = await fetch(
-      "https://blog.fancydigitals.com.ng/wp-json/wp/v2/posts?per_page=50",
+      "https://blog.fancydigitals.com.ng/wp-json/wp/v2/posts?per_page=100&_fields=slug,modified",
       { next: { revalidate: 3600 } }
     );
     if (res.ok) {
@@ -34,10 +118,10 @@ export default async function sitemap() {
         const posts = await res.json();
         if (Array.isArray(posts)) {
           blogUrls = posts.map((post) => ({
-            url: `${baseUrl}/blog/${post.slug}`,
-            lastModified: post.modified,
+            url: `${BASE_URL}/blog/${post.slug}`,
+            lastModified: post.modified || new Date(),
             changeFrequency: "monthly",
-            priority: 0.7,
+            priority: 0.75,
           }));
         }
       }
@@ -46,5 +130,10 @@ export default async function sitemap() {
     blogUrls = [];
   }
 
-  return [...staticPages, ...toolPages, ...blogUrls];
+  return [
+    ...staticPages,
+    ...toolPages,
+    ...portfolioPages,
+    ...blogUrls,
+  ];
 }

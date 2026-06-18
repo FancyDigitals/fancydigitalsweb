@@ -20,39 +20,26 @@ export const homePage = {
     ],
   },
 
-  featuredTool: {
+  toolsSection: {
     enabled: true,
-    toolSlug: "website-audit-tool",
   },
 
   portfolioPreview: {
     title: "Selected work and case studies",
-    maxItems: 4,
-  },
-
-  toolsPreview: {
-    title: "Tools we are building",
     maxItems: 3,
   },
 
   finalCTA: {
-    title: "Let’s build something premium",
+    title: "Let's build something premium",
     description:
-      "Whether it’s a website, brand system, or future-ready tool, we help you move with clarity and confidence.",
+      "Whether it's a website, brand system, or a free tool you use daily — we build things that work, look great, and grow with you.",
     primaryAction: {
       label: "Start a Project",
       href: "/contact",
     },
     secondaryAction: {
       label: "Chat on WhatsApp",
-      href: "https://wa.me/2340000000000",
+      href: "https://wa.me/2349034360785",
     },
-  },
-
-  contactSection: {
-    title: "Let’s build something premium together",
-    description:
-      "Have a project, idea, or tool in mind? We work with founders and brands who value clarity, performance, and long-term growth.",
-    trustNote: "Clear scope • Fair pricing • No pressure",
   },
 };
