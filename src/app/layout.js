@@ -7,8 +7,10 @@ import MobileContactFloat from "@/components/MobileContactFloat";
 import NewYearPopup from "@/components/NewYearPopup";
 import GalleryLightbox from "@/components/GalleryLightbox";
 import LayoutShell from "@/components/LayoutShell";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const BASE_URL = "https://fancydigitals.com.ng";
+const GA_ID = "G-3K633E2JSK";
 
 export const metadata = {
   metadataBase: new URL(BASE_URL),
@@ -42,9 +44,7 @@ export const metadata = {
   publisher: "Fancy Digitals",
   category: "Technology",
   classification: "Digital Agency, Free Online Tools",
-  alternates: {
-    canonical: BASE_URL,
-  },
+  alternates: { canonical: BASE_URL },
   openGraph: {
     type: "website",
     url: BASE_URL,
@@ -53,22 +53,14 @@ export const metadata = {
       "Premium web design, SEO and branding agency in Nigeria. Plus 8+ free online tools — word counter, password generator, invoice maker, QR code generator and more. No sign-up required.",
     siteName: "Fancy Digitals",
     locale: "en_NG",
-    images: [
-      {
-        url: `${BASE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "Fancy Digitals — Web Design, Free Tools & Digital Agency",
-      },
-    ],
+    images: [{ url: `${BASE_URL}/og-image.png`, width: 1200, height: 630, alt: "Fancy Digitals — Web Design, Free Tools & Digital Agency" }],
   },
   twitter: {
     card: "summary_large_image",
     site: "@fancydigitals",
     creator: "@fancydigitals",
     title: "Fancy Digitals — Free Tools, Web Design & SEO Agency Nigeria",
-    description:
-      "8+ free online tools with no sign-up. Plus premium web design, SEO and branding services. Based in Nigeria, serving the world.",
+    description: "8+ free online tools with no sign-up. Plus premium web design, SEO and branding services.",
     images: [`${BASE_URL}/og-image.png`],
   },
   robots: {
@@ -84,9 +76,6 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
 };
 
 export default function RootLayout({ children }) {
@@ -96,15 +85,9 @@ export default function RootLayout({ children }) {
     "@id": `${BASE_URL}/#organization`,
     name: "Fancy Digitals",
     url: BASE_URL,
-    logo: {
-      "@type": "ImageObject",
-      url: `${BASE_URL}/logo.png`,
-      width: 512,
-      height: 512,
-    },
+    logo: { "@type": "ImageObject", url: `${BASE_URL}/logo.png`, width: 512, height: 512 },
     image: `${BASE_URL}/og-image.png`,
-    description:
-      "Premium web design, SEO, branding and free digital tools agency based in Nigeria serving founders and businesses worldwide.",
+    description: "Premium web design, SEO, branding and free digital tools agency based in Nigeria serving founders and businesses worldwide.",
     foundingDate: "2022",
     founder: {
       "@type": "Person",
@@ -133,13 +116,7 @@ export default function RootLayout({ children }) {
         availableLanguage: "English",
       },
     ],
-    sameAs: [
-      "https://wa.me/2349034360785",
-    ],
-    areaServed: {
-      "@type": "GeoCircle",
-      description: "Worldwide with strong focus on Nigeria",
-    },
+    sameAs: ["https://wa.me/2349034360785"],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Digital Services",
@@ -164,27 +141,10 @@ export default function RootLayout({ children }) {
     publisher: { "@id": `${BASE_URL}/#organization` },
     potentialAction: {
       "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${BASE_URL}/tools?q={search_term_string}`,
-      },
+      target: { "@type": "EntryPoint", urlTemplate: `${BASE_URL}/tools?q={search_term_string}` },
       "query-input": "required name=search_term_string",
     },
     inLanguage: "en-NG",
-  };
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-      { "@type": "ListItem", position: 2, name: "Tools", item: `${BASE_URL}/tools` },
-      { "@type": "ListItem", position: 3, name: "Services", item: `${BASE_URL}/services` },
-      { "@type": "ListItem", position: 4, name: "Portfolio", item: `${BASE_URL}/portfolio` },
-      { "@type": "ListItem", position: 5, name: "Blog", item: `${BASE_URL}/blog` },
-      { "@type": "ListItem", position: 6, name: "About", item: `${BASE_URL}/about` },
-      { "@type": "ListItem", position: 7, name: "Contact", item: `${BASE_URL}/contact` },
-    ],
   };
 
   const localBusinessSchema = {
@@ -224,12 +184,7 @@ export default function RootLayout({ children }) {
         closes: "14:00",
       },
     ],
-    hasMap: "https://maps.google.com/?q=Lagos,Nigeria",
     areaServed: ["Nigeria", "United Kingdom", "United States", "Ghana", "Kenya", "South Africa"],
-    serviceArea: {
-      "@type": "AdministrativeArea",
-      name: "Worldwide",
-    },
     knowsAbout: [
       "Web Design", "Web Development", "SEO", "Digital Marketing",
       "Brand Identity", "UI/UX Design", "Free Online Tools",
@@ -273,22 +228,9 @@ export default function RootLayout({ children }) {
       <body className="min-h-screen bg-[#050705] text-white antialiased">
         <NewYearPopup />
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
 
         <LayoutShell
           header={<Header />}
@@ -298,6 +240,8 @@ export default function RootLayout({ children }) {
         >
           {children}
         </LayoutShell>
+
+        <GoogleAnalytics gaId={GA_ID} />
       </body>
     </html>
   );

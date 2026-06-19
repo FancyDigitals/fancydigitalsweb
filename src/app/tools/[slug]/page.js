@@ -1,367 +1,312 @@
 import { tools } from "@/content/tools";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { notFound } from "next/navigation";
+import SEOMetaGenerator from "@/components/tools/live/SEOMetaGenerator";
+import WordCounter from "@/components/tools/live/WordCounter";
+import PasswordGenerator from "@/components/tools/live/PasswordGenerator";
+import QRCodeGenerator from "@/components/tools/live/QRCodeGenerator";
+import ColorPaletteGenerator from "@/components/tools/live/ColorPaletteGenerator";
+import InvoiceGenerator from "@/components/tools/live/InvoiceGenerator";
+import HashtagGenerator from "@/components/tools/live/HashtagGenerator";
+import UnitConverter from "@/components/tools/live/UnitConverter";
+import WaitlistForm from "@/components/WaitlistForm";
+import ToolAnalytics from "@/components/tools/ToolAnalytics";
 import Link from "next/link";
 
 const BASE_URL = "https://fancydigitals.com.ng";
 
-const STATUS_STYLES = {
-  Live: "bg-green-100 text-green-700",
-  "Coming Soon": "bg-orange-100 text-orange-700",
-  "In Development": "bg-blue-100 text-blue-700",
-};
+export async function generateStaticParams() {
+  return tools
+    .filter((t) => t.published)
+    .map((t) => ({ slug: t.slug }));
+}
 
-export const metadata = {
-  title: "Free Online Tools — Word Counter, Password Generator, Invoice Maker & More | Fancy Digitals",
-  description:
-    "Use 8+ free online tools by Fancy Digitals. Word counter, password generator, invoice generator, QR code generator, color palette generator, SEO meta tag generator, hashtag generator and unit converter. No sign-up. No credit card. Free forever.",
-  keywords: [
-    "free online tools",
-    "word counter online free",
-    "password generator free",
-    "invoice generator free no signup",
-    "QR code generator free",
-    "color palette generator",
-    "SEO meta tag generator",
-    "hashtag generator free",
-    "unit converter online",
-    "free tools no signup",
-    "online tools free",
-    "digital tools free",
-    "Fancy Digitals tools",
-    "free SEO tools",
-    "free writing tools",
-    "free business tools",
-  ],
-  alternates: {
-    canonical: `${BASE_URL}/tools`,
-  },
-  openGraph: {
-    title: "Free Online Tools — Word Counter, Password Generator & More | Fancy Digitals",
-    description:
-      "8+ free online tools. No sign-up required. Word counter, password generator, invoice maker, QR code generator, color palette generator, hashtag generator, unit converter and SEO meta tag generator.",
-    url: `${BASE_URL}/tools`,
-    siteName: "Fancy Digitals",
-    type: "website",
-    images: [{ url: `${BASE_URL}/og-image.png`, width: 1200, height: 630, alt: "Free Online Tools by Fancy Digitals" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "8+ Free Online Tools — No Sign-up | Fancy Digitals",
-    description: "Word counter, password generator, invoice maker, QR code generator and more. All free, no sign-up required.",
-    images: [`${BASE_URL}/og-image.png`],
-  },
-};
-
-export default function ToolsPage() {
-  const published = tools.filter((t) => t.published).sort((a, b) => a.order - b.order);
-  const liveTools = published.filter((t) => t.isLive);
-  const featuredTool = liveTools[0];
-
-  const toolsPageSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: "Free Online Tools — Fancy Digitals",
-    description: "Free online tools including word counter, password generator, invoice generator, QR code generator and more.",
-    url: `${BASE_URL}/tools`,
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-        { "@type": "ListItem", position: 2, name: "Tools", item: `${BASE_URL}/tools` },
-      ],
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const tool = tools.find((t) => t.slug === slug);
+  if (!tool) return { title: "Tool Not Found | Fancy Digitals" };
+  return {
+    title: `${tool.name} — Free Online Tool | Fancy Digitals`,
+    description: tool.longDesc || tool.desc,
+    keywords: tool.keywords?.join(", "),
+    alternates: {
+      canonical: `${BASE_URL}/tools/${tool.slug}`,
     },
-    mainEntity: {
-      "@type": "ItemList",
-      name: "Free Online Tools by Fancy Digitals",
-      description: "Free digital tools for SEO, writing, security, business and design. No sign-up required.",
-      numberOfItems: published.length,
-      itemListElement: published.map((t, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        url: `${BASE_URL}/tools/${t.slug}`,
-        name: t.name,
-      })),
+    openGraph: {
+      title: `${tool.name} — Free Online Tool | Fancy Digitals`,
+      description: tool.longDesc || tool.desc,
+      url: `${BASE_URL}/tools/${tool.slug}`,
+      siteName: "Fancy Digitals",
+      type: "website",
+      images: [{ url: `${BASE_URL}/og-image.png`, width: 1200, height: 630, alt: tool.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${tool.name} — Free Tool | Fancy Digitals`,
+      description: tool.desc,
+      images: [`${BASE_URL}/og-image.png`],
     },
   };
+}
 
-  const softwareAppSchemas = liveTools.map((t) => ({
+export default async function ToolPage({ params }) {
+  const { slug } = await params;
+  const tool = tools.find((t) => t.slug === slug && t.published);
+
+  if (!tool) return notFound();
+
+  const otherTools = tools
+    .filter((t) => t.published && t.slug !== slug && t.isLive)
+    .slice(0, 3);
+
+  const schema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: t.name,
-    description: t.longDesc || t.desc,
-    url: `${BASE_URL}/tools/${t.slug}`,
+    name: tool.name,
+    description: tool.longDesc || tool.desc,
+    url: `${BASE_URL}/tools/${tool.slug}`,
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Web",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD", availability: "https://schema.org/InStock" },
-    publisher: { "@type": "Organization", name: "Fancy Digitals", url: BASE_URL },
-    keywords: t.keywords?.join(", "),
-  }));
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: tool.isLive
+        ? "https://schema.org/InStock"
+        : "https://schema.org/PreOrder",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Fancy Digitals",
+      url: BASE_URL,
+    },
+    keywords: tool.keywords?.join(", "),
+  };
 
-  const faqSchema = {
+  const faqSchema = tool.faq?.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "Are all Fancy Digitals tools really free?",
-        acceptedAnswer: { "@type": "Answer", text: "Yes. All tools on Fancy Digitals are completely free to use. No sign-up, no credit card, no hidden fees. Use them as many times as you want." },
-      },
-      {
-        "@type": "Question",
-        name: "Do I need to create an account to use the tools?",
-        acceptedAnswer: { "@type": "Answer", text: "No. All tools work instantly in your browser with no account required. Just open a tool and start using it." },
-      },
-      {
-        "@type": "Question",
-        name: "Are the tools safe to use?",
-        acceptedAnswer: { "@type": "Answer", text: "Yes. All tools run entirely in your browser. No data is sent to any server. Your text, passwords, invoices and other data never leave your device." },
-      },
-      {
-        "@type": "Question",
-        name: "What free tools does Fancy Digitals offer?",
-        acceptedAnswer: { "@type": "Answer", text: `Fancy Digitals offers ${liveTools.length} free online tools including: ${liveTools.map((t) => t.name).join(", ")}. More tools are being added regularly.` },
-      },
-      {
-        "@type": "Question",
-        name: "Can I request a custom tool?",
-        acceptedAnswer: { "@type": "Answer", text: "Yes. Contact Fancy Digitals via the contact page or WhatsApp to request a custom tool built for your specific business needs." },
-      },
+    mainEntity: tool.faq.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  } : null;
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: "Tools", item: `${BASE_URL}/tools` },
+      { "@type": "ListItem", position: 3, name: tool.name, item: `${BASE_URL}/tools/${tool.slug}` },
     ],
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
-      <Header />
+    <main className="min-h-screen bg-[#fafafa]">
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(toolsPageSchema) }} />
-      {softwareAppSchemas.map((s, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
-      ))}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <ToolAnalytics toolName={tool.name} />
 
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[600px] w-[600px] animate-pulse rounded-full bg-[#075a01]/10 blur-[120px]" />
-        <div className="absolute -right-40 top-1/4 h-[500px] w-[500px] animate-pulse rounded-full bg-[#ff914d]/10 blur-[100px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-[size:40px_40px]" />
-      </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
-      {/* HERO */}
-      <section className="relative px-5 pb-16 pt-32 md:px-10 md:pt-40">
-        <div className="mx-auto max-w-7xl">
-          <nav className="mb-10 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 shadow-sm">
-              <a href="/" className="text-sm text-gray-500 hover:text-[#075a01]">Home</a>
-              <svg className="h-4 w-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              <span className="text-sm font-semibold text-gray-900">Tools</span>
+      {/* TOP BAR */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-5 py-3 md:px-10">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-lg font-bold text-gray-900">Fancy</span>
+          <span className="text-lg font-bold text-[#075a01]">Digitals</span>
+        </Link>
+        <div className="flex items-center gap-3">
+          <span className={`hidden sm:inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+            tool.isLive ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+          }`}>
+            {tool.status}
+          </span>
+          <Link
+            href="/tools"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            All Tools
+          </Link>
+        </div>
+      </header>
+
+      {/* BREADCRUMB */}
+      <nav className="pt-20 pb-2 px-5 md:px-10">
+        <div className="mx-auto max-w-5xl">
+          <ol className="flex items-center gap-2 text-xs text-gray-400">
+            <li><Link href="/" className="hover:text-gray-600 transition">Home</Link></li>
+            <li>/</li>
+            <li><Link href="/tools" className="hover:text-gray-600 transition">Tools</Link></li>
+            <li>/</li>
+            <li className="text-gray-700 font-medium truncate">{tool.name}</li>
+          </ol>
+        </div>
+      </nav>
+
+      {/* TOOL HEADER */}
+      <section className="pt-4 pb-8 px-5 md:px-10">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{tool.category}</span>
+            <span className="text-gray-200">•</span>
+            <span className="text-xs font-bold text-green-600">Free</span>
+            <span className="text-gray-200">•</span>
+            <span className="text-xs text-gray-400">No sign-up required</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{tool.name}</h1>
+          <p className="mt-2 text-sm text-gray-500 max-w-2xl leading-relaxed">
+            {tool.longDesc || tool.desc}
+          </p>
+        </div>
+      </section>
+
+      {/* TOOL BODY */}
+      <section className="px-5 pb-16 md:px-10">
+        <div className="mx-auto max-w-5xl">
+          {tool.isLive ? (
+            <>
+              {slug === "seo-meta-tag-generator" && <SEOMetaGenerator />}
+              {slug === "word-counter" && <WordCounter />}
+              {slug === "password-generator" && <PasswordGenerator />}
+              {slug === "qr-code-generator" && <QRCodeGenerator />}
+              {slug === "color-palette-generator" && <ColorPaletteGenerator />}
+              {slug === "invoice-generator" && <InvoiceGenerator />}
+              {slug === "hashtag-generator" && <HashtagGenerator />}
+              {slug === "unit-converter" && <UnitConverter />}
+            </>
+          ) : (
+            <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-white px-8 py-16 shadow-sm md:px-14">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#075a01] to-[#ff914d]" />
+              <div className="max-w-xl">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                  <span className="text-xs font-bold text-orange-700">{tool.status}</span>
+                </div>
+                <h2 className="text-2xl font-bold md:text-3xl">
+                  Get notified when this launches
+                </h2>
+                <p className="mt-3 text-sm text-gray-500">
+                  This tool is being built. Join the waitlist and we will notify you the moment it goes live.
+                </p>
+                <WaitlistForm toolName={tool.name} />
+              </div>
             </div>
-          </nav>
+          )}
+        </div>
+      </section>
 
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-              <span className="text-sm font-bold text-green-700">
-                {liveTools.length} tools live now — free to use, no sign-up
-              </span>
+      {/* FEATURES + WHO FOR */}
+      <section className="px-5 pb-12 md:px-10">
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-base font-bold text-gray-900">What this tool does</h2>
+              <ul className="space-y-2.5">
+                {tool.features.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-gray-600">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#075a01]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-              Free online tools built for
-              <span className="relative mx-2 mt-3 block">
-                <span className="bg-gradient-to-r from-[#075a01] via-[#075a01] to-[#075a01] bg-clip-text text-transparent">real work</span>
-                <span className="mx-2 text-gray-900">&</span>
-                <span className="bg-gradient-to-r from-[#ff914d] to-[#f97316] bg-clip-text text-transparent">real results</span>
-              </span>
-            </h1>
-
-            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl">
-              Word counter, password generator, invoice maker, QR code generator, color palette tool,
-              hashtag generator, unit converter and SEO meta tag generator.
-              No sign-up. No credit card. Free forever.
-            </p>
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-base font-bold text-gray-900">Who it is for</h2>
+              <ul className="space-y-2.5">
+                {tool.whoFor.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-gray-600">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#075a01]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FEATURED LIVE TOOL */}
-      {featuredTool && (
-        <section className="relative px-5 pb-16 md:px-10">
-          <div className="mx-auto max-w-7xl">
-            <div className="relative overflow-hidden rounded-3xl border-2 border-[#075a01]/20 bg-gradient-to-br from-white to-gray-50 shadow-xl">
-              <div className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full bg-[#075a01]/5 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-[#ff914d]/5 blur-3xl" />
-
-              <div className="relative grid items-center gap-8 p-8 md:grid-cols-2 md:p-12 lg:p-16">
-                <div>
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                    <span className="text-sm font-bold text-green-700">Live — Use it now, free</span>
-                  </div>
-                  <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">{featuredTool.name}</h2>
-                  <p className="mt-4 text-lg text-gray-600">{featuredTool.longDesc || featuredTool.desc}</p>
-                  <ul className="mt-6 space-y-3">
-                    {featuredTool.features.map((f) => (
-                      <li key={f} className="flex items-center gap-3">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#075a01]/10">
-                          <svg className="h-4 w-4 text-[#075a01]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </span>
-                        <span className="text-gray-700">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <a
-                    href={`/tools/${featuredTool.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-8 py-4 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    Use Tool Free — No Sign-up
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
+      {/* FAQ */}
+      {tool.faq?.length > 0 && (
+        <section className="px-5 pb-16 md:px-10">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-6 text-xl font-bold text-gray-900">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-4">
+              {tool.faq.map((f) => (
+                <div key={f.q} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">{f.q}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{f.a}</p>
                 </div>
-
-                <div className="flex items-center justify-center">
-                  <div className="relative">
-                    <div className="absolute -inset-8 rounded-3xl bg-gradient-to-br from-[#075a01]/10 to-[#ff914d]/10 blur-xl" />
-                    <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl w-full max-w-sm p-6">
-                      <div className="h-2 bg-gradient-to-r from-[#075a01] via-[#ff914d] to-[#0ea5e9] rounded-full mb-4" />
-                      <div className="space-y-3">
-                        <div className="rounded-lg bg-gray-50 border border-gray-100 p-3">
-                          <p className="text-xs text-gray-400 mb-1">Keyword</p>
-                          <div className="h-3 w-3/4 rounded bg-[#075a01]/20" />
-                        </div>
-                        <div className="rounded-lg bg-gray-50 border border-gray-100 p-3">
-                          <p className="text-xs text-gray-400 mb-1">SEO Score</p>
-                          <div className="h-2 w-full rounded-full bg-gray-100">
-                            <div className="h-2 w-4/5 rounded-full bg-[#075a01]" />
-                          </div>
-                        </div>
-                        <div className="rounded-lg bg-white border border-[#075a01]/20 p-3">
-                          <p className="text-xs text-gray-400 mb-1">Result</p>
-                          <div className="h-3 w-full rounded bg-gray-100" />
-                          <div className="h-3 w-2/3 rounded bg-gray-100 mt-1" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="absolute -left-6 top-1/4 flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-lg text-lg">🔍</div>
-                    <div className="absolute -right-6 bottom-1/4 flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-lg text-lg">✨</div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* ALL TOOLS GRID */}
-      <section className="relative px-5 pb-24 md:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-              All <span className="text-[#075a01]">Free Tools</span>
+      {/* OTHER TOOLS */}
+      {otherTools.length > 0 && (
+        <section className="px-5 pb-20 md:px-10">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-6 text-base font-bold text-gray-900">
+              Try other free tools
             </h2>
-            <p className="mt-3 text-gray-500">Use live tools now. Get notified when others launch.</p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {published.map((tool) => (
-              <a
-                key={tool.slug}
-                href={`/tools/${tool.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative overflow-hidden rounded-3xl border-2 border-gray-100 bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
-              >
-                <div
-                  className="absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  style={{ background: `linear-gradient(135deg, ${tool.accent}30, transparent)` }}
-                />
-                <div className="absolute inset-[2px] rounded-[22px] bg-white" />
-
-                {tool.popular && (
-                  <div className="absolute right-4 top-4 z-10 rounded-full px-3 py-1 text-xs font-bold text-white" style={{ backgroundColor: tool.accent }}>
-                    Popular
+            <div className="grid gap-4 sm:grid-cols-3">
+              {otherTools.map((t) => (
+                <a
+                  key={t.slug}
+                  href={`/tools/${t.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                >
+                  <div
+                    className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: `${t.accent}20` }}
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke={t.accent} viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+                    </svg>
                   </div>
-                )}
-
-                <div className="relative">
-                  <div className={`relative h-[160px] overflow-hidden rounded-t-[22px] bg-gradient-to-br ${tool.accentLight} flex items-center justify-center`}>
-                    <div className="text-6xl opacity-20 transition-all duration-500 group-hover:scale-110 group-hover:opacity-30">
-                      {tool.icon || "🔧"}
-                    </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 group-hover:text-[#075a01]">{t.name}</p>
+                    <p className="mt-0.5 text-xs text-gray-400 line-clamp-2">{t.desc}</p>
+                    <span className="mt-2 inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                      {t.status}
+                    </span>
                   </div>
-
-                  <div className="relative p-6">
-                    <div className="mb-3 flex items-center justify-between">
-                      <p className="text-xs font-bold uppercase tracking-wider" style={{ color: tool.accent }}>{tool.category}</p>
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[tool.status] || "bg-gray-100 text-gray-600"}`}>
-                        {tool.status}
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-gray-900">{tool.name}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-500">{tool.desc}</p>
-
-                    <div className="mt-5 flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-sm font-bold" style={{ color: tool.accent }}>
-                        {tool.isLive ? "Use free now" : "Join waitlist"}
-                        <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                      </span>
-                      <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Free</span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ SECTION — for SEO */}
-      <section className="relative px-5 pb-24 md:px-10">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="mb-8 text-center text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {[
-              { q: "Are all Fancy Digitals tools really free?", a: "Yes. All tools are completely free. No sign-up, no credit card, no hidden fees. Use them as many times as you want." },
-              { q: "Do I need to create an account?", a: "No. All tools work instantly in your browser with zero account required. Just open and use." },
-              { q: "Is my data safe when using these tools?", a: "Yes. All tools run entirely in your browser. No data is sent to any server. Your text, passwords, invoices and other data never leave your device." },
-              { q: "What free tools are available?", a: `Currently ${liveTools.length} tools are live: ${liveTools.map((t) => t.name).join(", ")}. More are being built regularly.` },
-              { q: "Can I request a custom tool?", a: "Yes. Contact us via the contact page or WhatsApp to request a custom tool for your business." },
-            ].map((faq) => (
-              <div key={faq.q} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <h3 className="mb-2 font-bold text-gray-900">{faq.q}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="relative px-5 pb-24 md:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#075a01] to-[#0a8f01] p-10 text-center shadow-2xl md:p-16">
-            <h2 className="text-3xl font-bold text-white md:text-4xl">Want a tool built just for you?</h2>
-            <p className="mx-auto mt-4 max-w-xl text-white/80">We build custom digital tools for businesses. Let us know what you need.</p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <a href="/contact" className="inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 font-bold text-[#075a01] shadow-lg transition hover:-translate-y-1">Discuss Your Idea</a>
-              <a href="https://wa.me/2349034360785" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 px-8 py-4 font-bold text-white transition hover:bg-white/10">Chat on WhatsApp</a>
+                </a>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <Footer />
+      {/* FOOTER */}
+      <footer className="border-t border-gray-100 bg-white px-5 py-6 md:px-10">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4">
+          <p className="text-xs text-gray-400">
+            Built by{" "}
+            <a href={BASE_URL} className="font-semibold text-[#075a01] hover:underline">
+              Fancy Digitals
+            </a>
+            {" "}— Free tools for founders and marketers
+          </p>
+          <div className="flex items-center gap-4">
+            <a href="/contact" className="text-xs font-semibold text-gray-500 hover:text-gray-900">
+              Request a custom tool
+            </a>
+            <a href="/tools" className="rounded-xl bg-[#075a01] px-4 py-2 text-xs font-bold text-white hover:opacity-90">
+              All Tools
+            </a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
