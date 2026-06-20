@@ -1,8 +1,104 @@
 export const tools = [
+  
+
+  {
+  slug: "ai-resume-builder",
+  name: "AI Resume Builder",
+  category: "AI Tools",
+  desc: "Build ATS-optimized resumes in 30 seconds with AI. 6 premium templates, photo upload, job match scoring.",
+  longDesc: "Generate professional, ATS-friendly resumes powered by AI. Choose from 6 premium templates, customize colors, add your photo, and download as PDF. Built-in ATS compatibility checker, job match analyzer, and AI auto-fix to optimize your resume for any job description.",
+  status: "Live",
+  image: "/tools/ai-resume.png",
+  published: true,
+  order: 0,
+  isLive: true,
+  isAI: true,
+  requiresLogin: true,
+  accent: "#075a01",
+  accentLight: "from-[#075a01]/10 to-[#0a8f01]/10",
+  popular: true,
+  href: "/dashboard/tools/ai-resume-builder",
+  keywords: [
+    "ai resume builder",
+    "free resume builder",
+    "ats resume builder",
+    "resume generator ai",
+    "professional resume maker",
+    "cv builder online",
+  ],
+  features: [
+    "AI-powered content generation",
+    "6 premium templates (Pro)",
+    "ATS compatibility score",
+    "Job match analyzer",
+    "AI auto-fix optimization (Pro)",
+    "Photo upload support",
+    "Real PDF download",
+    "Custom accent colors (Pro)",
+    "Auto-save form data",
+  ],
+  whoFor: [
+    "Job seekers",
+    "Career changers",
+    "Recent graduates",
+    "Professionals updating their CV",
+  ],
+  faq: [
+    { q: "Is the resume builder free?", a: "Yes — 3 free resumes per day with the Basic template. Pro unlocks unlimited resumes, 5 premium templates, and AI optimization." },
+    { q: "Is my resume ATS-friendly?", a: "Yes. Every resume passes our ATS compatibility check and includes a score with improvement tips." },
+    { q: "Can I download as PDF?", a: "Yes. Pro users get instant PDF download. Free users can print to PDF using the browser." },
+  ],
+},
+{
+  slug: "ai-cover-letter",
+  name: "AI Cover Letter Generator",
+  category: "AI Tools",
+  desc: "Generate tailored cover letters in seconds. Auto-fills from your resume. Multiple tones and lengths.",
+  longDesc: "Create personalized cover letters that match any job description. Choose your tone (professional, enthusiastic, direct, creative) and length. Auto-fills from your AI Resume Builder data for maximum efficiency.",
+  status: "Live",
+  image: "/tools/ai-cover-letter.png",
+  published: true,
+  order: 0,
+  isLive: true,
+  isAI: true,
+  requiresLogin: true,
+  accent: "#7c3aed",
+  accentLight: "from-[#7c3aed]/10 to-[#ec4899]/10",
+  popular: true,
+  href: "/dashboard/tools/ai-cover-letter",
+  keywords: [
+    "ai cover letter generator",
+    "free cover letter builder",
+    "cover letter maker ai",
+    "job application letter generator",
+  ],
+  features: [
+    "AI-tailored to any job description",
+    "4 tone options",
+    "3 length options",
+    "Auto-fills from your resume",
+    "Personalized hiring manager greeting",
+    "Free download",
+  ],
+  whoFor: [
+    "Job applicants",
+    "Career changers",
+    "Recent graduates",
+    "Anyone applying to multiple jobs",
+  ],
+  faq: [
+    { q: "How many cover letters per day?", a: "Free users get 3 per day. Pro users get unlimited." },
+    { q: "Does it tailor to specific jobs?", a: "Yes. Paste the job description and AI will optimize the letter with relevant keywords and tone." },
+  ],
+},
+
   {
     slug: "seo-meta-tag-generator",
     name: "SEO Meta Tag Generator",
     category: "SEO",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/meta-tag-generator",
     desc: "Generate perfect SEO meta titles and descriptions with a live Google preview and real-time scoring.",
     longDesc: "The free SEO Meta Tag Generator helps website owners, bloggers, and marketers create optimised meta titles and descriptions that rank higher on Google. Get real-time character count validation, keyword density checking, live Google search preview for desktop and mobile, Twitter card preview, Facebook OG preview, and instant HTML output ready to paste into your website.",
     status: "Live",
@@ -53,6 +149,9 @@ export const tools = [
     slug: "word-counter",
     name: "Word Counter",
     category: "Writing",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/word-counter",
     desc: "Count words, characters, sentences and paragraphs instantly with readability scoring and keyword density analysis.",
     longDesc: "The free Word Counter tool gives writers, students, SEO specialists and content creators a complete text analysis suite. Get instant word count, character count, reading time, speaking time, Flesch readability score, keyword density analysis, passive voice detection, adverb detection, platform character limit checking, auto-save, text cleaner, case converter, text diff comparison, and auto summariser.",
     status: "Live",
@@ -107,6 +206,9 @@ export const tools = [
     slug: "password-generator",
     name: "Password Generator",
     category: "Security",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/password-generator",
     desc: "Generate strong, secure, random passwords instantly with full control over length and character types.",
     longDesc: "The free Password Generator creates cryptographically strong passwords using your browser's built-in secure random number generator. Choose password length from 4 to 128 characters, toggle uppercase, lowercase, numbers and symbols, generate passphrases, bulk generate up to 50 passwords, check password strength in real time with entropy calculation and crack time estimate, and copy instantly. No data is ever sent to a server.",
     status: "Live",
@@ -157,6 +259,9 @@ export const tools = [
     slug: "invoice-generator",
     name: "Invoice Generator",
     category: "Business",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/invoice-generator",
     desc: "Create professional invoices instantly and download as PDF. Free, no sign-up required.",
     longDesc: "The free Invoice Generator lets you create professional invoices in seconds. Add your business details, logo, client information, unlimited line items, taxes and discounts. Download as PDF or print directly. Supports 10 currencies including Nigerian Naira (NGN). Auto-saves to your browser. Save and load multiple invoices. No account needed, no watermark, completely free.",
     status: "Live",
@@ -209,6 +314,9 @@ export const tools = [
     slug: "qr-code-generator",
     name: "QR Code Generator",
     category: "Utilities",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/rq-code-generator",
     desc: "Generate QR codes for URLs, text, WiFi, email, phone, SMS and vCards instantly. Download as PNG or SVG.",
     longDesc: "The free QR Code Generator creates high-quality QR codes for any purpose. Generate QR codes for websites, WiFi passwords, contact cards, phone numbers, emails, SMS and plain text. Customise colours, add a center logo, adjust size and error correction level. Download as PNG or SVG, scan QR codes from images or camera, generate in bulk from CSV, and create print-ready layouts.",
     status: "Live",
@@ -263,6 +371,9 @@ export const tools = [
     slug: "color-palette-generator",
     name: "Color Palette Generator",
     category: "Design",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/color-palette-generator",
     desc: "Generate beautiful color palettes from any base color, image, or preset style. Export as CSS, Tailwind, HEX, RGB and more.",
     longDesc: "The free Color Palette Generator creates professional color palettes for designers, developers, and brand builders. Generate harmonious color schemes using 7 color harmony rules — complementary, analogous, triadic, split-complementary, tetradic, monochromatic and shades. Extract palettes from uploaded images, explore 20 curated presets, check WCAG accessibility contrast ratios, and export in HEX, RGB, HSL, CSS variables, Tailwind config and SCSS format.",
     status: "Live",
@@ -314,6 +425,9 @@ export const tools = [
     slug: "hashtag-generator",
     name: "Hashtag Generator",
     category: "Social Media",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/hashtag-generator",
     desc: "Generate the best hashtags for Instagram, TikTok, Twitter, LinkedIn, YouTube and Facebook instantly.",
     longDesc: "The free Hashtag Generator creates targeted hashtag sets for every major social media platform. Enter your topic, niche or keyword and get hundreds of relevant hashtags grouped by size — small, medium and large — for maximum reach. Build captions with hashtags included, save your favourite sets, copy everything with one click, and get platform-specific strategy for each network.",
     status: "Live",
@@ -365,6 +479,9 @@ export const tools = [
     slug: "unit-converter",
     name: "Unit Converter",
     category: "Utilities",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/unit-converter",
     desc: "Convert length, weight, temperature, area, volume, speed, time, data, pressure and energy instantly.",
     longDesc: "The free Unit Converter handles every common conversion in one place across 10 categories. Convert between metric and imperial units for length, weight, temperature, area, volume, speed, time, digital storage, pressure and energy. Get instant real-time results as you type, a full conversion table for all units, formula display, saved favourite conversions, and conversion history.",
     status: "Live",
@@ -416,6 +533,9 @@ export const tools = [
     slug: "ai-landing-page-generator",
     name: "AI Landing Page Generator",
     category: "Marketing",
+    isAI: false,           // mark non-AI tools
+requiresLogin: false,  // they don't need login
+href: "/tools/ai-landing-page-generator",
     desc: "Generate high-converting landing page structures and copy with clarity and speed.",
     longDesc: "Plan and structure high-converting landing pages using proven frameworks. Get section-by-section guidance, headline formulas, CTA logic, and value proposition structure without the guesswork.",
     status: "Coming Soon",

@@ -111,42 +111,34 @@ export default async function ToolPage({ params }) {
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
-      {/* TOP BAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-5 py-3 md:px-10">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-lg font-bold text-gray-900">Fancy</span>
-          <span className="text-lg font-bold text-[#075a01]">Digitals</span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <span className={`hidden sm:inline-flex rounded-full px-3 py-1 text-xs font-bold ${
-            tool.isLive ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
-          }`}>
-            {tool.status}
-          </span>
-          <Link
-            href="/tools"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            All Tools
-          </Link>
-        </div>
-      </header>
-
-      {/* BREADCRUMB */}
-      <nav className="pt-20 pb-2 px-5 md:px-10">
-        <div className="mx-auto max-w-5xl">
-          <ol className="flex items-center gap-2 text-xs text-gray-400">
-            <li><Link href="/" className="hover:text-gray-600 transition">Home</Link></li>
-            <li>/</li>
-            <li><Link href="/tools" className="hover:text-gray-600 transition">Tools</Link></li>
-            <li>/</li>
-            <li className="text-gray-700 font-medium truncate">{tool.name}</li>
-          </ol>
-        </div>
-      </nav>
+      {/* BREADCRUMB + Back Link */}
+<nav className="pt-24 pb-2 px-5 md:px-10">
+  <div className="mx-auto max-w-5xl flex items-center justify-between gap-4">
+    <ol className="flex items-center gap-2 text-xs text-gray-400 min-w-0">
+      <li><Link href="/" className="hover:text-gray-600 transition">Home</Link></li>
+      <li>/</li>
+      <li><Link href="/tools" className="hover:text-gray-600 transition">Tools</Link></li>
+      <li>/</li>
+      <li className="text-gray-700 font-medium truncate">{tool.name}</li>
+    </ol>
+    <div className="flex items-center gap-2 shrink-0">
+      <span className={`hidden sm:inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+        tool.isLive ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+      }`}>
+        {tool.status}
+      </span>
+      <Link
+        href="/tools"
+        className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+      >
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        All Tools
+      </Link>
+    </div>
+  </div>
+</nav>
 
       {/* TOOL HEADER */}
       <section className="pt-4 pb-8 px-5 md:px-10">

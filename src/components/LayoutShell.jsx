@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 const TOOL_SHELL_PATHS = ["/tools/"];
+const APP_SHELL_PATHS = ["/dashboard", "/signin", "/signup"];
 
 export default function LayoutShell({ children, header, footer, float, lightbox }) {
   const pathname = usePathname();
@@ -11,13 +12,16 @@ export default function LayoutShell({ children, header, footer, float, lightbox 
     TOOL_SHELL_PATHS.some((p) => pathname.startsWith(p)) &&
     pathname !== "/tools";
 
+  const isAppPage = APP_SHELL_PATHS.some((p) => pathname.startsWith(p));
+  const hideShell = isToolPage || isAppPage;
+
   return (
     <>
-      {!isToolPage && header}
+      {!hideShell && header}
       {children}
-      {!isToolPage && footer}
-      {!isToolPage && float}
-      {lightbox}
+      {!hideShell && footer}
+      {!hideShell && float}
+      {!isAppPage && lightbox}
     </>
   );
 }

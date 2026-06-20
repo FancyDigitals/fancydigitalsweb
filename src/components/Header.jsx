@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AuthButton from "@/components/AuthButton";
+import Link from "next/link";
 
 /* =====================================================
    HEADER — BRIGHT, CREATIVE, PREMIUM
@@ -16,8 +18,20 @@ const NAV = [
       { label: "Graphics Design", href: "/graphics-design-nigeria" },
     ],
   },
+  {
+    label: "Tools",
+    children: [
+      { label: "All Tools", href: "/tools", featured: true },
+      { label: "AI Resume Builder", href: "/free-ai-resume-builder", badge: "AI" },
+      { label: "AI Cover Letter", href: "/dashboard/tools/ai-cover-letter", badge: "AI" },
+      { label: "SEO Meta Generator", href: "/tools/seo-meta-tag-generator" },
+      { label: "Word Counter", href: "/tools/word-counter" },
+      { label: "Password Generator", href: "/tools/password-generator" },
+      { label: "Invoice Generator", href: "/tools/invoice-generator" },
+      { label: "QR Code Generator", href: "/tools/qr-code-generator" },
+    ],
+  },
   { label: "Portfolio", href: "/portfolio" },
-  { label: "Tools", href: "/tools" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
   { label: "Blog", href: "/blog" },
@@ -123,22 +137,36 @@ export default function Header() {
 
       {/* DROPDOWN */}
       {item.children && (
-        <div className="absolute left-0 top-full mt-2 w-64 rounded-2xl bg-white shadow-xl border opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-300">
-
-          <div className="p-3 space-y-1">
-            {item.children.map((sub, j) => (
-              <a
-                key={j}
-                href={sub.href}
-                className="block px-4 py-3 rounded-xl text-sm text-gray-700 hover:bg-gray-50 hover:text-[#075a01] transition"
-              >
-                {sub.label}
-              </a>
-            ))}
-          </div>
-
-        </div>
-      )}
+  <div className="absolute left-0 top-full mt-2 w-72 rounded-2xl bg-white shadow-xl border border-gray-100 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-300">
+    <div className="p-2 space-y-0.5">
+      {item.children.map((sub, j) => (
+        <a
+          key={j}
+          href={sub.href}
+          className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl text-sm transition ${
+            sub.featured
+              ? "bg-gradient-to-r from-[#075a01]/5 to-[#0a8f01]/5 text-[#075a01] font-bold border border-[#075a01]/10 mb-2"
+              : "text-gray-700 hover:bg-gray-50 hover:text-[#075a01]"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            {sub.label}
+            {sub.featured && (
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            )}
+          </span>
+          {sub.badge && (
+            <span className="rounded-md bg-gradient-to-r from-amber-100 to-yellow-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">
+              {sub.badge}
+            </span>
+          )}
+        </a>
+      ))}
+    </div>
+  </div>
+)}
 
     </div>
   ))}
@@ -146,6 +174,8 @@ export default function Header() {
 
           {/* DESKTOP ACTIONS */}
           <div className="hidden items-center gap-3 lg:flex">
+
+            <AuthButton />
             {/* WhatsApp */}
             <a
               href="https://wa.me/2349034360785"
@@ -160,7 +190,6 @@ export default function Header() {
               </div>
               <span className="hidden xl:inline">WhatsApp</span>
             </a>
-
             {/* Call */}
             <a
               href="tel:+2349045547761"
@@ -289,19 +318,28 @@ export default function Header() {
 
     {/* SUBMENU */}
     {item.children && (
-      <div className="pl-6 pb-2 space-y-1">
-        {item.children.map((sub, j) => (
-          <a
-            key={j}
-            href={sub.href}
-            onClick={() => setMenuOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-600 hover:text-[#075a01]"
-          >
-            {sub.label}
-          </a>
-        ))}
-      </div>
-    )}
+  <div className="pl-4 pb-2 space-y-0.5">
+    {item.children.map((sub, j) => (
+      <a
+        key={j}
+        href={sub.href}
+        onClick={() => setMenuOpen(false)}
+        className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg text-sm transition ${
+          sub.featured
+            ? "bg-gradient-to-r from-[#075a01]/5 to-[#0a8f01]/5 text-[#075a01] font-bold"
+            : "text-gray-600 hover:text-[#075a01] hover:bg-gray-50"
+        }`}
+      >
+        <span>{sub.label}</span>
+        {sub.badge && (
+          <span className="rounded-md bg-gradient-to-r from-amber-100 to-yellow-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">
+            {sub.badge}
+          </span>
+        )}
+      </a>
+    ))}
+  </div>
+)}
 
   </div>
 ))}
@@ -316,6 +354,18 @@ export default function Header() {
 
             {/* Contact buttons */}
             <div className="space-y-3">
+              <Link
+  href="/signin"
+  onClick={() => setMenuOpen(false)}
+  className="group flex items-center justify-center gap-3 rounded-xl border-2 border-gray-100 bg-white px-4 py-4 transition-all duration-300 hover:border-[#075a01]/30 hover:bg-green-50"
+>
+  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#075a01] text-white shadow-lg shadow-[#075a01]/30">
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  </div>
+  <span className="font-semibold text-gray-700 group-hover:text-[#075a01]">Sign In / Dashboard</span>
+</Link>
               <a
                 href="https://wa.me/2349034360785"
                 target="_blank"

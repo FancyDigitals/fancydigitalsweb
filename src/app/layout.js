@@ -6,8 +6,8 @@ import Footer from "@/components/Footer";
 import MobileContactFloat from "@/components/MobileContactFloat";
 import NewYearPopup from "@/components/NewYearPopup";
 import GalleryLightbox from "@/components/GalleryLightbox";
-import LayoutShell from "@/components/LayoutShell";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import DashboardDetector from "@/components/DashboardDetector";
 
 const BASE_URL = "https://fancydigitals.com.ng";
 const GA_ID = "G-3K633E2JSK";
@@ -53,14 +53,22 @@ export const metadata = {
       "Premium web design, SEO and branding agency in Nigeria. Plus 8+ free online tools — word counter, password generator, invoice maker, QR code generator and more. No sign-up required.",
     siteName: "Fancy Digitals",
     locale: "en_NG",
-    images: [{ url: `${BASE_URL}/og-image.png`, width: 1200, height: 630, alt: "Fancy Digitals — Web Design, Free Tools & Digital Agency" }],
+    images: [
+      {
+        url: `${BASE_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Fancy Digitals — Web Design, Free Tools & Digital Agency",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@fancydigitals",
     creator: "@fancydigitals",
     title: "Fancy Digitals — Free Tools, Web Design & SEO Agency Nigeria",
-    description: "8+ free online tools with no sign-up. Plus premium web design, SEO and branding services.",
+    description:
+      "8+ free online tools with no sign-up. Plus premium web design, SEO and branding services.",
     images: [`${BASE_URL}/og-image.png`],
   },
   robots: {
@@ -85,9 +93,15 @@ export default function RootLayout({ children }) {
     "@id": `${BASE_URL}/#organization`,
     name: "Fancy Digitals",
     url: BASE_URL,
-    logo: { "@type": "ImageObject", url: `${BASE_URL}/logo.png`, width: 512, height: 512 },
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE_URL}/logo.png`,
+      width: 512,
+      height: 512,
+    },
     image: `${BASE_URL}/og-image.png`,
-    description: "Premium web design, SEO, branding and free digital tools agency based in Nigeria serving founders and businesses worldwide.",
+    description:
+      "Premium web design, SEO, branding and free digital tools agency based in Nigeria serving founders and businesses worldwide.",
     foundingDate: "2022",
     founder: {
       "@type": "Person",
@@ -121,12 +135,39 @@ export default function RootLayout({ children }) {
       "@type": "OfferCatalog",
       name: "Digital Services",
       itemListElement: [
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Web Design & Development" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Brand Identity Design" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "SEO Services" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Digital Marketing" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "AI Automation" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Social Media Management" } },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Web Design & Development",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Brand Identity Design",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name: "SEO Services" },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name: "Digital Marketing" },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name: "AI Automation" },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Social Media Management",
+          },
+        },
       ],
     },
   };
@@ -137,11 +178,15 @@ export default function RootLayout({ children }) {
     "@id": `${BASE_URL}/#website`,
     url: BASE_URL,
     name: "Fancy Digitals",
-    description: "Web design, free online tools, SEO and digital marketing agency",
+    description:
+      "Web design, free online tools, SEO and digital marketing agency",
     publisher: { "@id": `${BASE_URL}/#organization` },
     potentialAction: {
       "@type": "SearchAction",
-      target: { "@type": "EntryPoint", urlTemplate: `${BASE_URL}/tools?q={search_term_string}` },
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${BASE_URL}/tools?q={search_term_string}`,
+      },
       "query-input": "required name=search_term_string",
     },
     inLanguage: "en-NG",
@@ -173,7 +218,13 @@ export default function RootLayout({ children }) {
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+        ],
         opens: "08:00",
         closes: "18:00",
       },
@@ -184,13 +235,31 @@ export default function RootLayout({ children }) {
         closes: "14:00",
       },
     ],
-    areaServed: ["Nigeria", "United Kingdom", "United States", "Ghana", "Kenya", "South Africa"],
+    areaServed: [
+      "Nigeria",
+      "United Kingdom",
+      "United States",
+      "Ghana",
+      "Kenya",
+      "South Africa",
+    ],
     knowsAbout: [
-      "Web Design", "Web Development", "SEO", "Digital Marketing",
-      "Brand Identity", "UI/UX Design", "Free Online Tools",
-      "Password Generator", "QR Code Generator", "Invoice Generator",
-      "Word Counter", "Color Palette Generator", "Hashtag Generator",
-      "Unit Converter", "SEO Meta Tag Generator", "AI Automation",
+      "Web Design",
+      "Web Development",
+      "SEO",
+      "Digital Marketing",
+      "Brand Identity",
+      "UI/UX Design",
+      "Free Online Tools",
+      "Password Generator",
+      "QR Code Generator",
+      "Invoice Generator",
+      "Word Counter",
+      "Color Palette Generator",
+      "Hashtag Generator",
+      "Unit Converter",
+      "SEO Meta Tag Generator",
+      "AI Automation",
     ],
     aggregateRating: {
       "@type": "AggregateRating",
@@ -219,7 +288,10 @@ export default function RootLayout({ children }) {
         <meta name="HandheldFriendly" content="True" />
         <meta name="MobileOptimized" content="320" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
         <meta name="theme-color" content="#075a01" />
         <meta name="msapplication-TileColor" content="#075a01" />
         <link rel="icon" href="/favicon.ico" />
@@ -228,18 +300,33 @@ export default function RootLayout({ children }) {
       <body className="min-h-screen bg-[#050705] text-white antialiased">
         <NewYearPopup />
 
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessSchema),
+          }}
+        />
 
-        <LayoutShell
+        <DashboardDetector
           header={<Header />}
           footer={<Footer />}
           float={<MobileContactFloat />}
           lightbox={<GalleryLightbox />}
         >
           {children}
-        </LayoutShell>
+        </DashboardDetector>
 
         <GoogleAnalytics gaId={GA_ID} />
       </body>
