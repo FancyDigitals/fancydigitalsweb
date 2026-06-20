@@ -1,4 +1,5 @@
 import { tools } from "@/content/tools";
+import { JOB_ROLES } from "@/data/job-roles";
 
 const BASE_URL = "https://fancydigitals.com.ng";
 
@@ -16,6 +17,12 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.98,
+    },
+    {
+      url: `${BASE_URL}/pricing`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.95,
     },
     {
       url: `${BASE_URL}/services`,
@@ -46,6 +53,12 @@ export default async function sitemap() {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.80,
+    },
+    {
+      url: `${BASE_URL}/free-ai-resume-builder`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.95,
     },
     {
       url: `${BASE_URL}/web-design-nigeria`,
@@ -82,7 +95,7 @@ export default async function sitemap() {
   // Tool pages — live tools get highest priority
   const toolPages = tools
     .filter((t) => t.published)
-    .sort((a, b) => a.order - b.order)
+    .sort((a, b) => (a.order || 99) - (b.order || 99))
     .map((t) => ({
       url: `${BASE_URL}/tools/${t.slug}`,
       lastModified: new Date(),
@@ -104,6 +117,22 @@ export default async function sitemap() {
     changeFrequency: "monthly",
     priority: 0.70,
   }));
+
+  // ============ PROGRAMMATIC SEO PAGES ============
+  // Resume pages — 50 high-volume job roles
+  const resumePages = JOB_ROLES.map((role) => ({
+  url: `${BASE_URL}/resume-for/${role.slug}`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.85,
+}));
+
+const coverLetterPages = JOB_ROLES.map((role) => ({
+  url: `${BASE_URL}/cover-letter-for/${role.slug}`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.85,
+}));
 
   // Blog posts from WordPress
   let blogUrls = [];
@@ -134,6 +163,8 @@ export default async function sitemap() {
     ...staticPages,
     ...toolPages,
     ...portfolioPages,
+    ...resumePages,        // ⬅️ 50 NEW resume SEO pages
+    ...coverLetterPages,   // ⬅️ 50 NEW cover letter SEO pages
     ...blogUrls,
   ];
 }
