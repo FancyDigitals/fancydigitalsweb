@@ -240,3 +240,43 @@ button:focus-visible {
 .resume-preview-locked {
   cursor: default;
 }
+
+/* =====================================================
+   PLACEHOLDER STYLES — Better readability
+===================================================== */
+
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+/* Select dropdowns — make placeholder option darker */
+select:invalid,
+select option[value=""] {
+  color: #94a3b8;
+}
+
+/* Make sure all form labels are readable */
+label {
+  color: #374151;
+}
