@@ -367,22 +367,56 @@ const [optimizeSuccess, setOptimizeSuccess] = useState(false);
           {/* Template Selector */}
           <div className="space-y-3 pt-4 border-t border-gray-100">
             <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">Choose Template</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {templates.map((tpl) => {
-                const isSelected = selectedTemplate === tpl.id;
-                const isLocked = tpl.pro && !isPro;
-                return (
-                  <button key={tpl.id} type="button" onClick={() => handleSelectTemplate(tpl.id)} className={`relative flex flex-col items-center p-3 rounded-xl border-2 transition-all ${isSelected ? "border-[#075a01] bg-[#075a01]/5" : isLocked ? "border-gray-200 bg-gray-50 opacity-70" : "border-gray-200 hover:border-gray-300"}`}>
-                    <div className="h-8 w-6 rounded border mb-2" style={{ backgroundColor: tpl.accent }} />
-                    <p className="text-xs font-bold text-gray-900">{tpl.name}</p>
-                    <p className="text-[10px] text-gray-500">{tpl.description}</p>
-                    {isLocked && <div className="absolute top-1.5 right-1.5"><Lock className="h-3 w-3 text-gray-400" /></div>}
-                    {isSelected && !isLocked && <div className="absolute top-1.5 right-1.5"><CheckCircle2 className="h-4 w-4 text-[#075a01]" /></div>}
-                    {tpl.pro && !isLocked && <div className="absolute top-1.5 left-1.5"><Star className="h-3 w-3 text-amber-500 fill-current" /></div>}
-                  </button>
-                );
-              })}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+  {templates.map((tpl) => {
+    const isSelected = selectedTemplate === tpl.id;
+    const isLocked = tpl.pro && !isPro;
+    return (
+      <button
+        key={tpl.id}
+        type="button"
+        onClick={() => handleSelectTemplate(tpl.id)}
+        className={`relative rounded-xl border-2 transition-all overflow-hidden group ${
+          isSelected
+            ? "border-[#075a01] ring-2 ring-[#075a01]/20"
+            : isLocked
+            ? "border-gray-200 opacity-60"
+            : "border-gray-200 hover:border-gray-400 hover:shadow-md"
+        }`}
+      >
+        {/* Mini preview */}
+        <div className="aspect-[3/4] bg-white overflow-hidden">
+          <TemplateThumbnail templateId={tpl.id} accent={tpl.accent} />
+        </div>
+
+        {/* Footer with name */}
+        <div className={`px-2 py-1.5 border-t ${isSelected ? "bg-[#075a01]/5 border-[#075a01]/20" : "bg-gray-50 border-gray-100"}`}>
+          <p className="text-[11px] font-bold text-gray-900 truncate">{tpl.name}</p>
+        </div>
+
+        {/* Badges */}
+        {isLocked && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+            <div className="flex flex-col items-center gap-1">
+              <Lock className="h-5 w-5 text-white" />
+              <span className="text-[9px] font-bold uppercase tracking-wider text-white bg-amber-500 px-1.5 py-0.5 rounded">Pro</span>
             </div>
+          </div>
+        )}
+        {isSelected && !isLocked && (
+          <div className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#075a01] shadow-md">
+            <CheckCircle2 className="h-3.5 w-3.5 text-white" />
+          </div>
+        )}
+        {tpl.pro && !isLocked && (
+          <div className="absolute top-1.5 left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 shadow-md">
+            <Star className="h-3 w-3 text-white fill-current" />
+          </div>
+        )}
+      </button>
+    );
+  })}
+</div>
             {!isPro && (
               <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 p-2.5">
                 <Crown className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
@@ -610,11 +644,17 @@ const [optimizeSuccess, setOptimizeSuccess] = useState(false);
                   </div>
                 )}
                 {selectedTemplate === "basic" && <BasicTemplate resume={resume} accent={accentColor} />}
-                {selectedTemplate === "modern" && <ModernTemplate resume={resume} accent={accentColor} />}
-                {selectedTemplate === "professional" && <ProfessionalTemplate resume={resume} accent={accentColor} />}
-                {selectedTemplate === "creative" && <CreativeTemplate resume={resume} accent={accentColor} />}
-                {selectedTemplate === "minimal" && <MinimalTemplate resume={resume} accent={accentColor} />}
-                {selectedTemplate === "tech" && <TechTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "modern" && <ModernTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "professional" && <ProfessionalTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "creative" && <CreativeTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "minimal" && <MinimalTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "tech" && <TechTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "elegant" && <ElegantTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "bold" && <BoldTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "compact" && <CompactTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "academic" && <AcademicTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "startup" && <StartupTemplate resume={resume} accent={accentColor} />}
+{selectedTemplate === "photo" && <PhotoFirstTemplate resume={resume} accent={accentColor} />}
               </div>
 
               <div className="rounded-xl bg-[#075a01]/10 border border-[#075a01]/20 p-4 print:hidden">
@@ -1055,19 +1095,777 @@ function TechTemplate({ resume, accent }) {
   );
 }
 
+/* ============================ ELEGANT TEMPLATE ============================ */
+function ElegantTemplate({ resume, accent }) {
+  const color = accent || "#78350f";
+  const photo = resume.photo;
+  return (
+    <div className="bg-white" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+      <div className="text-center pb-5 mb-5 border-b" style={{ borderColor: color }}>
+        {photo && (
+          <img src={photo} alt={resume.fullName} className="h-24 w-24 rounded-full object-cover mx-auto mb-3 ring-2 ring-offset-2" style={{ ringColor: color }} />
+        )}
+        <h2 className="text-3xl font-normal tracking-wide" style={{ color }}>{resume.fullName}</h2>
+        <p className="text-sm italic text-gray-600 mt-1">{resume.title}</p>
+        <div className="mt-3 text-[11px] text-gray-500 flex justify-center flex-wrap gap-x-3 gap-y-1">
+          {resume.contact?.email && <span>{resume.contact.email}</span>}
+          {resume.contact?.phone && <span>·</span>}
+          {resume.contact?.phone && <span>{resume.contact.phone}</span>}
+          {resume.contact?.location && <span>·</span>}
+          {resume.contact?.location && <span>{resume.contact.location}</span>}
+        </div>
+      </div>
+      {resume.summary && (
+        <div className="mb-5 text-center">
+          <p className="text-[13px] text-gray-700 leading-[1.8] italic max-w-2xl mx-auto">"{resume.summary}"</p>
+        </div>
+      )}
+      {resume.experience?.length > 0 && (
+        <div className="mb-5">
+          <h3 className="text-center text-[11px] uppercase tracking-[0.3em] font-semibold mb-4 pb-1 border-b" style={{ color, borderColor: `${color}33` }}>Experience</h3>
+          <div className="space-y-4">
+            {resume.experience.map((exp, i) => (
+              <div key={i} className="text-center">
+                <p className="font-semibold text-[14px] text-gray-900">{exp.role}</p>
+                <p className="text-[12px] italic" style={{ color }}>{exp.company}{exp.location && ` · ${exp.location}`}</p>
+                <p className="text-[10px] text-gray-500 mb-2">{exp.duration}</p>
+                <ul className="text-[12px] text-gray-700 leading-[1.7] space-y-1 max-w-xl mx-auto">
+                  {exp.bullets?.map((b, j) => <li key={j}>{b}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {resume.education?.length > 0 && (
+        <div className="mb-5">
+          <h3 className="text-center text-[11px] uppercase tracking-[0.3em] font-semibold mb-3 pb-1 border-b" style={{ color, borderColor: `${color}33` }}>Education</h3>
+          <div className="text-center space-y-2">
+            {resume.education.map((edu, i) => (
+              <div key={i}>
+                <p className="font-semibold text-[13px] text-gray-900">{edu.degree}</p>
+                <p className="text-[12px] italic text-gray-600">{edu.school} · {edu.year}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {resume.skills?.length > 0 && (
+        <div>
+          <h3 className="text-center text-[11px] uppercase tracking-[0.3em] font-semibold mb-3 pb-1 border-b" style={{ color, borderColor: `${color}33` }}>Expertise</h3>
+          <p className="text-center text-[12px] text-gray-700">{resume.skills.join(" · ")}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================ BOLD TEMPLATE ============================ */
+function BoldTemplate({ resume, accent }) {
+  const color = accent || "#dc2626";
+  const photo = resume.photo;
+  return (
+    <div className="bg-white -m-6 sm:-m-8 flex min-h-[800px]">
+      <div className="w-1/3 text-white p-5" style={{ background: color }}>
+        {photo && <img src={photo} alt={resume.fullName} className="h-20 w-20 rounded-full object-cover mx-auto mb-4 ring-4 ring-white/30" />}
+        <h2 className="text-xl font-bold text-center leading-tight mb-1">{resume.fullName}</h2>
+        <p className="text-[11px] text-center text-white/80 uppercase tracking-wider mb-5">{resume.title}</p>
+
+        <div className="space-y-4 text-[11px]">
+          <div>
+            <p className="font-bold uppercase tracking-wider text-white/70 text-[10px] mb-2 border-b border-white/30 pb-1">Contact</p>
+            <div className="space-y-1">
+              {resume.contact?.email && <p className="break-all">{resume.contact.email}</p>}
+              {resume.contact?.phone && <p>{resume.contact.phone}</p>}
+              {resume.contact?.location && <p>{resume.contact.location}</p>}
+              {resume.contact?.linkedIn && <p className="break-all">{resume.contact.linkedIn}</p>}
+              {resume.contact?.portfolio && <p className="break-all">{resume.contact.portfolio}</p>}
+            </div>
+          </div>
+
+          {resume.skills?.length > 0 && (
+            <div>
+              <p className="font-bold uppercase tracking-wider text-white/70 text-[10px] mb-2 border-b border-white/30 pb-1">Skills</p>
+              <div className="space-y-1">
+                {resume.skills.map((s, i) => <p key={i}>· {s}</p>)}
+              </div>
+            </div>
+          )}
+
+          {resume.education?.length > 0 && (
+            <div>
+              <p className="font-bold uppercase tracking-wider text-white/70 text-[10px] mb-2 border-b border-white/30 pb-1">Education</p>
+              <div className="space-y-2">
+                {resume.education.map((edu, i) => (
+                  <div key={i}>
+                    <p className="font-semibold">{edu.degree}</p>
+                    <p className="text-white/80 text-[10px]">{edu.school}</p>
+                    <p className="text-white/60 text-[10px]">{edu.year}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="w-2/3 p-6">
+        {resume.summary && (
+          <div className="mb-5">
+            <h3 className="text-xs uppercase tracking-widest font-bold mb-2" style={{ color }}>About</h3>
+            <p className="text-[12.5px] text-gray-700 leading-[1.7]">{resume.summary}</p>
+          </div>
+        )}
+        {resume.experience?.length > 0 && (
+          <div>
+            <h3 className="text-xs uppercase tracking-widest font-bold mb-3" style={{ color }}>Experience</h3>
+            <div className="space-y-4">
+              {resume.experience.map((exp, i) => (
+                <div key={i} className="border-l-2 pl-4" style={{ borderColor: color }}>
+                  <div className="flex justify-between items-baseline gap-2">
+                    <p className="font-bold text-[13px] text-gray-900">{exp.role}</p>
+                    <p className="text-[10px] text-gray-500 whitespace-nowrap">{exp.duration}</p>
+                  </div>
+                  <p className="text-[12px] font-semibold" style={{ color }}>{exp.company}{exp.location && ` · ${exp.location}`}</p>
+                  <ul className="mt-1.5 space-y-1 pl-4">
+                    {exp.bullets?.map((b, j) => <li key={j} className="text-[11.5px] text-gray-700 leading-[1.6] list-disc list-outside">{b}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================ COMPACT TEMPLATE ============================ */
+function CompactTemplate({ resume, accent }) {
+  const color = accent || "#374151";
+  const photo = resume.photo;
+  return (
+    <div className="bg-white text-[11px]">
+      <div className="flex items-center justify-between border-b-2 pb-2 mb-3" style={{ borderColor: color }}>
+        <div className="flex items-center gap-3">
+          {photo && <img src={photo} alt={resume.fullName} className="h-14 w-14 rounded object-cover border border-gray-200" />}
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 leading-tight">{resume.fullName}</h2>
+            <p className="text-[12px]" style={{ color }}>{resume.title}</p>
+          </div>
+        </div>
+        <div className="text-right text-[10px] text-gray-600 space-y-0.5">
+          {resume.contact?.email && <p>{resume.contact.email}</p>}
+          {resume.contact?.phone && <p>{resume.contact.phone}</p>}
+          {resume.contact?.location && <p>{resume.contact.location}</p>}
+        </div>
+      </div>
+
+      {resume.summary && (
+        <div className="mb-3">
+          <h3 className="text-[10px] uppercase font-bold tracking-wider mb-1" style={{ color }}>Summary</h3>
+          <p className="text-[11px] text-gray-700 leading-[1.55]">{resume.summary}</p>
+        </div>
+      )}
+
+      {resume.experience?.length > 0 && (
+        <div className="mb-3">
+          <h3 className="text-[10px] uppercase font-bold tracking-wider mb-1.5 pb-0.5 border-b border-gray-200" style={{ color }}>Experience</h3>
+          <div className="space-y-2.5">
+            {resume.experience.map((exp, i) => (
+              <div key={i}>
+                <div className="flex justify-between items-baseline">
+                  <p><span className="font-bold text-[11.5px] text-gray-900">{exp.role}</span> <span className="text-[10px] text-gray-600">— {exp.company}{exp.location && `, ${exp.location}`}</span></p>
+                  <p className="text-[10px] text-gray-500 whitespace-nowrap">{exp.duration}</p>
+                </div>
+                <ul className="mt-0.5 space-y-0.5 pl-4">
+                  {exp.bullets?.map((b, j) => <li key={j} className="text-[10.5px] text-gray-700 leading-[1.5] list-disc list-outside">{b}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {resume.education?.length > 0 && (
+        <div className="mb-3">
+          <h3 className="text-[10px] uppercase font-bold tracking-wider mb-1.5 pb-0.5 border-b border-gray-200" style={{ color }}>Education</h3>
+          <div className="space-y-1">
+            {resume.education.map((edu, i) => (
+              <p key={i} className="text-[11px]"><span className="font-bold text-gray-900">{edu.degree}</span> <span className="text-gray-600">— {edu.school}, {edu.year}</span></p>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {resume.skills?.length > 0 && (
+        <div>
+          <h3 className="text-[10px] uppercase font-bold tracking-wider mb-1.5 pb-0.5 border-b border-gray-200" style={{ color }}>Skills</h3>
+          <p className="text-[11px] text-gray-700"><span className="font-semibold">Core:</span> {resume.skills.join(" · ")}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================ ACADEMIC TEMPLATE ============================ */
+function AcademicTemplate({ resume, accent }) {
+  const color = accent || "#1e40af";
+  const photo = resume.photo;
+  return (
+    <div className="bg-white" style={{ fontFamily: "Garamond, Georgia, serif" }}>
+      <div className="text-center pb-3 mb-4 border-b-2 border-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900">{resume.fullName}</h2>
+        <p className="text-[13px] italic text-gray-700 mt-1">{resume.title}</p>
+        <div className="mt-2 text-[10px] text-gray-600 flex justify-center flex-wrap gap-x-2">
+          {resume.contact?.email && <span>{resume.contact.email}</span>}
+          {resume.contact?.phone && <span>|</span>}
+          {resume.contact?.phone && <span>{resume.contact.phone}</span>}
+          {resume.contact?.location && <span>|</span>}
+          {resume.contact?.location && <span>{resume.contact.location}</span>}
+        </div>
+      </div>
+
+      {resume.summary && (
+        <div className="mb-4">
+          <h3 className="text-[11px] font-bold mb-1.5" style={{ color }}>Research Statement</h3>
+          <p className="text-[12px] text-gray-700 leading-[1.75] text-justify">{resume.summary}</p>
+        </div>
+      )}
+
+      {resume.experience?.length > 0 && (
+        <div className="mb-4">
+          <h3 className="text-[11px] font-bold mb-2" style={{ color }}>Academic & Professional Experience</h3>
+          <div className="space-y-3">
+            {resume.experience.map((exp, i) => (
+              <div key={i}>
+                <div className="flex justify-between">
+                  <p className="text-[12.5px]"><span className="font-bold">{exp.role}</span>, <span className="italic">{exp.company}</span></p>
+                  <p className="text-[11px] text-gray-600">{exp.duration}</p>
+                </div>
+                {exp.location && <p className="text-[10px] text-gray-500 italic">{exp.location}</p>}
+                <ul className="mt-1 space-y-0.5 pl-5">
+                  {exp.bullets?.map((b, j) => <li key={j} className="text-[11.5px] text-gray-700 leading-[1.65] list-disc list-outside text-justify">{b}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {resume.education?.length > 0 && (
+        <div className="mb-4">
+          <h3 className="text-[11px] font-bold mb-2" style={{ color }}>Education</h3>
+          <div className="space-y-1.5">
+            {resume.education.map((edu, i) => (
+              <div key={i}>
+                <p className="text-[12px]"><span className="font-bold">{edu.degree}</span> — <span className="italic">{edu.school}</span>, {edu.year}</p>
+                {edu.details && <p className="text-[10.5px] text-gray-600 italic pl-3">{edu.details}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {resume.skills?.length > 0 && (
+        <div>
+          <h3 className="text-[11px] font-bold mb-1.5" style={{ color }}>Research Interests & Methods</h3>
+          <p className="text-[11.5px] text-gray-700 leading-[1.7]">{resume.skills.join(" · ")}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================ STARTUP TEMPLATE (Bento) ============================ */
+function StartupTemplate({ resume, accent }) {
+  const color = accent || "#059669";
+  const photo = resume.photo;
+  return (
+    <div className="bg-gray-50 -m-6 sm:-m-8 p-4 space-y-3">
+      {/* Top bento: Hero card */}
+      <div className="rounded-2xl bg-white p-5 border border-gray-200 shadow-sm flex items-center gap-4">
+        {photo && <img src={photo} alt={resume.fullName} className="h-16 w-16 rounded-2xl object-cover" />}
+        <div className="flex-1 min-w-0">
+          <h2 className="text-2xl font-bold text-gray-900 leading-tight">{resume.fullName}</h2>
+          <p className="text-[13px] font-semibold" style={{ color }}>{resume.title}</p>
+        </div>
+        <div className="hidden sm:block text-right text-[10px] text-gray-500 space-y-0.5">
+          {resume.contact?.email && <p>{resume.contact.email}</p>}
+          {resume.contact?.phone && <p>{resume.contact.phone}</p>}
+          {resume.contact?.location && <p>{resume.contact.location}</p>}
+        </div>
+      </div>
+
+      {/* Summary bento */}
+      {resume.summary && (
+        <div className="rounded-2xl p-5 text-white" style={{ background: color }}>
+          <p className="text-[10px] uppercase tracking-wider font-bold opacity-80 mb-2">// About</p>
+          <p className="text-[13px] leading-[1.7]">{resume.summary}</p>
+        </div>
+      )}
+
+      {/* Experience bento */}
+      {resume.experience?.length > 0 && (
+        <div className="rounded-2xl bg-white p-5 border border-gray-200">
+          <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color }}>// Experience</p>
+          <div className="space-y-3">
+            {resume.experience.map((exp, i) => (
+              <div key={i} className="rounded-xl bg-gray-50 p-3 border border-gray-100">
+                <div className="flex justify-between gap-2 mb-1">
+                  <p className="font-bold text-[13px] text-gray-900">{exp.role}</p>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap" style={{ background: `${color}20`, color }}>{exp.duration}</span>
+                </div>
+                <p className="text-[11px] text-gray-600 mb-2">@ {exp.company}{exp.location && ` · ${exp.location}`}</p>
+                <ul className="space-y-0.5">
+                  {exp.bullets?.map((b, j) => <li key={j} className="text-[11.5px] text-gray-700 leading-[1.6] pl-3 relative"><span className="absolute left-0 top-1.5 h-1 w-1 rounded-full" style={{ background: color }} />{b}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom row: Education + Skills */}
+      <div className="grid grid-cols-2 gap-3">
+        {resume.education?.length > 0 && (
+          <div className="rounded-2xl bg-white p-4 border border-gray-200">
+            <p className="text-[10px] uppercase tracking-wider font-bold mb-2" style={{ color }}>// Education</p>
+            <div className="space-y-1.5">
+              {resume.education.map((edu, i) => (
+                <div key={i}>
+                  <p className="text-[11.5px] font-bold">{edu.degree}</p>
+                  <p className="text-[10px] text-gray-600">{edu.school} · {edu.year}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {resume.skills?.length > 0 && (
+          <div className="rounded-2xl bg-white p-4 border border-gray-200">
+            <p className="text-[10px] uppercase tracking-wider font-bold mb-2" style={{ color }}>// Stack</p>
+            <div className="flex flex-wrap gap-1">
+              {resume.skills.map((s, i) => <span key={i} className="text-[10px] px-2 py-0.5 rounded-md font-semibold" style={{ background: `${color}15`, color }}>{s}</span>)}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================ PHOTO-FIRST TEMPLATE ============================ */
+function PhotoFirstTemplate({ resume, accent }) {
+  const color = accent || "#0891b2";
+  const photo = resume.photo;
+  return (
+    <div className="bg-white -m-6 sm:-m-8">
+      <div className="grid grid-cols-3 min-h-[200px]">
+        <div className="col-span-1 flex items-center justify-center p-4" style={{ background: color }}>
+          {photo ? (
+            <img src={photo} alt={resume.fullName} className="h-32 w-32 sm:h-40 sm:w-40 rounded-full object-cover ring-4 ring-white shadow-xl" />
+          ) : (
+            <div className="h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-white/20 flex items-center justify-center text-white text-5xl font-bold ring-4 ring-white">
+              {resume.fullName?.charAt(0)}
+            </div>
+          )}
+        </div>
+        <div className="col-span-2 p-5 flex flex-col justify-center">
+          <h2 className="text-3xl font-bold text-gray-900 leading-tight">{resume.fullName}</h2>
+          <p className="text-base font-semibold mt-1" style={{ color }}>{resume.title}</p>
+          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-gray-600">
+            {resume.contact?.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3" style={{ color }} />{resume.contact.email}</span>}
+            {resume.contact?.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" style={{ color }} />{resume.contact.phone}</span>}
+            {resume.contact?.location && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" style={{ color }} />{resume.contact.location}</span>}
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6">
+        {resume.summary && (
+          <div className="mb-5">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color }}>Profile</h3>
+            <p className="text-[13px] text-gray-700 leading-[1.75]">{resume.summary}</p>
+          </div>
+        )}
+
+        {resume.experience?.length > 0 && (
+          <div className="mb-5">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color }}>Experience</h3>
+            <div className="space-y-3">
+              {resume.experience.map((exp, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-baseline gap-2">
+                    <p className="font-bold text-[14px] text-gray-900">{exp.role}</p>
+                    <p className="text-xs text-gray-500 whitespace-nowrap">{exp.duration}</p>
+                  </div>
+                  <p className="text-[12.5px] font-semibold mt-0.5" style={{ color }}>{exp.company}{exp.location && <span className="text-gray-500 font-normal"> · {exp.location}</span>}</p>
+                  <ul className="mt-1.5 space-y-1 pl-4">
+                    {exp.bullets?.map((b, j) => <li key={j} className="text-[12px] text-gray-700 leading-[1.65] list-disc list-outside">{b}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-5">
+          {resume.education?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color }}>Education</h3>
+              <div className="space-y-1.5">
+                {resume.education.map((edu, i) => (
+                  <div key={i}>
+                    <p className="font-bold text-[12px] text-gray-900">{edu.degree}</p>
+                    <p className="text-[11px] text-gray-600">{edu.school} · {edu.year}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {resume.skills?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color }}>Skills</h3>
+              <div className="flex flex-wrap gap-1">
+                {resume.skills.map((s, i) => <span key={i} className="text-[10.5px] px-2 py-0.5 rounded font-semibold" style={{ background: `${color}15`, color }}>{s}</span>)}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ TEMPLATE THUMBNAIL PREVIEWS ============================ */
+function TemplateThumbnail({ templateId, accent }) {
+  switch (templateId) {
+    case "basic": return <ThumbBasic color={accent} />;
+    case "modern": return <ThumbModern color={accent} />;
+    case "professional": return <ThumbProfessional color={accent} />;
+    case "creative": return <ThumbCreative color={accent} />;
+    case "minimal": return <ThumbMinimal color={accent} />;
+    case "tech": return <ThumbTech color={accent} />;
+    case "elegant": return <ThumbElegant color={accent} />;
+    case "bold": return <ThumbBold color={accent} />;
+    case "compact": return <ThumbCompact color={accent} />;
+    case "academic": return <ThumbAcademic color={accent} />;
+    case "startup": return <ThumbStartup color={accent} />;
+    case "photo": return <ThumbPhoto color={accent} />;
+    default: return <ThumbBasic color={accent} />;
+  }
+}
+
+function ThumbBasic({ color }) {
+  return (
+    <div className="h-full p-2 bg-white">
+      <div className="h-1.5 w-3/4 rounded-sm" style={{ background: color }} />
+      <div className="h-1 w-1/2 rounded-sm bg-gray-300 mt-1" />
+      <div className="border-b mt-1.5" style={{ borderColor: color }} />
+      <div className="mt-2 space-y-0.5">
+        <div className="h-0.5 w-full rounded bg-gray-200" />
+        <div className="h-0.5 w-5/6 rounded bg-gray-200" />
+        <div className="h-0.5 w-3/4 rounded bg-gray-200" />
+      </div>
+      <div className="mt-2">
+        <div className="h-1 w-1/4 rounded" style={{ background: color }} />
+        <div className="mt-1 space-y-0.5">
+          <div className="h-0.5 w-full rounded bg-gray-200" />
+          <div className="h-0.5 w-4/5 rounded bg-gray-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbModern({ color }) {
+  return (
+    <div className="h-full p-2 bg-white">
+      <div className="border-b-2 pb-1.5" style={{ borderColor: color }}>
+        <div className="h-2 w-3/4 rounded bg-gray-900" />
+        <div className="h-1 w-1/2 rounded mt-1" style={{ background: color }} />
+      </div>
+      <div className="mt-2">
+        <div className="h-1 w-1/3 rounded uppercase mb-1" style={{ background: color }} />
+        <div className="pl-2 border-l-2 ml-0.5" style={{ borderColor: "#e5e7eb" }}>
+          <div className="h-1 w-3/4 rounded bg-gray-900 mb-0.5" />
+          <div className="h-0.5 w-2/3 rounded mb-1" style={{ background: color }} />
+          <div className="space-y-0.5">
+            <div className="h-0.5 w-full rounded bg-gray-200" />
+            <div className="h-0.5 w-5/6 rounded bg-gray-200" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbProfessional({ color }) {
+  return (
+    <div className="h-full bg-white flex flex-col">
+      <div className="h-6 px-2 py-1" style={{ background: color }}>
+        <div className="h-1.5 w-3/5 rounded bg-white/80" />
+        <div className="h-0.5 w-1/3 rounded bg-white/50 mt-0.5" />
+      </div>
+      <div className="flex-1 p-2 grid grid-cols-3 gap-1">
+        <div className="col-span-2 space-y-1">
+          <div className="h-1 w-2/5 rounded" style={{ background: color }} />
+          <div className="space-y-0.5">
+            <div className="h-0.5 w-full rounded bg-gray-200" />
+            <div className="h-0.5 w-5/6 rounded bg-gray-200" />
+            <div className="h-0.5 w-3/4 rounded bg-gray-200" />
+          </div>
+          <div className="h-1 w-1/2 rounded bg-gray-900 mt-1" />
+          <div className="space-y-0.5">
+            <div className="h-0.5 w-full rounded bg-gray-200" />
+            <div className="h-0.5 w-4/5 rounded bg-gray-200" />
+          </div>
+        </div>
+        <div className="col-span-1 space-y-1">
+          <div className="h-1 w-3/4 rounded" style={{ background: color }} />
+          <div className="space-y-0.5">
+            <div className="h-0.5 w-full rounded bg-gray-200" />
+            <div className="h-0.5 w-4/5 rounded bg-gray-200" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbCreative({ color }) {
+  return (
+    <div className="h-full p-1.5 bg-white">
+      <div
+        className="rounded-md p-1.5 mb-1.5"
+        style={{ background: `linear-gradient(135deg, ${color}, ${color}aa)` }}
+      >
+        <div className="h-1.5 w-3/4 rounded bg-white" />
+        <div className="h-0.5 w-1/2 rounded bg-white/70 mt-1" />
+      </div>
+      <div className="mt-2">
+        <div className="flex items-center gap-1 mb-1">
+          <div className="h-0.5 w-2 rounded-full" style={{ background: color }} />
+          <div className="h-1 w-1/3 rounded" style={{ background: color }} />
+        </div>
+        <div className="rounded border p-1" style={{ borderColor: `${color}33` }}>
+          <div className="space-y-0.5">
+            <div className="h-0.5 w-full rounded bg-gray-200" />
+            <div className="h-0.5 w-3/4 rounded bg-gray-200" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbMinimal({ color }) {
+  return (
+    <div className="h-full p-3 bg-white">
+      <div className="h-1.5 w-2/3 rounded-sm" style={{ background: color }} />
+      <div className="h-0.5 w-1/3 rounded bg-gray-400 mt-1" />
+      <div className="border-b mt-2 border-gray-200" />
+      <div className="mt-2 italic">
+        <div className="h-0.5 w-full rounded bg-gray-300" />
+        <div className="h-0.5 w-5/6 rounded bg-gray-300 mt-0.5" />
+      </div>
+      <div className="mt-3 grid grid-cols-4 gap-1">
+        <div className="h-0.5 w-full rounded bg-gray-300" />
+        <div className="col-span-3 space-y-0.5">
+          <div className="h-0.5 w-full rounded bg-gray-400" />
+          <div className="h-0.5 w-4/5 rounded bg-gray-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbTech({ color }) {
+  return (
+    <div className="h-full bg-white flex flex-col">
+      <div className="bg-slate-800 px-1.5 py-1 flex items-center gap-0.5">
+        <div className="h-1 w-1 rounded-full bg-red-500" />
+        <div className="h-1 w-1 rounded-full bg-yellow-500" />
+        <div className="h-1 w-1 rounded-full bg-green-500" />
+      </div>
+      <div className="flex-1 bg-slate-900 p-2 text-[6px] leading-tight" style={{ fontFamily: "monospace" }}>
+        <div className="text-pink-400">const <span style={{ color }}>name</span> <span className="text-purple-400">=</span></div>
+        <div className="text-yellow-400 ml-2">"...";</div>
+        <div className="text-slate-500 mt-1">/* about */</div>
+        <div className="text-slate-400 ml-1">* lorem ipsum</div>
+        <div className="text-slate-500">*/</div>
+        <div className="text-pink-400 mt-1">const <span style={{ color }}>skills</span></div>
+        <div className="text-yellow-400 ml-2">["js", "react"]</div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbElegant({ color }) {
+  return (
+    <div className="h-full p-2 bg-white text-center" style={{ fontFamily: "Georgia, serif" }}>
+      <div className="h-3 w-3 rounded-full mx-auto mb-1" style={{ background: color, opacity: 0.3 }} />
+      <div className="h-1.5 w-2/3 rounded mx-auto" style={{ background: color }} />
+      <div className="h-0.5 w-1/2 rounded mx-auto mt-1 bg-gray-400" />
+      <div className="border-b mt-2 mx-2" style={{ borderColor: color, opacity: 0.4 }} />
+      <div className="mt-2 italic space-y-0.5 px-1">
+        <div className="h-0.5 w-full rounded bg-gray-300" />
+        <div className="h-0.5 w-4/5 rounded mx-auto bg-gray-300" />
+      </div>
+      <div className="mt-2">
+        <div className="h-0.5 w-1/4 rounded mx-auto" style={{ background: color }} />
+        <div className="h-1 w-1/2 rounded mx-auto mt-1 bg-gray-300" />
+      </div>
+    </div>
+  );
+}
+
+function ThumbBold({ color }) {
+  return (
+    <div className="h-full bg-white flex">
+      <div className="w-2/5 p-1.5" style={{ background: color }}>
+        <div className="h-3 w-3 rounded-full bg-white/40 mx-auto mb-1" />
+        <div className="h-1 w-full rounded bg-white/70" />
+        <div className="h-0.5 w-3/4 rounded bg-white/50 mx-auto mt-1" />
+        <div className="mt-2 space-y-0.5">
+          <div className="h-0.5 w-full rounded bg-white/30" />
+          <div className="h-0.5 w-3/4 rounded bg-white/30" />
+          <div className="h-0.5 w-5/6 rounded bg-white/30" />
+        </div>
+      </div>
+      <div className="w-3/5 p-2">
+        <div className="h-1 w-1/3 rounded" style={{ background: color }} />
+        <div className="space-y-0.5 mt-1">
+          <div className="h-0.5 w-full rounded bg-gray-200" />
+          <div className="h-0.5 w-5/6 rounded bg-gray-200" />
+        </div>
+        <div className="pl-1 border-l mt-2" style={{ borderColor: color }}>
+          <div className="h-0.5 w-3/4 rounded bg-gray-900" />
+          <div className="h-0.5 w-1/2 rounded mt-0.5" style={{ background: color }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbCompact({ color }) {
+  return (
+    <div className="h-full p-1.5 bg-white">
+      <div className="flex justify-between items-center border-b-2 pb-1" style={{ borderColor: color }}>
+        <div>
+          <div className="h-1.5 w-12 rounded bg-gray-900" />
+          <div className="h-0.5 w-8 rounded mt-0.5" style={{ background: color }} />
+        </div>
+        <div className="space-y-0.5">
+          <div className="h-0.5 w-6 rounded bg-gray-300" />
+          <div className="h-0.5 w-5 rounded bg-gray-300" />
+        </div>
+      </div>
+      <div className="mt-1 space-y-1">
+        <div className="h-0.5 w-1/4 rounded" style={{ background: color }} />
+        <div className="space-y-0.5">
+          <div className="h-0.5 w-full rounded bg-gray-200" />
+          <div className="h-0.5 w-5/6 rounded bg-gray-200" />
+          <div className="h-0.5 w-full rounded bg-gray-200" />
+          <div className="h-0.5 w-3/4 rounded bg-gray-200" />
+        </div>
+        <div className="h-0.5 w-1/4 rounded mt-1" style={{ background: color }} />
+        <div className="space-y-0.5">
+          <div className="h-0.5 w-full rounded bg-gray-200" />
+          <div className="h-0.5 w-5/6 rounded bg-gray-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbAcademic({ color }) {
+  return (
+    <div className="h-full p-2 bg-white text-center" style={{ fontFamily: "Georgia, serif" }}>
+      <div className="border-b-2 border-gray-900 pb-1">
+        <div className="h-1.5 w-3/5 rounded mx-auto bg-gray-900" />
+        <div className="h-0.5 w-2/5 rounded mx-auto mt-1 bg-gray-400 italic" />
+      </div>
+      <div className="text-left mt-2">
+        <div className="h-1 w-1/3 rounded font-bold" style={{ background: color }} />
+        <div className="space-y-0.5 mt-1">
+          <div className="h-0.5 w-full rounded bg-gray-300" />
+          <div className="h-0.5 w-full rounded bg-gray-300" />
+          <div className="h-0.5 w-3/4 rounded bg-gray-300" />
+        </div>
+        <div className="h-1 w-2/5 rounded mt-2" style={{ background: color }} />
+        <div className="space-y-0.5 mt-1">
+          <div className="h-0.5 w-5/6 rounded bg-gray-300" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbStartup({ color }) {
+  return (
+    <div className="h-full p-1 bg-gray-100 space-y-1">
+      <div className="rounded-md bg-white p-1.5 flex items-center gap-1 border border-gray-200">
+        <div className="h-3 w-3 rounded-md" style={{ background: color }} />
+        <div className="flex-1">
+          <div className="h-1 w-3/4 rounded bg-gray-900" />
+          <div className="h-0.5 w-1/2 rounded mt-0.5" style={{ background: color }} />
+        </div>
+      </div>
+      <div className="rounded-md p-1.5" style={{ background: color }}>
+        <div className="h-0.5 w-1/4 rounded bg-white/60" />
+        <div className="space-y-0.5 mt-0.5">
+          <div className="h-0.5 w-full rounded bg-white/70" />
+          <div className="h-0.5 w-3/4 rounded bg-white/70" />
+        </div>
+      </div>
+      <div className="rounded-md bg-white p-1.5 border border-gray-200">
+        <div className="h-0.5 w-1/3 rounded" style={{ background: color }} />
+        <div className="rounded bg-gray-50 p-1 mt-1 border border-gray-100">
+          <div className="h-0.5 w-full rounded bg-gray-300" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ThumbPhoto({ color }) {
+  return (
+    <div className="h-full bg-white flex flex-col">
+      <div className="grid grid-cols-3 h-1/2">
+        <div className="col-span-1 flex items-center justify-center" style={{ background: color }}>
+          <div className="h-5 w-5 rounded-full bg-white shadow-md" />
+        </div>
+        <div className="col-span-2 p-1.5 flex flex-col justify-center">
+          <div className="h-1.5 w-3/4 rounded bg-gray-900" />
+          <div className="h-0.5 w-1/2 rounded mt-1" style={{ background: color }} />
+          <div className="h-0.5 w-2/3 rounded mt-1 bg-gray-300" />
+        </div>
+      </div>
+      <div className="flex-1 p-2 space-y-1">
+        <div className="h-0.5 w-1/3 rounded" style={{ background: color }} />
+        <div className="space-y-0.5">
+          <div className="h-0.5 w-full rounded bg-gray-200" />
+          <div className="h-0.5 w-4/5 rounded bg-gray-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ============================ HTML GENERATORS ============================ */
 function generateResumeHTML(resume, isPro, templateId, accent) {
   const photo = resume.photo;
   const footer = isPro ? "" : `<div class="footer">Built with <a href="https://fancydigitals.com.ng">Fancy Digitals AI Resume Builder</a></div>`;
   switch (templateId) {
-    case "modern": return modernHTML(resume, photo, footer, accent);
-    case "professional": return professionalHTML(resume, photo, footer, accent);
-    case "creative": return creativeHTML(resume, photo, footer, accent);
-    case "minimal": return minimalHTML(resume, photo, footer, accent);
-    case "tech": return techHTML(resume, photo, footer, accent);
-    case "basic":
-    default: return basicHTML(resume, photo, footer, accent);
-  }
+  case "modern": return modernHTML(resume, photo, footer, accent);
+  case "professional": return professionalHTML(resume, photo, footer, accent);
+  case "creative": return creativeHTML(resume, photo, footer, accent);
+  case "minimal": return minimalHTML(resume, photo, footer, accent);
+  case "tech": return techHTML(resume, photo, footer, accent);
+  case "basic":
+  default: return basicHTML(resume, photo, footer, accent);
+}
 }
 
 const PRINT_RESET = `* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } @media print { @page { margin: 15mm; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }`;
@@ -1328,5 +2126,223 @@ ${resume.experience?.length>0?`<div><span class="pink">const</span> <span class=
 ${resume.education?.length>0?`<div><span class="pink">const</span> <span class="accent-c">education</span> <span class="purple">=</span> [</div><div class="indent">${resume.education.map(e=>`<div><span class="yellow">"${e.degree||""}, ${e.school||""} (${e.year||""})"</span>,</div>`).join("")}</div><div style="margin-bottom:12px;">];</div>`:""}
 ${resume.skills?.length>0?`<div><span class="pink">const</span> <span class="accent-c">skills</span> <span class="purple">=</span> [${resume.skills.map(s=>`<span class="yellow">"${s}"</span>`).join(", ")}];</div>`:""}
 </div></div>
+${footer}</body></html>`;
+}
+
+function elegantHTML(resume, photo, footer, accent) {
+  const color = accent || "#78350f";
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resume.fullName} - Resume</title><style>
+${PRINT_RESET}
+body { font-family: Georgia, 'Times New Roman', serif; max-width: 800px; margin: 0 auto; padding: 50px; color: #1f2937; line-height: 1.5; background: white; }
+.header { text-align: center; padding-bottom: 20px; margin-bottom: 24px; border-bottom: 1px solid ${color}; }
+.photo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; display: block; box-shadow: 0 0 0 3px white, 0 0 0 5px ${color}; }
+h1 { font-size: 28px; font-weight: normal; color: ${color}; letter-spacing: 2px; margin: 0; }
+.title { font-size: 13px; font-style: italic; color: #6b7280; margin-top: 6px; }
+.contact { font-size: 11px; color: #6b7280; margin-top: 10px; }
+.summary { text-align: center; font-style: italic; font-size: 13px; line-height: 1.85; color: #374151; max-width: 600px; margin: 0 auto 24px; }
+h2 { text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 4px; font-weight: 600; color: ${color}; margin: 24px 0 16px; padding-bottom: 4px; border-bottom: 1px solid ${color}33; }
+.exp { text-align: center; margin: 14px 0; }
+.exp-role { font-weight: 600; font-size: 14px; color: #111827; }
+.exp-company { font-style: italic; font-size: 12px; color: ${color}; }
+.exp-date { font-size: 10px; color: #6b7280; margin-top: 2px; }
+.exp ul { list-style: none; padding: 0; max-width: 550px; margin: 8px auto 0; }
+.exp li { font-size: 12px; color: #374151; line-height: 1.7; margin-bottom: 4px; }
+.edu { text-align: center; margin: 8px 0; }
+.edu-degree { font-weight: 600; font-size: 13px; color: #111827; }
+.edu-school { font-style: italic; font-size: 12px; color: #6b7280; }
+.skills { text-align: center; font-size: 12px; color: #374151; }
+.footer { margin-top: 40px; padding-top: 12px; text-align: center; color: #9ca3af; font-size: 10px; }
+.footer a { color: #075a01; text-decoration: none; font-weight: bold; }
+</style></head><body>
+<div class="header">${photo ? `<img src="${photo}" class="photo" alt="" />` : ""}<h1>${resume.fullName || ""}</h1><p class="title">${resume.title || ""}</p><p class="contact">${[resume.contact?.email, resume.contact?.phone, resume.contact?.location].filter(Boolean).join(" · ")}</p></div>
+${resume.summary ? `<p class="summary">"${resume.summary}"</p>` : ""}
+${resume.experience?.length > 0 ? `<h2>Experience</h2>${resume.experience.map(e => `<div class="exp"><p class="exp-role">${e.role||""}</p><p class="exp-company">${e.company||""}${e.location?" · "+e.location:""}</p><p class="exp-date">${e.duration||""}</p><ul>${(e.bullets||[]).map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}` : ""}
+${resume.education?.length > 0 ? `<h2>Education</h2>${resume.education.map(e => `<div class="edu"><p class="edu-degree">${e.degree||""}</p><p class="edu-school">${e.school||""} · ${e.year||""}</p></div>`).join("")}` : ""}
+${resume.skills?.length > 0 ? `<h2>Expertise</h2><p class="skills">${resume.skills.join(" · ")}</p>` : ""}
+${footer}</body></html>`;
+}
+
+function boldHTML(resume, photo, footer, accent) {
+  const color = accent || "#dc2626";
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resume.fullName} - Resume</title><style>
+${PRINT_RESET}
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; color: #1f2937; line-height: 1.5; background: white; display: flex; min-height: 100vh; }
+.sidebar { width: 35%; background: ${color}; color: white; padding: 30px 20px; }
+.photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; display: block; box-shadow: 0 0 0 4px rgba(255,255,255,0.3); }
+h1 { font-size: 20px; font-weight: bold; text-align: center; margin: 0 0 4px; line-height: 1.2; }
+.title { font-size: 10px; text-align: center; text-transform: uppercase; letter-spacing: 2px; opacity: 0.85; margin-bottom: 24px; }
+.section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; opacity: 0.75; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.3); }
+.sidebar p { font-size: 11px; margin: 2px 0; word-wrap: break-word; }
+.main { width: 65%; padding: 30px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; color: ${color}; margin: 0 0 12px; }
+.summary { font-size: 12.5px; color: #374151; line-height: 1.7; margin-bottom: 20px; }
+.exp { margin: 14px 0; padding-left: 16px; border-left: 2px solid ${color}; }
+.exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+.exp-role { font-weight: bold; font-size: 13px; }
+.exp-date { font-size: 10px; color: #6b7280; }
+.exp-company { font-weight: 600; font-size: 12px; color: ${color}; margin-top: 2px; }
+.exp ul { margin: 6px 0 0; padding-left: 18px; }
+.exp li { font-size: 11.5px; color: #374151; line-height: 1.6; margin-bottom: 3px; }
+.footer { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; color: #9ca3af; font-size: 10px; }
+.footer a { color: #075a01; text-decoration: none; font-weight: bold; }
+</style></head><body>
+<div class="sidebar">${photo ? `<img src="${photo}" class="photo" alt="" />` : ""}<h1>${resume.fullName || ""}</h1><p class="title">${resume.title || ""}</p>
+<p class="section-title">Contact</p>${resume.contact?.email ? `<p>${resume.contact.email}</p>` : ""}${resume.contact?.phone ? `<p>${resume.contact.phone}</p>` : ""}${resume.contact?.location ? `<p>${resume.contact.location}</p>` : ""}${resume.contact?.linkedIn ? `<p>${resume.contact.linkedIn}</p>` : ""}${resume.contact?.portfolio ? `<p>${resume.contact.portfolio}</p>` : ""}
+${resume.skills?.length > 0 ? `<p class="section-title">Skills</p>${resume.skills.map(s => `<p>· ${s}</p>`).join("")}` : ""}
+${resume.education?.length > 0 ? `<p class="section-title">Education</p>${resume.education.map(e => `<div style="margin-bottom:10px;"><p style="font-weight:600;">${e.degree||""}</p><p style="opacity:0.85;">${e.school||""}</p><p style="opacity:0.7;font-size:10px;">${e.year||""}</p></div>`).join("")}` : ""}
+</div>
+<div class="main">
+${resume.summary ? `<h2>About</h2><p class="summary">${resume.summary}</p>` : ""}
+${resume.experience?.length > 0 ? `<h2>Experience</h2>${resume.experience.map(e => `<div class="exp"><div class="exp-header"><span class="exp-role">${e.role||""}</span><span class="exp-date">${e.duration||""}</span></div><p class="exp-company">${e.company||""}${e.location?" · "+e.location:""}</p><ul>${(e.bullets||[]).map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}` : ""}
+</div>
+${footer}</body></html>`;
+}
+
+function compactHTML(resume, photo, footer, accent) {
+  const color = accent || "#374151";
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resume.fullName} - Resume</title><style>
+${PRINT_RESET}
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; color: #1f2937; line-height: 1.45; background: white; font-size: 11px; }
+.header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid ${color}; padding-bottom: 8px; margin-bottom: 12px; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.photo { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; border: 1px solid #e5e7eb; }
+h1 { font-size: 20px; margin: 0; color: #111827; }
+.title { font-size: 12px; color: ${color}; }
+.contact { text-align: right; font-size: 10px; color: #4b5563; }
+h2 { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; color: ${color}; border-bottom: 1px solid #e5e7eb; padding-bottom: 2px; margin: 12px 0 6px; }
+.summary { font-size: 11px; color: #374151; line-height: 1.55; margin-bottom: 10px; }
+.exp { margin: 8px 0; }
+.exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+.exp-role-line { font-size: 11.5px; }
+.exp-date { font-size: 10px; color: #6b7280; white-space: nowrap; }
+.exp ul { margin: 2px 0 0; padding-left: 16px; }
+.exp li { font-size: 10.5px; color: #374151; line-height: 1.5; }
+.edu-item { font-size: 11px; margin: 2px 0; }
+.skills-text { font-size: 11px; color: #374151; }
+.footer { margin-top: 20px; padding-top: 10px; text-align: center; color: #9ca3af; font-size: 9px; }
+.footer a { color: #075a01; text-decoration: none; font-weight: bold; }
+</style></head><body>
+<div class="header"><div class="header-left">${photo ? `<img src="${photo}" class="photo" alt="" />` : ""}<div><h1>${resume.fullName || ""}</h1><p class="title">${resume.title || ""}</p></div></div><div class="contact">${resume.contact?.email ? `<div>${resume.contact.email}</div>` : ""}${resume.contact?.phone ? `<div>${resume.contact.phone}</div>` : ""}${resume.contact?.location ? `<div>${resume.contact.location}</div>` : ""}</div></div>
+${resume.summary ? `<h2>Summary</h2><p class="summary">${resume.summary}</p>` : ""}
+${resume.experience?.length > 0 ? `<h2>Experience</h2>${resume.experience.map(e => `<div class="exp"><div class="exp-header"><span class="exp-role-line"><strong>${e.role||""}</strong> — ${e.company||""}${e.location?", "+e.location:""}</span><span class="exp-date">${e.duration||""}</span></div><ul>${(e.bullets||[]).map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}` : ""}
+${resume.education?.length > 0 ? `<h2>Education</h2>${resume.education.map(e => `<p class="edu-item"><strong>${e.degree||""}</strong> — ${e.school||""}, ${e.year||""}</p>`).join("")}` : ""}
+${resume.skills?.length > 0 ? `<h2>Skills</h2><p class="skills-text"><strong>Core:</strong> ${resume.skills.join(" · ")}</p>` : ""}
+${footer}</body></html>`;
+}
+
+function academicHTML(resume, photo, footer, accent) {
+  const color = accent || "#1e40af";
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resume.fullName} - Resume</title><style>
+${PRINT_RESET}
+body { font-family: Garamond, Georgia, serif; max-width: 800px; margin: 0 auto; padding: 50px; color: #1f2937; line-height: 1.6; background: white; }
+.header { text-align: center; padding-bottom: 12px; margin-bottom: 18px; border-bottom: 2px solid #111827; }
+h1 { font-size: 24px; font-weight: bold; margin: 0; color: #111827; }
+.title { font-size: 13px; font-style: italic; color: #4b5563; margin-top: 4px; }
+.contact { font-size: 10px; color: #6b7280; margin-top: 8px; }
+h2 { font-size: 11px; font-weight: bold; color: ${color}; margin: 18px 0 8px; }
+.summary { font-size: 12px; color: #374151; line-height: 1.8; text-align: justify; margin-bottom: 14px; }
+.exp { margin: 12px 0; }
+.exp-header { display: flex; justify-content: space-between; align-items: baseline; }
+.exp-role { font-size: 12.5px; }
+.exp-date { font-size: 11px; color: #6b7280; }
+.exp-location { font-size: 10px; color: #6b7280; font-style: italic; }
+.exp ul { margin: 4px 0 0; padding-left: 22px; }
+.exp li { font-size: 11.5px; color: #374151; line-height: 1.65; text-align: justify; margin-bottom: 3px; }
+.edu-item { font-size: 12px; margin: 6px 0; }
+.edu-details { font-size: 10.5px; color: #6b7280; font-style: italic; padding-left: 12px; }
+.skills-text { font-size: 11.5px; color: #374151; line-height: 1.7; }
+.footer { margin-top: 30px; padding-top: 12px; text-align: center; color: #9ca3af; font-size: 10px; }
+.footer a { color: #075a01; text-decoration: none; font-weight: bold; }
+</style></head><body>
+<div class="header"><h1>${resume.fullName || ""}</h1><p class="title">${resume.title || ""}</p><p class="contact">${[resume.contact?.email, resume.contact?.phone, resume.contact?.location].filter(Boolean).join(" | ")}</p></div>
+${resume.summary ? `<h2>Research Statement</h2><p class="summary">${resume.summary}</p>` : ""}
+${resume.experience?.length > 0 ? `<h2>Academic &amp; Professional Experience</h2>${resume.experience.map(e => `<div class="exp"><div class="exp-header"><span class="exp-role"><strong>${e.role||""}</strong>, <em>${e.company||""}</em></span><span class="exp-date">${e.duration||""}</span></div>${e.location?`<p class="exp-location">${e.location}</p>`:""}<ul>${(e.bullets||[]).map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}` : ""}
+${resume.education?.length > 0 ? `<h2>Education</h2>${resume.education.map(e => `<div><p class="edu-item"><strong>${e.degree||""}</strong> — <em>${e.school||""}</em>, ${e.year||""}</p>${e.details?`<p class="edu-details">${e.details}</p>`:""}</div>`).join("")}` : ""}
+${resume.skills?.length > 0 ? `<h2>Research Interests &amp; Methods</h2><p class="skills-text">${resume.skills.join(" · ")}</p>` : ""}
+${footer}</body></html>`;
+}
+
+function startupHTML(resume, photo, footer, accent) {
+  const color = accent || "#059669";
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resume.fullName} - Resume</title><style>
+${PRINT_RESET}
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 16px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
+.card { background: white; border-radius: 16px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 12px; }
+.hero { display: flex; align-items: center; gap: 16px; }
+.photo { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; }
+h1 { font-size: 22px; margin: 0; color: #111827; }
+.title { font-size: 13px; font-weight: 600; color: ${color}; }
+.contact-right { text-align: right; font-size: 10px; color: #6b7280; }
+.summary-card { background: ${color}; color: white; border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+.section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; opacity: 0.85; margin-bottom: 8px; }
+.summary-text { font-size: 13px; line-height: 1.7; }
+.exp-section { background: white; border-radius: 16px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 12px; }
+.exp-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; color: ${color}; margin-bottom: 12px; }
+.exp-item { background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+.exp-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.exp-role { font-weight: bold; font-size: 13px; }
+.exp-tag { font-size: 10px; padding: 2px 8px; border-radius: 999px; background: ${color}20; color: ${color}; font-weight: 600; }
+.exp-company { font-size: 11px; color: #6b7280; margin-bottom: 6px; }
+.exp-item ul { list-style: none; padding: 0; margin: 0; }
+.exp-item li { font-size: 11.5px; color: #374151; line-height: 1.6; padding-left: 12px; position: relative; margin-bottom: 2px; }
+.exp-item li:before { content: ""; position: absolute; left: 0; top: 7px; width: 4px; height: 4px; border-radius: 50%; background: ${color}; }
+.bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.skill-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 6px; background: ${color}15; color: ${color}; font-weight: 600; margin: 2px; }
+.footer { margin-top: 16px; padding-top: 12px; text-align: center; color: #9ca3af; font-size: 10px; }
+.footer a { color: #075a01; text-decoration: none; font-weight: bold; }
+</style></head><body>
+<div class="card hero"><div style="display:flex;align-items:center;gap:16px;flex:1;">${photo ? `<img src="${photo}" class="photo" alt="" />` : ""}<div><h1>${resume.fullName || ""}</h1><p class="title">${resume.title || ""}</p></div></div><div class="contact-right">${resume.contact?.email ? `<div>${resume.contact.email}</div>` : ""}${resume.contact?.phone ? `<div>${resume.contact.phone}</div>` : ""}${resume.contact?.location ? `<div>${resume.contact.location}</div>` : ""}</div></div>
+${resume.summary ? `<div class="summary-card"><p class="section-label">// About</p><p class="summary-text">${resume.summary}</p></div>` : ""}
+${resume.experience?.length > 0 ? `<div class="exp-section"><p class="exp-label">// Experience</p>${resume.experience.map(e => `<div class="exp-item"><div class="exp-header"><span class="exp-role">${e.role||""}</span><span class="exp-tag">${e.duration||""}</span></div><p class="exp-company">@ ${e.company||""}${e.location?" · "+e.location:""}</p><ul>${(e.bullets||[]).map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}</div>` : ""}
+<div class="bottom-row">
+${resume.education?.length > 0 ? `<div class="card"><p class="exp-label">// Education</p>${resume.education.map(e => `<div style="margin-bottom:6px;"><p style="font-size:11.5px;font-weight:bold;">${e.degree||""}</p><p style="font-size:10px;color:#6b7280;">${e.school||""} · ${e.year||""}</p></div>`).join("")}</div>` : ""}
+${resume.skills?.length > 0 ? `<div class="card"><p class="exp-label">// Stack</p>${resume.skills.map(s => `<span class="skill-tag">${s}</span>`).join("")}</div>` : ""}
+</div>
+${footer}</body></html>`;
+}
+
+function photoFirstHTML(resume, photo, footer, accent) {
+  const color = accent || "#0891b2";
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${resume.fullName} - Resume</title><style>
+${PRINT_RESET}
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 0 auto; color: #1f2937; line-height: 1.5; background: white; }
+.top { display: grid; grid-template-columns: 1fr 2fr; min-height: 180px; }
+.photo-side { background: ${color}; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.photo { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px white, 0 4px 12px rgba(0,0,0,0.2); }
+.photo-fallback { width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white; font-size: 60px; font-weight: bold; box-shadow: 0 0 0 4px white; }
+.intro { padding: 24px; display: flex; flex-direction: column; justify-content: center; }
+h1 { font-size: 28px; color: #111827; margin: 0; line-height: 1.1; }
+.title { font-size: 15px; font-weight: 600; color: ${color}; margin-top: 4px; }
+.contact { margin-top: 12px; font-size: 11px; color: #4b5563; display: flex; flex-wrap: wrap; gap: 10px; }
+.body { padding: 24px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; color: ${color}; margin: 18px 0 10px; }
+.summary { font-size: 13px; color: #374151; line-height: 1.75; }
+.exp { margin: 12px 0; }
+.exp-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.exp-role { font-weight: bold; font-size: 14px; }
+.exp-date { font-size: 11px; color: #6b7280; white-space: nowrap; }
+.exp-company { font-size: 12.5px; font-weight: 600; color: ${color}; margin-top: 2px; }
+.exp ul { margin: 6px 0 0; padding-left: 18px; }
+.exp li { font-size: 12px; color: #374151; line-height: 1.6; margin-bottom: 3px; }
+.bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.edu-item { margin-bottom: 8px; }
+.edu-degree { font-weight: bold; font-size: 12px; }
+.edu-school { font-size: 11px; color: #6b7280; }
+.skill-tag { display: inline-block; font-size: 10.5px; padding: 3px 8px; border-radius: 4px; background: ${color}15; color: ${color}; font-weight: 600; margin: 2px; }
+.footer { padding: 20px; text-align: center; color: #9ca3af; font-size: 10px; }
+.footer a { color: #075a01; text-decoration: none; font-weight: bold; }
+</style></head><body>
+<div class="top">
+<div class="photo-side">${photo ? `<img src="${photo}" class="photo" alt="" />` : `<div class="photo-fallback">${(resume.fullName||"?").charAt(0)}</div>`}</div>
+<div class="intro"><h1>${resume.fullName || ""}</h1><p class="title">${resume.title || ""}</p><div class="contact">${resume.contact?.email ? `<span>${resume.contact.email}</span>` : ""}${resume.contact?.phone ? `<span>${resume.contact.phone}</span>` : ""}${resume.contact?.location ? `<span>${resume.contact.location}</span>` : ""}</div></div>
+</div>
+<div class="body">
+${resume.summary ? `<h2>Profile</h2><p class="summary">${resume.summary}</p>` : ""}
+${resume.experience?.length > 0 ? `<h2>Experience</h2>${resume.experience.map(e => `<div class="exp"><div class="exp-header"><span class="exp-role">${e.role||""}</span><span class="exp-date">${e.duration||""}</span></div><p class="exp-company">${e.company||""}${e.location?" · "+e.location:""}</p><ul>${(e.bullets||[]).map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}` : ""}
+<div class="bottom">
+${resume.education?.length > 0 ? `<div><h2>Education</h2>${resume.education.map(e => `<div class="edu-item"><p class="edu-degree">${e.degree||""}</p><p class="edu-school">${e.school||""} · ${e.year||""}</p></div>`).join("")}</div>` : ""}
+${resume.skills?.length > 0 ? `<div><h2>Skills</h2>${resume.skills.map(s => `<span class="skill-tag">${s}</span>`).join("")}</div>` : ""}
+</div>
+</div>
 ${footer}</body></html>`;
 }

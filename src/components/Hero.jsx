@@ -51,48 +51,48 @@ export default function Hero({
       <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28 md:px-10 md:pb-20 md:pt-32 lg:pt-36">
 
         {/* Headline */}
-        <div className="mx-auto mb-5 max-w-4xl text-center sm:mb-7">
-          <h1 className="text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-            <span className="block text-white/90">Where Vision</span>
-            <span className="block bg-gradient-to-r from-[#075a01] via-[#4ade80] to-[#ff914d] bg-clip-text text-transparent">
-              Meets Excellence
-            </span>
-          </h1>
-        </div>
+<div className="mx-auto mb-4 max-w-4xl text-center sm:mb-6 md:mb-7">
+  <h1 className="text-2xl font-bold leading-[1.15] tracking-[-0.02em] text-white sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl">
+    <span className="block text-white/90">Where Vision</span>
+    <span className="block bg-gradient-to-r from-[#075a01] via-[#4ade80] to-[#ff914d] bg-clip-text text-transparent">
+      Meets Excellence
+    </span>
+  </h1>
+</div>
 
-        {/* Subheadline */}
-        <p className="mx-auto mb-8 max-w-xs text-center text-xs leading-relaxed text-white/40 sm:max-w-lg sm:text-sm md:mb-10 md:max-w-xl md:text-base lg:text-lg">
-          Premium websites, brands, and digital tools —
-          built for founders and businesses who demand clarity and performance.
-        </p>
+{/* Subheadline */}
+<p className="mx-auto mb-6 max-w-[280px] text-center text-[11px] leading-relaxed text-white/50 sm:mb-8 sm:max-w-md sm:text-sm md:mb-10 md:max-w-xl md:text-base lg:text-lg">
+  Premium websites, brands, and digital tools —
+  built for founders and businesses who demand clarity and performance.
+</p>
 
-        {/* CTA Buttons */}
-        <div className="mb-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4 md:mb-14">
-          <a
-            href="/contact"
-            className="group relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#075a01] px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#0a8f01] hover:shadow-[0_0_40px_rgba(7,90,1,0.4)] sm:w-auto sm:px-8 sm:py-3.5"
-          >
-            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            <span className="relative">Start Your Project</span>
-            <ArrowRight className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-          </a>
+{/* CTA Buttons */}
+<div className="mb-8 grid w-full max-w-md grid-cols-2 gap-2 px-4 sm:mb-10 sm:flex sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-3 sm:px-0 md:mb-14 md:gap-4">
+  <a
+    href="/contact"
+    className="group relative col-span-2 inline-flex items-center justify-center gap-1.5 overflow-hidden rounded-xl bg-[#075a01] px-4 py-3 text-xs font-semibold text-white transition-all duration-300 hover:bg-[#0a8f01] hover:shadow-[0_0_40px_rgba(7,90,1,0.4)] active:scale-95 sm:col-span-1 sm:gap-2.5 sm:px-6 sm:py-3 sm:text-sm md:px-8 md:py-3.5"
+  >
+    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+    <span className="relative">Start Your Project</span>
+    <ArrowRight className="relative h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
+  </a>
 
-          <a
-            href="/tools"
-            className="inline-flex w-full items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white sm:w-auto sm:px-8 sm:py-3.5"
-          >
-            Free Tools
-            <Wrench className="h-4 w-4" />
-          </a>
+  <a
+    href="/tools"
+    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white active:scale-95 sm:gap-2.5 sm:px-6 sm:py-3 sm:text-sm md:px-8 md:py-3.5"
+  >
+    Free Tools
+    <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+  </a>
 
-          <a
-            href="/portfolio"
-            className="hidden sm:inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-white/5 px-8 py-3.5 text-sm font-semibold text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white"
-          >
-            Portfolio
-            <Images className="h-4 w-4" />
-          </a>
-        </div>
+  <a
+    href="/portfolio"
+    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white active:scale-95 sm:gap-2.5 sm:px-6 sm:py-3 sm:text-sm md:px-8 md:py-3.5"
+  >
+    Portfolio
+    <Images className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+  </a>
+</div>
 
         {/* Slider */}
         <div
@@ -138,27 +138,6 @@ export default function Hero({
                   <path d="M32 20v12H20" />
                 </svg>
 
-                {/* Slide counter */}
-                <div className="absolute left-3 top-3 rounded-md border border-white/10 bg-black/40 px-2 py-1 backdrop-blur-sm sm:left-5 sm:top-5 sm:px-3 sm:py-1.5">
-                  <span className="font-mono text-[9px] font-medium text-white/60 sm:text-xs">
-                    {String(currentSlide + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
-                  </span>
-                </div>
-
-                {/* Nav arrows */}
-                <button
-                  onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-                  className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-black/60 hover:text-white sm:left-4 sm:h-10 sm:w-10"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                </button>
-                <button
-                  onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-                  className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/70 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-black/60 hover:text-white sm:right-4 sm:h-10 sm:w-10"
-                >
-                  <ChevronRight className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                </button>
-
                 {/* Dots */}
                 <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 sm:bottom-5 sm:gap-1.5">
                   {slides.map((_, index) => (
@@ -186,33 +165,13 @@ export default function Hero({
           </div>
         </div>
 
-        {/* Stats row */}
-        <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/5 bg-white/5 sm:mt-10 sm:grid-cols-4 md:mt-12">
-          {[
-            { value: "50+", label: "Projects Delivered" },
-            { value: "98%", label: "Client Satisfaction" },
-            { value: "8+", label: "Free Tools" },
-            { value: "24h", label: "Response Time" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="flex flex-col items-center justify-center gap-0.5 bg-[#050a0f] px-3 py-4 text-center sm:px-6 sm:py-5 md:px-8 md:py-6"
-            >
-              <p className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-lg font-bold text-transparent sm:text-2xl md:text-3xl">
-                {stat.value}
-              </p>
-              <p className="text-[9px] text-white/30 sm:text-xs">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-
         {/* Services mini grid */}
         <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
           {[
+            { icon: Wrench, title: "Free Tools", desc: "8+ tools, no sign-up", href: "/tools" },
             { icon: Globe, title: "Websites", desc: "Modern & conversion-ready", href: "/services" },
             { icon: Palette, title: "Branding", desc: "Identity that stands out", href: "/services" },
             { icon: TrendingUp, title: "SEO", desc: "Organic growth systems", href: "/seo-services-nigeria" },
-            { icon: Wrench, title: "Free Tools", desc: "8+ tools, no sign-up", href: "/tools" },
           ].map((item) => {
             const Icon = item.icon;
             return (

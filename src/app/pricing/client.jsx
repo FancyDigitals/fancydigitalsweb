@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { REGIONAL_PRICING, getRegionForCountry, formatPrice } from "@/lib/pricing";
 import Link from "next/link";
 import {
   Check,
@@ -18,109 +19,110 @@ import {
 
 export default function PricingClient() {
   const [billing, setBilling] = useState("monthly");
-  const [currency, setCurrency] = useState("NGN");
+const [region, setRegion] = useState("US");
+const [detectedRegion, setDetectedRegion] = useState(null);
 
-  const prices = {
-    NGN: {
-      symbol: "₦",
-      pro_monthly: "2,500",
-      pro_yearly: "20,000",
-      pro_yearly_per_month: "1,667",
-      lifetime: "25,000",
-      savings: "Save ₦10,000/year",
-    },
-    USD: {
-      symbol: "$",
-      pro_monthly: "4.99",
-      pro_yearly: "39",
-      pro_yearly_per_month: "3.25",
-      lifetime: "49",
-      savings: "Save $21/year",
-    },
-  };
+// Auto-detect on mount
+useEffect(() => {
+  fetch("/api/geo")
+    .then((res) => res.json())
+    .then((data) => {
+      const r = getRegionForCountry(data.country);
+      setRegion(r);
+      setDetectedRegion(r);
+    })
+    .catch(() => setRegion("US"));
+}, []);
 
-  const p = prices[currency];
+const pricing = REGIONAL_PRICING[region];
+const yearlyPerMonth = (pricing.yearly / 12).toFixed(2);
+const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
 
   const plans = [
-    {
-      name: "Free",
-      tagline: "Try it out, no card needed",
-      price: "0",
-      period: "forever",
-      icon: Sparkles,
-      iconBg: "bg-gray-100",
-      iconColor: "text-gray-600",
-      cta: "Start Free",
-      ctaLink: "/signup",
-      ctaStyle: "bg-gray-900 text-white hover:bg-gray-800",
-      features: [
-        "3 resumes per day",
-        "1 professional template",
-        "AI-powered content",
-        "Download as HTML",
-        "Print & save as PDF",
-        "All AI tools (limited daily)",
-      ],
-      notIncluded: [
-        "Premium templates",
-        "Unlimited generations",
-        "Remove footer branding",
-        "Priority support",
-      ],
-      popular: false,
-    },
-    {
-      name: "Pro",
-      tagline: "For job seekers & professionals",
-      price: billing === "monthly" ? p.pro_monthly : p.pro_yearly_per_month,
-      period: billing === "monthly" ? "/month" : "/month, billed yearly",
-      yearlyTotal: billing === "yearly" ? `${p.symbol}${p.pro_yearly}/year` : null,
-      icon: Zap,
-      iconBg: "bg-gradient-to-br from-[#075a01] to-[#0a8f01]",
-      iconColor: "text-white",
-      cta: "Get Pro",
-      ctaLink: "/api/checkout?plan=pro_" + billing,
-      ctaStyle: "bg-gradient-to-r from-[#075a01] to-[#0a8f01] text-white hover:opacity-90",
-      features: [
-        "Unlimited resumes & generations",
-        "6+ premium templates",
-        "No footer branding",
-        "ATS score checker",
-        "Save & re-edit any resume",
-        "All current & future AI tools",
-        "Cover letter generator",
-        "Priority email support",
-        "Export to multiple formats",
-        "Cancel anytime",
-      ],
-      notIncluded: [],
-      popular: true,
-      badge: billing === "yearly" ? p.savings : null,
-    },
-    {
-      name: "Lifetime",
-      tagline: "Pay once, use forever",
-      price: p.lifetime,
-      period: "one-time",
-      icon: Crown,
-      iconBg: "bg-gradient-to-br from-amber-400 to-orange-500",
-      iconColor: "text-white",
-      cta: "Buy Lifetime",
-      ctaLink: "/api/checkout?plan=lifetime",
-      ctaStyle: "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90",
-      features: [
-        "Everything in Pro",
-        "One-time payment, no subscription",
-        "Free updates forever",
-        "Early access to new tools",
-        "Lifetime priority support",
-        "Best value long-term",
-      ],
-      notIncluded: [],
-      popular: false,
-      badge: "Best Value",
-    },
-  ];
+  {
+    name: "Free",
+    tagline: "Try it out, no card needed",
+    price: 0,
+    displayPrice: "Free",
+    period: "forever",
+    icon: Sparkles,
+    iconBg: "bg-gray-100",
+    iconColor: "text-gray-600",
+    cta: "Start Free",
+    ctaLink: "/signup",
+    ctaStyle: "bg-gray-900 text-white hover:bg-gray-800",
+    features: [
+      "3 resumes per day",
+      "1 professional template",
+      "AI-powered content",
+      "Download as HTML",
+      "Print & save as PDF",
+      "All AI tools (limited daily)",
+    ],
+    notIncluded: [
+      "Premium templates",
+      "Unlimited generations",
+      "Remove footer branding",
+      "Priority support",
+    ],
+    popular: false,
+  },
+  {
+    name: "Pro",
+    tagline: "For job seekers & professionals",
+    price: billing === "monthly" ? pricing.monthly : parseFloat(yearlyPerMonth),
+    displayPrice: billing === "monthly" 
+      ? formatPrice(pricing.monthly, region) 
+      : formatPrice(parseFloat(yearlyPerMonth), region),
+    period: billing === "monthly" ? "/month" : "/month, billed yearly",
+    yearlyTotal: billing === "yearly" ? `${formatPrice(pricing.yearly, region)}/year` : null,
+    icon: Zap,
+    iconBg: "bg-gradient-to-br from-[#075a01] to-[#0a8f01]",
+    iconColor: "text-white",
+    cta: "Get Pro",
+    ctaLink: "/api/checkout?plan=pro_" + billing,
+    ctaStyle: "bg-gradient-to-r from-[#075a01] to-[#0a8f01] text-white hover:opacity-90",
+    features: [
+      "Unlimited resumes & generations",
+      "6+ premium templates",
+      "No footer branding",
+      "ATS score checker",
+      "Save & re-edit any resume",
+      "All current & future AI tools",
+      "Cover letter generator",
+      "Priority email support",
+      "Export to multiple formats",
+      "Cancel anytime",
+    ],
+    notIncluded: [],
+    popular: true,
+    badge: billing === "yearly" ? `Save ${formatPrice(yearlySavings, region)}` : null,
+  },
+  {
+    name: "Lifetime",
+    tagline: "Pay once, use forever",
+    price: pricing.lifetime,
+    displayPrice: formatPrice(pricing.lifetime, region),
+    period: "one-time",
+    icon: Crown,
+    iconBg: "bg-gradient-to-br from-amber-400 to-orange-500",
+    iconColor: "text-white",
+    cta: "Buy Lifetime",
+    ctaLink: "/api/checkout?plan=lifetime",
+    ctaStyle: "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90",
+    features: [
+      "Everything in Pro",
+      "One-time payment, no subscription",
+      "Free updates forever",
+      "Early access to new tools",
+      "Lifetime priority support",
+      "Best value long-term",
+    ],
+    notIncluded: [],
+    popular: false,
+    badge: "Best Value",
+  },
+];
 
   const comparison = [
     { feature: "AI generations per day", free: "3", pro: "Unlimited", lifetime: "Unlimited" },
@@ -174,10 +176,6 @@ export default function PricingClient() {
       {/* HERO */}
       <section className="px-4 pt-16 pb-12 sm:pt-24 sm:pb-16 lg:pt-32">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#075a01]/10 px-3 py-1 text-xs font-bold text-[#075a01] mb-4">
-            <Sparkles className="h-3 w-3" />
-            Simple, transparent pricing
-          </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
             Build smarter. <span className="text-[#075a01]">Pay less.</span>
@@ -212,24 +210,28 @@ export default function PricingClient() {
             </div>
 
             {/* Currency toggle */}
-            <div className="inline-flex items-center rounded-full bg-gray-100 p-1">
-              <button
-                onClick={() => setCurrency("NGN")}
-                className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  currency === "NGN" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
-                }`}
-              >
-                ₦ NGN
-              </button>
-              <button
-                onClick={() => setCurrency("USD")}
-                className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
-                  currency === "USD" ? "bg-white shadow-sm text-gray-900" : "text-gray-500"
-                }`}
-              >
-                $ USD
-              </button>
-            </div>
+            <div className="relative inline-block">
+  <select
+    value={region}
+    onChange={(e) => setRegion(e.target.value)}
+    className="appearance-none rounded-full bg-gray-100 px-4 py-2 pr-9 text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#075a01]/30"
+  >
+    {Object.entries(REGIONAL_PRICING).map(([key, val]) => (
+      <option key={key} value={key}>
+        {val.flag} {val.country} ({val.code})
+      </option>
+    ))}
+  </select>
+  <svg className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+  </svg>
+</div>
+
+{detectedRegion === region && (
+  <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 whitespace-nowrap">
+    Auto-detected from your location
+  </p>
+)}
           </div>
         </div>
       </section>
@@ -286,20 +288,20 @@ export default function PricingClient() {
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-bold text-gray-900">
-                      {plan.price === "0" ? "Free" : `${p.symbol}${plan.price}`}
-                    </span>
-                    {plan.price !== "0" && (
-                      <span className="text-sm text-gray-500">{plan.period}</span>
-                    )}
+  {plan.displayPrice}
+</span>
+                    {plan.price !== 0 && (
+  <span className="text-sm text-gray-500">{plan.period}</span>
+)}
                   </div>
                   {plan.yearlyTotal && (
                     <p className="mt-1 text-xs text-gray-500">{plan.yearlyTotal}</p>
                   )}
                   {plan.name === "Lifetime" && (
-                    <p className="mt-1 text-xs text-amber-600 font-semibold">
-                      Pays off after {currency === "NGN" ? "10" : "10"} months
-                    </p>
-                  )}
+  <p className="mt-1 text-xs text-amber-600 font-semibold">
+    Pays off after 10 months
+  </p>
+)}
                 </div>
 
                 <Link

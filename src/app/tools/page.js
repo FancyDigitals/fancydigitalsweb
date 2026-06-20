@@ -71,24 +71,8 @@ export default function ToolsPage() {
       {/* HERO */}
       <section className="relative px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28 lg:px-10 lg:pt-32">
         <div className="mx-auto max-w-6xl">
-          {/* Breadcrumb */}
-          <nav className="mb-8 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-sm">
-              <Link href="/" className="text-xs sm:text-sm text-gray-500 hover:text-[#075a01]">
-                Home
-              </Link>
-              <ArrowRight className="h-3 w-3 text-gray-300" />
-              <span className="text-xs sm:text-sm font-semibold text-gray-900">Tools</span>
-            </div>
-          </nav>
 
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1.5">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-              <span className="text-xs sm:text-sm font-bold text-green-700">
-                {published.filter((t) => t.isLive).length} tools live now
-              </span>
-            </div>
 
             <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
               Tools that{" "}
