@@ -23,7 +23,7 @@ const NAV = [
     children: [
       { label: "All Tools", href: "/tools", featured: true },
       { label: "AI Resume Builder", href: "/free-ai-resume-builder", badge: "AI" },
-      { label: "AI Cover Letter", href: "/dashboard/tools/ai-cover-letter", badge: "AI" },
+      { label: "AI Cover Letter", href: "/free-ai-cover-letter", badge: "AI" },
       { label: "SEO Meta Generator", href: "/tools/seo-meta-tag-generator" },
       { label: "Word Counter", href: "/tools/word-counter" },
       { label: "Password Generator", href: "/tools/password-generator" },

@@ -25,7 +25,7 @@ const nextConfig = {
       },
       {
         source: "/tools/ai-cover-letter",
-        destination: "/dashboard/tools/ai-cover-letter",
+        destination: "/free-ai-cover-letter", 
         permanent: true,
       },
     ];

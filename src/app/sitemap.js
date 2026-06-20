@@ -60,6 +60,13 @@ export default async function sitemap() {
       changeFrequency: "weekly",
       priority: 0.95,
     },
+
+    {
+  url: `${BASE_URL}/free-ai-cover-letter`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.95,
+},
     {
       url: `${BASE_URL}/web-design-nigeria`,
       lastModified: new Date(),
@@ -90,6 +97,7 @@ export default async function sitemap() {
       changeFrequency: "monthly",
       priority: 0.82,
     },
+    
   ];
 
   // Tool pages — live tools get highest priority
