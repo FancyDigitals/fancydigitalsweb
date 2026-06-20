@@ -268,10 +268,10 @@ export default function Header() {
 
         {/* Drawer */}
         <div
-          className={`absolute right-0 top-0 h-full w-[85%] max-w-sm transform bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-out ${
-            menuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
+  className={`absolute right-0 top-0 h-full w-[85%] max-w-sm transform bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-out overflow-y-auto overscroll-contain ${
+    menuOpen ? "translate-x-0" : "translate-x-full"
+  }`}
+>
           {/* Decorative header gradient */}
           <div className="absolute left-0 right-0 top-0 h-32 bg-gradient-to-b from-[#075a01]/5 to-transparent" />
 
@@ -420,14 +420,6 @@ export default function Header() {
                   <p className="text-sm font-bold text-gray-900">Fancy Digitals</p>
                   <p className="text-xs text-gray-500">Premium Digital Studio</p>
                 </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-[#075a01]/10 px-3 py-1 text-[10px] font-semibold text-[#075a01]">
-                  ✦ Calm Systems
-                </span>
-                <span className="rounded-full bg-[#ff914d]/10 px-3 py-1 text-[10px] font-semibold text-[#ff914d]">
-                  ✦ Premium Quality
-                </span>
               </div>
             </div>
           </div>
