@@ -220,7 +220,7 @@ export default async function RoleResumePage({ params }) {
       <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-10">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
               Top Skills for <span className="text-[#075a01]">{role.title} Resumes</span>
             </h2>
             <p className="mt-2 text-sm text-gray-600">These are the most in-demand skills hiring managers look for.</p>
@@ -243,7 +243,7 @@ export default async function RoleResumePage({ params }) {
       <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-10 bg-gray-50">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
               <span className="text-[#075a01]">{role.title}</span> Resume Examples
             </h2>
             <p className="mt-2 text-sm text-gray-600">Real bullet points that get interviews. Copy or use as inspiration.</p>
@@ -277,7 +277,7 @@ export default async function RoleResumePage({ params }) {
       <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-10">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
               Common <span className="text-red-600">Mistakes</span> to Avoid
             </h2>
             <p className="mt-2 text-sm text-gray-600">Don't let these errors disqualify your application.</p>
@@ -298,7 +298,7 @@ export default async function RoleResumePage({ params }) {
       <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-10 bg-gray-50">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
               Build Your Resume in <span className="text-[#075a01]">3 Steps</span>
             </h2>
           </div>
@@ -325,7 +325,7 @@ export default async function RoleResumePage({ params }) {
       <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-10">
         <div className="mx-auto max-w-3xl">
           <div className="text-center mb-8">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
               {role.title} Resume <span className="text-[#075a01]">FAQs</span>
             </h2>
           </div>
@@ -351,7 +351,7 @@ export default async function RoleResumePage({ params }) {
         <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-10 bg-gray-50">
           <div className="mx-auto max-w-5xl">
             <div className="text-center mb-8">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+              <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
                 Related <span className="text-[#075a01]">{role.category}</span> Resumes
               </h2>
             </div>
