@@ -242,9 +242,10 @@ button:focus-visible {
 }
 
 /* =====================================================
-   PLACEHOLDER STYLES — Better readability
+   FORM INPUT STYLES — Better readability
 ===================================================== */
 
+/* PLACEHOLDERS (the hint text) — medium gray, visible */
 input::placeholder,
 textarea::placeholder,
 select::placeholder {
@@ -270,13 +271,35 @@ textarea:-ms-input-placeholder {
   opacity: 1 !important;
 }
 
-/* Select dropdowns — make placeholder option darker */
+/* ACTUAL TYPED TEXT — dark, fully visible */
+input,
+textarea,
+select {
+  color: #111827 !important;
+}
+
+/* Select dropdowns — placeholder when no value selected */
 select:invalid,
 select option[value=""] {
   color: #94a3b8;
 }
 
-/* Make sure all form labels are readable */
+/* Make all options dark when expanded */
+select option {
+  color: #111827;
+}
+
+/* Labels — clearer dark text */
 label {
   color: #374151;
+}
+
+/* Autofill background fix (Chrome auto-fill turns inputs yellow/blue) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  caret-color: #111827 !important;
 }
