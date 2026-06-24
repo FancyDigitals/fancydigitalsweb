@@ -1856,16 +1856,24 @@ function ThumbPhoto({ color }) {
 /* ============================ HTML GENERATORS ============================ */
 function generateResumeHTML(resume, isPro, templateId, accent) {
   const photo = resume.photo;
-  const footer = isPro ? "" : `<div class="footer">Built with <a href="https://fancydigitals.com.ng">Fancy Digitals AI Resume Builder</a></div>`;
+  const footer = isPro
+    ? ""
+    : `<div class="footer">Built with <a href="https://fancydigitals.com.ng">Fancy Digitals AI Resume Builder</a></div>`;
   switch (templateId) {
-  case "modern": return modernHTML(resume, photo, footer, accent);
-  case "professional": return professionalHTML(resume, photo, footer, accent);
-  case "creative": return creativeHTML(resume, photo, footer, accent);
-  case "minimal": return minimalHTML(resume, photo, footer, accent);
-  case "tech": return techHTML(resume, photo, footer, accent);
-  case "basic":
-  default: return basicHTML(resume, photo, footer, accent);
-}
+    case "modern": return modernHTML(resume, photo, footer, accent);
+    case "professional": return professionalHTML(resume, photo, footer, accent);
+    case "creative": return creativeHTML(resume, photo, footer, accent);
+    case "minimal": return minimalHTML(resume, photo, footer, accent);
+    case "tech": return techHTML(resume, photo, footer, accent);
+    case "elegant": return elegantHTML(resume, photo, footer, accent);
+    case "bold": return boldHTML(resume, photo, footer, accent);
+    case "compact": return compactHTML(resume, photo, footer, accent);
+    case "academic": return academicHTML(resume, photo, footer, accent);
+    case "startup": return startupHTML(resume, photo, footer, accent);
+    case "photo": return photoFirstHTML(resume, photo, footer, accent);
+    case "basic":
+    default: return basicHTML(resume, photo, footer, accent);
+  }
 }
 
 const PRINT_RESET = `* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } @media print { @page { margin: 15mm; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }`;

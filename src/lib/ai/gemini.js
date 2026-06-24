@@ -2,50 +2,91 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+// Order: fastest/best first, fallback to lighter models
 const MODELS = [
   "gemini-2.5-flash",
   "gemini-2.0-flash",
-  "gemini-2.0-flash-lite",
   "gemini-2.5-flash-lite",
+  "gemini-2.0-flash-lite",
 ];
+
+// Sleep helper
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Check if error is retryable (rate limit / overloaded / temporary)
+function isRetryableError(error) {
+  const msg = (error?.message || "").toLowerCase();
+  return (
+    msg.includes("429") ||
+    msg.includes("503") ||
+    msg.includes("502") ||
+    msg.includes("500") ||
+    msg.includes("unavailable") ||
+    msg.includes("quota") ||
+    msg.includes("rate") ||
+    msg.includes("overload") ||
+    msg.includes("high demand") ||
+    msg.includes("busy") ||
+    msg.includes("resource_exhausted") ||
+    msg.includes("timeout") ||
+    msg.includes("fetch failed") ||
+    msg.includes("network")
+  );
+}
+
+// Check if error means model doesn't exist (should skip to next model)
+function isModelNotFound(error) {
+  const msg = (error?.message || "").toLowerCase();
+  return msg.includes("404") || msg.includes("not found");
+}
 
 export async function generateWithGemini(prompt, options = {}) {
   const modelsToTry = options.model ? [options.model] : MODELS;
   let lastError = null;
+  const maxRetriesPerModel = 2;
 
+  // Try each model with retries
   for (const model of modelsToTry) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          temperature: options.temperature || 0.7,
-          maxOutputTokens: options.maxTokens || 8192,  // ⬅️ bumped to 8192
-        },
-      });
+    for (let attempt = 0; attempt < maxRetriesPerModel; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            temperature: options.temperature ?? 0.7,
+            maxOutputTokens: options.maxTokens || 8192,
+          },
+        });
 
-      console.log(`✅ Generated with model: ${model}`);
-      return response.text;
-    } catch (error) {
-      lastError = error;
-      const msg = error.message || "";
-      console.warn(`❌ Model ${model} failed:`, msg.substring(0, 200));
+        console.log(`✅ Generated with ${model} (attempt ${attempt + 1})`);
+        return response.text;
+      } catch (error) {
+        lastError = error;
+        const msg = error?.message || "";
+        console.warn(`❌ ${model} attempt ${attempt + 1} failed:`, msg.substring(0, 150));
 
-      // Try next model on rate limit, not found, OR overloaded
-      if (
-        msg.includes("429") ||
-        msg.includes("404") ||
-        msg.includes("503") ||      // ⬅️ handle overloaded
-        msg.includes("UNAVAILABLE") ||
-        msg.includes("quota") ||
-        msg.includes("not found") ||
-        msg.includes("high demand") ||
-        msg.includes("RESOURCE_EXHAUSTED")
-      ) {
-        continue;
+        // If model doesn't exist, skip remaining attempts for this model
+        if (isModelNotFound(error)) {
+          break;
+        }
+
+        // If it's a retryable error and we have retries left, wait and retry
+        if (isRetryableError(error) && attempt < maxRetriesPerModel - 1) {
+          // Exponential backoff: 2s, 4s
+          const waitTime = Math.pow(2, attempt + 1) * 1000;
+          console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+          await sleep(waitTime);
+          continue;
+        }
+
+        // If retryable but no retries left, try next model
+        if (isRetryableError(error)) {
+          break;
+        }
+
+        // Non-retryable error — throw immediately
+        throw error;
       }
-
-      throw error;
     }
   }
 

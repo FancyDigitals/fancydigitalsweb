@@ -11,7 +11,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Check Pro status — this feature is Pro-only
     const { data: profile } = await supabase
       .from("profiles")
       .select("plan")
@@ -34,58 +33,98 @@ export async function POST(request) {
       );
     }
 
-    const prompt = `Rewrite this resume to match the job description. Use ONLY existing facts — never invent jobs, companies, or dates.
+    const prompt = `You are a real human resume writer with 15 years of experience helping people land jobs. Your job is to rewrite the resume below to better match the target role — but you MUST sound like a real person, NOT an AI.
 
-RESUME:
+⚠️ ABSOLUTE RULES:
+1. NEVER invent jobs, companies, dates, or facts. Only use what's already in the resume.
+2. Keep every company name, role title, duration, and education entry EXACTLY the same.
+3. Only rewrite the SUMMARY and EXPERIENCE BULLETS to be stronger.
+4. Reorder skills to put most relevant first. Can add 2-3 obviously related skills.
+
+🚫 BANNED WORDS/PHRASES (these scream "AI wrote this"):
+- "Spearheaded"
+- "Leveraged"
+- "Synergize" or "synergies"
+- "Cutting-edge"
+- "Innovative" (overused)
+- "Demonstrated proficiency in"
+- "Possesses strong..."
+- "Results-driven professional"
+- "Detail-oriented individual"
+- "Excels at"
+- "Adept at"
+- "Proven track record of"
+- "Seamlessly"
+- "Robust"
+- "Holistic"
+- "Strategic alignment"
+- "Drive value"
+- "Best-in-class"
+- "Industry-leading"
+- "Game-changing"
+- "Synergistic"
+
+✅ INSTEAD, use real, simple language:
+- "Led" not "Spearheaded"
+- "Used" not "Leveraged"
+- "Built" not "Architected"
+- "Helped" not "Facilitated"
+- "Worked with" not "Collaborated cross-functionally"
+- "Made" not "Drove"
+
+GOOD BULLET EXAMPLES (sound human):
+- "Cut server costs by 40% by moving 3 apps to serverless"
+- "Hired and trained 4 new engineers, all still on the team 2 years later"
+- "Built the checkout flow that's now used by 200K customers a month"
+- "Fixed a billing bug that was costing the company $30K/month"
+
+BAD BULLET EXAMPLES (sound like AI — DO NOT WRITE LIKE THIS):
+- "Spearheaded comprehensive infrastructure migration initiatives leveraging serverless architecture"
+- "Demonstrated proficiency in talent acquisition by onboarding multiple high-caliber engineering professionals"
+- "Architected scalable checkout solutions driving significant customer value"
+
+RESUME TO REWRITE:
 Name: ${resume.fullName}
-Title: ${resume.title}
-Summary: ${resume.summary}
-Skills: ${resume.skills?.join(", ")}
+Current Title: ${resume.title}
+Current Summary: ${resume.summary}
+Current Skills: ${resume.skills?.join(", ")}
 
 Experience:
-${resume.experience?.map((e, i) => `${i + 1}. ${e.role} at ${e.company} (${e.duration})
-Bullets: ${e.bullets?.join(" | ")}`).join("\n\n")}
+${resume.experience?.map((e, i) => `
+${i + 1}. ${e.role} at ${e.company} (${e.duration})
+Current bullets:
+${e.bullets?.map(b => `   - ${b}`).join("\n")}
+`).join("\n")}
 
 Education: ${resume.education?.map(e => `${e.degree}, ${e.school} (${e.year})`).join("; ")}
 
-JOB DESCRIPTION:
+TARGET JOB DESCRIPTION:
 ${jobDescription.slice(0, 2000)}
 
-MISSING KEYWORDS to include naturally: ${missingKeywords?.slice(0, 10).join(", ")}
+KEYWORDS TO INCLUDE NATURALLY (don't force them — only if they fit):
+${missingKeywords?.slice(0, 10).join(", ")}
 
-Rewrite summary, experience bullets, and reorder/expand skills. Keep all roles, companies, dates EXACTLY the same.
+NOW REWRITE:
+- Summary: 2-3 sentences max. Conversational. Mentions what they actually do and what they've done. NO buzzwords.
+- Each bullet: Start with a strong verb. Include a specific number or outcome. Max 20 words. Sounds like a real person describing their work.
+- Skills: Reorder to match job priority. Add 2-3 truly relevant skills if missing.
 
 Return JSON:
 {
   "fullName": "${resume.fullName}",
-  "title": "may update",
+  "title": "may slightly update to match target",
   "contact": ${JSON.stringify(resume.contact || {})},
-  "summary": "rewritten",
+  "summary": "natural, human-sounding summary",
   "experience": [
-    { "role": "same", "company": "same", "duration": "same", "location": "same", "bullets": ["rewritten with keywords"] }
+    { "role": "EXACTLY SAME", "company": "EXACTLY SAME", "duration": "EXACTLY SAME", "location": "EXACTLY SAME", "bullets": ["human-sounding bullet with numbers"] }
   ],
   "education": ${JSON.stringify(resume.education || [])},
-  "skills": ["reordered + new relevant ones"]
+  "skills": ["reordered with most relevant first"]
 }
 
-Make every word count. This is for a real job application.`;
+Remember: A real hiring manager will read this. Make it sound like a smart, capable person wrote it about themselves — not like an AI tried to impress them.`;
 
-    let optimized;
-let attempts = 0;
-const maxAttempts = 2;
-
-while (attempts < maxAttempts) {
-  try {
-    optimized = await generateJSON(prompt);
-    break;
-  } catch (err) {
-    attempts++;
-    console.log(`Attempt ${attempts} failed:`, err.message);
-    if (attempts >= maxAttempts) throw err;
-    // Wait 3 seconds before retry
-    await new Promise(resolve => setTimeout(resolve, 3000));
-  }
-}
+    const optimized = await generateJSON(prompt);
 
     // Preserve photo
     if (resume.photo) {
