@@ -24,6 +24,7 @@ const NAV = [
       { label: "All Tools", href: "/tools", featured: true },
       { label: "AI Resume Builder", href: "/free-ai-resume-builder", badge: "AI" },
       { label: "AI Cover Letter", href: "/free-ai-cover-letter", badge: "AI" },
+      { label: "AI Landing Page Builder", href: "/free-ai-landing-page-generator", badge: "AI" },
       { label: "SEO Meta Generator", href: "/tools/seo-meta-tag-generator" },
       { label: "Word Counter", href: "/tools/word-counter" },
       { label: "Password Generator", href: "/tools/password-generator" },

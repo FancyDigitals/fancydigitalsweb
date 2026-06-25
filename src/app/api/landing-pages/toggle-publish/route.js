@@ -9,14 +9,17 @@ const adminClient = createAdminClient(
 
 export async function POST(request) {
   try {
+    const { pageId, publish } = await request.json();
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { pageId, publish } = await request.json();
+    console.log("[toggle-publish] user:", user?.id, "pageId:", pageId, "publish:", publish);
+
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!pageId) return NextResponse.json({ error: "pageId required" }, { status: 400 });
 
-    // Verify ownership using regular client
+    // Verify ownership
     const { data: page } = await supabase
       .from("published_pages")
       .select("id")
@@ -24,9 +27,11 @@ export async function POST(request) {
       .eq("user_id", user.id)
       .single();
 
+    console.log("[toggle-publish] page found:", !!page);
+
     if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Use admin client to bypass RLS for the update
+    // Use admin client to bypass RLS
     const { error } = await adminClient
       .from("published_pages")
       .update({ is_published: publish })
@@ -34,8 +39,11 @@ export async function POST(request) {
 
     if (error) throw error;
 
+    console.log("[toggle-publish] updated successfully to:", publish);
+
     return NextResponse.json({ success: true, is_published: publish });
   } catch (error) {
+    console.error("[toggle-publish] error:", error.message);
     return NextResponse.json({ error: error.message || "Failed" }, { status: 500 });
   }
 }
