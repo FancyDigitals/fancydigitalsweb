@@ -10,10 +10,11 @@ export default function DashboardDetector({
   children,
 }) {
   const pathname = usePathname();
-  const isDashboard =
+    const isDashboard =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/signin") ||
-    pathname.startsWith("/signup");
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/p/");
 
   if (isDashboard) {
     return <>{children}</>;

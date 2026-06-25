@@ -1,5 +1,6 @@
 import { getUserProfile } from "@/lib/auth/actions";
 import { signOut } from "@/lib/auth/actions";
+import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -9,6 +10,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Globe,
 } from "lucide-react";
 
 export default async function DashboardLayout({ children }) {
@@ -16,10 +18,34 @@ export default async function DashboardLayout({ children }) {
   const isPro = profile?.plan !== "free";
   const displayName = profile?.full_name || profile?.email?.split("@")[0];
 
-  const navItems = [
+    // Fetch unseen leads count for badge
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let unseenLeadsCount = 0;
+  if (user) {
+    const { data: userPages } = await supabase
+      .from("published_pages")
+      .select("id")
+      .eq("user_id", user.id);
+
+    const pageIds = (userPages || []).map((p) => p.id);
+
+    if (pageIds.length > 0) {
+      const { count } = await supabase
+        .from("page_leads")
+        .select("id", { count: "exact", head: true })
+        .in("page_id", pageIds)
+        .eq("is_seen", false);
+
+      unseenLeadsCount = count || 0;
+    }
+  }
+    const navItems = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Tools", href: "/tools", icon: Wrench },
     { label: "Projects", href: "/dashboard/projects", icon: FolderOpen },
+    { label: "Landing Pages", href: "/dashboard/landing-pages", icon: Globe, badge: unseenLeadsCount },
     { label: "Billing", href: "/dashboard/billing", icon: CreditCard },
     { label: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
@@ -52,7 +78,12 @@ export default async function DashboardLayout({ children }) {
                   className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition"
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge > 0 && (
+                    <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}
@@ -136,14 +167,19 @@ export default async function DashboardLayout({ children }) {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white/90 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-col items-center gap-0.5 py-2.5 text-gray-400 hover:text-[#075a01] transition"
+              className="flex flex-col items-center gap-0.5 py-2.5 text-gray-400 hover:text-[#075a01] transition relative"
             >
-              <item.icon className="h-5 w-5" />
+              <div className="relative">
+                <item.icon className="h-5 w-5" />
+                {item.badge > 0 && (
+                  <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 border border-white" />
+                )}
+              </div>
               <span className="text-[10px] font-semibold">{item.label}</span>
             </Link>
           ))}

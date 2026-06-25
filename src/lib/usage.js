@@ -6,7 +6,7 @@ const FREE_DAILY_LIMITS = {
   "ai-cover-letter": 3,
   "ai-business-name": 5,
   "ai-bio-generator": 5,
-  "ai-landing-page": 2,
+  "ai-landing-page-generator": 2,
   "default": 5,
 };
 

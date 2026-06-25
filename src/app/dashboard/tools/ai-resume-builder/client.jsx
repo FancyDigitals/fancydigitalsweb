@@ -6,6 +6,7 @@ import {
   FileText, Loader2, Download, AlertCircle, Zap, ArrowLeft, Sparkles,
   Mail, Phone, MapPin, Briefcase, GraduationCap, Award, Plus, Trash2,
   Link2, Globe, Lock, CheckCircle2, Star, ArrowRight, Crown, User, Target,
+  Edit3, Save, X,
 } from "lucide-react";
 
 const STORAGE_KEY = "fancy_resume_builder_form_v1";
@@ -55,6 +56,11 @@ export default function ResumeBuilderClient({ isPro, initialUsage, limit, userEm
   const [jobMatch, setJobMatch] = useState(null);
   const [optimizing, setOptimizing] = useState(false);
 const [optimizeSuccess, setOptimizeSuccess] = useState(false);
+const [editingSummary, setEditingSummary] = useState(false);
+const [editedSummary, setEditedSummary] = useState("");
+const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+const [editingExpIndex, setEditingExpIndex] = useState(null);
+const [editedExp, setEditedExp] = useState(null);
 
   const remaining = isPro ? "∞" : Math.max(0, limit - usage);
 
@@ -109,6 +115,90 @@ const [optimizeSuccess, setOptimizeSuccess] = useState(false);
     const total = keywords.length;
     return { score: total > 0 ? Math.round((matched.length / total) * 100) : 0, matched: matched.slice(0, 15), missing: missing.slice(0, 10), totalKeywords: total };
   }
+
+  function startEditingSummary() {
+  if (!isPro) {
+    setShowUpgradeModal(true);
+    return;
+  }
+  setEditedSummary(resume.summary || "");
+  setEditingSummary(true);
+}
+
+function saveSummary() {
+  setResume({ ...resume, summary: editedSummary });
+  setEditingSummary(false);
+  
+  // Recalculate ATS score with new summary
+  const updatedResume = { ...resume, summary: editedSummary };
+  const { score, tips } = calculateATSScore(updatedResume);
+  setAtsScore(score);
+  setAtsTips(tips);
+  
+  // Save to database (optional — fire and forget)
+  fetch("/api/projects/update-resume", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ resume: updatedResume }),
+  }).catch(() => {}); // Silent fail
+}
+
+function cancelEditingSummary() {
+  setEditingSummary(false);
+  setEditedSummary("");
+}
+
+function startEditingExp(i) {
+  if (!isPro) {
+    setShowUpgradeModal(true);
+    return;
+  }
+  setEditedExp({ ...resume.experience[i], bullets: [...resume.experience[i].bullets] });
+  setEditingExpIndex(i);
+}
+
+function saveExp() {
+  const updated = resume.experience.map((exp, i) =>
+    i === editingExpIndex ? editedExp : exp
+  );
+  const updatedResume = { ...resume, experience: updated };
+  setResume(updatedResume);
+  setEditingExpIndex(null);
+  setEditedExp(null);
+  const { score, tips } = calculateATSScore(updatedResume);
+  setAtsScore(score);
+  setAtsTips(tips);
+  fetch("/api/projects/update-resume", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ resume: updatedResume }),
+  }).catch(() => {});
+}
+
+function cancelEditingExp() {
+  setEditingExpIndex(null);
+  setEditedExp(null);
+}
+
+function updateExpField(key, value) {
+  setEditedExp((prev) => ({ ...prev, [key]: value }));
+}
+
+function updateExpBullet(j, value) {
+  const bullets = [...editedExp.bullets];
+  bullets[j] = value;
+  setEditedExp((prev) => ({ ...prev, bullets }));
+}
+
+function addExpBullet() {
+  setEditedExp((prev) => ({ ...prev, bullets: [...prev.bullets, ""] }));
+}
+
+function deleteExpBullet(j) {
+  if (editedExp.bullets.length <= 1) return;
+  const bullets = editedExp.bullets.filter((_, x) => x !== j);
+  setEditedExp((prev) => ({ ...prev, bullets }));
+}
 
   async function handleGenerate(e) {
     e.preventDefault();
@@ -631,31 +721,96 @@ const [optimizeSuccess, setOptimizeSuccess] = useState(false);
   </div>
 )}
 
-              <div id="resume-print" className="rounded-2xl bg-white border border-gray-100 p-6 sm:p-8 shadow-sm print:shadow-none print:border-none">
-                {!isPro && (
-                  <div className="mb-4 rounded-xl bg-gradient-to-r from-[#075a01]/10 to-[#0a8f01]/10 border border-[#075a01]/20 p-3 print:hidden">
-                    <div className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-[#075a01] shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold text-gray-900">Want premium templates & no footer?</p>
-                        <Link href="/pricing" className="text-xs font-bold text-[#075a01] hover:underline">See Pro features →</Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {selectedTemplate === "basic" && <BasicTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "modern" && <ModernTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "professional" && <ProfessionalTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "creative" && <CreativeTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "minimal" && <MinimalTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "tech" && <TechTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "elegant" && <ElegantTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "bold" && <BoldTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "compact" && <CompactTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "academic" && <AcademicTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "startup" && <StartupTemplate resume={resume} accent={accentColor} />}
-{selectedTemplate === "photo" && <PhotoFirstTemplate resume={resume} accent={accentColor} />}
-              </div>
+              <div className="relative">
+  {/* Edit Summary Button (overlay) */}
+  {resume.summary && !editingSummary && (
+    <button
+      onClick={startEditingSummary}
+      className="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-lg bg-white shadow-md border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 active:scale-95 transition print:hidden"
+      title={isPro ? "Edit Summary" : "Edit (Pro only)"}
+    >
+      {isPro ? (
+        <>
+          <Edit3 className="h-3.5 w-3.5 text-[#075a01]" />
+          Edit
+        </>
+      ) : (
+        <>
+          <Lock className="h-3.5 w-3.5 text-amber-500" />
+          <span className="text-amber-600">Edit (Pro)</span>
+        </>
+      )}
+    </button>
+  )}
+
+  {/* Inline Editor */}
+  {editingSummary && (
+    <div className="mb-4 rounded-xl bg-amber-50 border-2 border-amber-300 p-4 print:hidden">
+      <div className="flex items-center gap-2 mb-2">
+        <Edit3 className="h-4 w-4 text-amber-700" />
+        <p className="text-sm font-bold text-amber-900">Editing Summary</p>
+      </div>
+      <textarea
+        value={editedSummary}
+        onChange={(e) => setEditedSummary(e.target.value)}
+        rows={4}
+        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#075a01] focus:outline-none focus:ring-2 focus:ring-[#075a01]/20"
+        placeholder="Write your professional summary..."
+      />
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <p className="text-xs text-gray-500">
+          {editedSummary.length} characters
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={cancelEditingSummary}
+            className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+          >
+            <X className="h-3 w-3" />
+            Cancel
+          </button>
+          <button
+            onClick={saveSummary}
+            style={{ background: "linear-gradient(to right, #075a01, #0a8f01)", color: "#fff" }}
+            className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold hover:opacity-90 active:scale-95 transition"
+          >
+            <Save className="h-3 w-3" />
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {/* Render the Template */}
+  {selectedTemplate === "basic" && (
+  <BasicTemplate
+    resume={resume}
+    accent={accentColor}
+    isPro={isPro}
+    editingExpIndex={editingExpIndex}
+    editedExp={editedExp}
+    startEditingExp={startEditingExp}
+    cancelEditingExp={cancelEditingExp}
+    saveExp={saveExp}
+    updateExpField={updateExpField}
+    updateExpBullet={updateExpBullet}
+    addExpBullet={addExpBullet}
+    deleteExpBullet={deleteExpBullet}
+  />
+)}
+  {selectedTemplate === "modern" && <ModernTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "professional" && <ProfessionalTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "creative" && <CreativeTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "minimal" && <MinimalTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "tech" && <TechTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "elegant" && <ElegantTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "bold" && <BoldTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "compact" && <CompactTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "academic" && <AcademicTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "startup" && <StartupTemplate resume={resume} accent={accentColor} />}
+  {selectedTemplate === "photo" && <PhotoFirstTemplate resume={resume} accent={accentColor} />}
+</div>
 
               <div className="rounded-xl bg-[#075a01]/10 border border-[#075a01]/20 p-4 print:hidden">
                 <div className="flex items-start gap-3">
@@ -673,6 +828,71 @@ const [optimizeSuccess, setOptimizeSuccess] = useState(false);
           )}
         </div>
       </div>
+
+      {/* Upgrade Modal (when free user clicks edit) */}
+{showUpgradeModal && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    onClick={() => setShowUpgradeModal(false)}
+  >
+    <div
+      className="relative max-w-md w-full rounded-2xl bg-white p-6 sm:p-8 shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={() => setShowUpgradeModal(false)}
+        className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 transition"
+      >
+        <X className="h-4 w-4 text-gray-500" />
+      </button>
+
+      <div className="text-center">
+        <div
+          style={{ background: "linear-gradient(to bottom right, #075a01, #0a8f01)" }}
+          className="inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4"
+        >
+          <Edit3 className="h-7 w-7 text-white" />
+        </div>
+
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          Editing is a Pro Feature
+        </h3>
+        <p className="text-sm text-gray-600 mb-6">
+          Upgrade to Pro to edit and personalize your AI-generated resume. Make it sound exactly like you.
+        </p>
+
+        <ul className="text-left space-y-2 mb-6 max-w-sm mx-auto">
+          {[
+            "Edit summary, bullets, and skills",
+            "Save unlimited resume versions",
+            "Re-edit anytime",
+            "All 12 premium templates",
+            "Real PDF download",
+          ].map((feature, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+              <CheckCircle2 className="h-4 w-4 text-[#075a01] shrink-0" />
+              {feature}
+            </li>
+          ))}
+        </ul>
+
+        <Link
+          href="/pricing"
+          style={{ background: "linear-gradient(to right, #075a01, #0a8f01)", color: "#fff" }}
+          className="block w-full text-center rounded-xl px-5 py-3 text-sm font-bold hover:opacity-90 active:scale-95 transition shadow-lg"
+        >
+          See Pro Plans
+        </Link>
+        <button
+          onClick={() => setShowUpgradeModal(false)}
+          className="block w-full mt-2 text-center text-xs text-gray-500 hover:text-gray-700 transition"
+        >
+          Maybe later
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       <style jsx global>{`
         @media print {
@@ -692,7 +912,7 @@ function hexWithAlpha(hex, alpha) {
 }
 
 /* ============================ BASIC TEMPLATE ============================ */
-function BasicTemplate({ resume, accent }) {
+function BasicTemplate({ resume, accent, isPro, editingExpIndex, editedExp, startEditingExp, cancelEditingExp, saveExp, updateExpField, updateExpBullet, addExpBullet, deleteExpBullet }) {
   const color = accent || "#111827";
   const photo = resume.photo;
   return (
@@ -718,19 +938,154 @@ function BasicTemplate({ resume, accent }) {
         </div>
       )}
       {resume.experience?.length > 0 && (
-        <div className="mb-5">
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 pb-1 border-b border-gray-300" style={{ color }}>Experience</h3>
-          <div className="space-y-4">
-            {resume.experience.map((exp, i) => (
-              <div key={i}>
-                <div className="flex justify-between items-baseline gap-3"><p className="font-bold text-[14px] text-gray-900">{exp.role}</p><p className="text-xs text-gray-500 whitespace-nowrap">{exp.duration}</p></div>
-                <p className="text-[13px] text-gray-700 italic mb-1.5">{exp.company}{exp.location ? ` · ${exp.location}` : ""}</p>
-                <ul className="space-y-1 pl-4">{exp.bullets?.map((b, j) => <li key={j} className="text-[12.5px] text-gray-700 leading-[1.65] list-disc list-outside">{b}</li>)}</ul>
+  <div className="mb-5">
+    <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 pb-1 border-b border-gray-300" style={{ color }}>Experience</h3>
+    <div className="space-y-4">
+      {resume.experience.map((exp, i) => (
+        <div key={i} className="relative group">
+
+          {/* Edit button — shows on hover */}
+          {editingExpIndex !== i && (
+            <button
+              onClick={() => startEditingExp(i)}
+              className="absolute top-0 right-0 z-10 flex items-center gap-1 rounded-lg bg-white shadow-md border border-gray-200 px-2.5 py-1 text-xs font-semibold text-gray-700 opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 max-sm:opacity-100 transition print:hidden"
+              title={isPro ? "Edit Experience" : "Edit (Pro only)"}
+            >
+              {isPro ? (
+                <>
+                  <Edit3 className="h-3 w-3 text-[#075a01]" />
+                  Edit
+                </>
+              ) : (
+                <>
+                  <Lock className="h-3 w-3 text-amber-500" />
+                  <span className="text-amber-600">Edit (Pro)</span>
+                </>
+              )}
+            </button>
+          )}
+
+          {/* Edit mode */}
+          {editingExpIndex === i ? (
+            <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4 print:hidden">
+              <div className="flex items-center gap-2 mb-3">
+                <Edit3 className="h-4 w-4 text-amber-700" />
+                <p className="text-sm font-bold text-amber-900">Editing Experience</p>
               </div>
-            ))}
-          </div>
+
+              {/* Role + Duration */}
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Role</label>
+                  <input
+                    value={editedExp.role}
+                    onChange={(e) => updateExpField("role", e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs focus:border-[#075a01] focus:outline-none focus:ring-2 focus:ring-[#075a01]/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Duration</label>
+                  <input
+                    value={editedExp.duration}
+                    onChange={(e) => updateExpField("duration", e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs focus:border-[#075a01] focus:outline-none focus:ring-2 focus:ring-[#075a01]/20"
+                  />
+                </div>
+              </div>
+
+              {/* Company + Location */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Company</label>
+                  <input
+                    value={editedExp.company}
+                    onChange={(e) => updateExpField("company", e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs focus:border-[#075a01] focus:outline-none focus:ring-2 focus:ring-[#075a01]/20"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Location</label>
+                  <input
+                    value={editedExp.location}
+                    onChange={(e) => updateExpField("location", e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs focus:border-[#075a01] focus:outline-none focus:ring-2 focus:ring-[#075a01]/20"
+                  />
+                </div>
+              </div>
+
+              {/* Bullets */}
+              <div className="mb-3">
+                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Bullet Points</label>
+                <div className="space-y-2">
+                  {editedExp.bullets.map((b, j) => (
+                    <div key={j} className="flex items-start gap-2">
+                      <textarea
+                        value={b}
+                        onChange={(e) => updateExpBullet(j, e.target.value)}
+                        rows={2}
+                        className="flex-1 rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs focus:border-[#075a01] focus:outline-none focus:ring-2 focus:ring-[#075a01]/20 resize-none"
+                      />
+                      <button
+                        onClick={() => deleteExpBullet(j)}
+                        disabled={editedExp.bullets.length <= 1}
+                        className="mt-1 rounded-lg p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                        title="Delete bullet"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add bullet */}
+                <button
+                  onClick={addExpBullet}
+                  className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-[#075a01] hover:text-[#0a8f01] transition"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add bullet
+                </button>
+              </div>
+
+              {/* Save / Cancel */}
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  onClick={cancelEditingExp}
+                  className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition"
+                >
+                  <X className="h-3 w-3" />
+                  Cancel
+                </button>
+                <button
+                  onClick={saveExp}
+                  style={{ background: "linear-gradient(to right, #075a01, #0a8f01)", color: "#fff" }}
+                  className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold hover:opacity-90 active:scale-95 transition"
+                >
+                  <Save className="h-3 w-3" />
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* View mode */
+            <>
+              <div className="flex justify-between items-baseline gap-3">
+                <p className="font-bold text-[14px] text-gray-900">{exp.role}</p>
+                <p className="text-xs text-gray-500 whitespace-nowrap">{exp.duration}</p>
+              </div>
+              <p className="text-[13px] text-gray-700 italic mb-1.5">{exp.company}{exp.location ? ` · ${exp.location}` : ""}</p>
+              <ul className="space-y-1 pl-4">
+                {exp.bullets?.map((b, j) => (
+                  <li key={j} className="text-[12.5px] text-gray-700 leading-[1.65] list-disc list-outside">{b}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
-      )}
+      ))}
+    </div>
+  </div>
+)}
       {resume.education?.length > 0 && (
         <div className="mb-5">
           <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 pb-1 border-b border-gray-300" style={{ color }}>Education</h3>

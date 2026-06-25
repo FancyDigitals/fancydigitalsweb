@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import QRCode from "qrcode";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 /* ============================================
    ICONS
@@ -209,6 +211,7 @@ async function generateQRCanvas(data, options) {
 ============================================ */
 export default function QRCodeGenerator() {
   const canvasRef = useRef(null);
+  const printCanvasRef = useRef(null);
   const videoRef = useRef(null);
   const scanCanvasRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -268,6 +271,12 @@ export default function QRCodeGenerator() {
   const [printLabel, setPrintLabel] = useState("");
   const [printSubLabel, setPrintSubLabel] = useState("");
   const [printGridCols, setPrintGridCols] = useState(3);
+  const [printStyle, setPrintStyle] = useState("card");
+  const [printBgColor, setPrintBgColor] = useState("#ffffff");
+  const [printTextColor, setPrintTextColor] = useState("#111827");
+  const [printAccent, setPrintAccent] = useState("#f97316");
+  const [downloadingPrint, setDownloadingPrint] = useState(false);
+  const [printQRDataUrl, setPrintQRDataUrl] = useState("");
 
   function notify(msg) { setNotification(msg); setTimeout(() => setNotification(""), 2500); }
   function setField(key, value) { setFields((p) => ({ ...p, [key]: value })); }
@@ -278,60 +287,69 @@ export default function QRCodeGenerator() {
   /* ============================================
      DRAW QR TO CANVAS WITH OPTIONAL LOGO
   ============================================ */
-  const drawQR = useCallback(async () => {
-    if (!currentData.trim()) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    setGenerating(true);
+  const drawQRToCanvas = useCallback(async (canvas, targetSize) => {
+  if (!canvas || !currentData.trim()) return;
+  try {
+    await new Promise((resolve, reject) => {
+      QRCode.toCanvas(canvas, currentData, {
+        width: targetSize, margin,
+        color: { dark: fgColor, light: bgColor },
+        errorCorrectionLevel: errorLevel,
+      }, (err) => err ? reject(err) : resolve());
+    });
 
-    try {
-      await new Promise((resolve, reject) => {
-        QRCode.toCanvas(canvas, currentData, {
-          width: size, margin,
-          color: { dark: fgColor, light: bgColor },
-          errorCorrectionLevel: errorLevel,
-        }, (err) => err ? reject(err) : resolve());
-      });
+    if (logoMode !== "none") {
+      const ctx = canvas.getContext("2d");
+      const logoW = (targetSize * logoSize) / 100;
+      const logoH = logoW;
+      const logoX = (targetSize - logoW) / 2;
+      const logoY = (targetSize - logoH) / 2;
 
-      // Draw logo/icon overlay
-      if (logoMode !== "none") {
-        const ctx = canvas.getContext("2d");
-        const logoW = (size * logoSize) / 100;
-        const logoH = logoW;
-        const logoX = (size - logoW) / 2;
-        const logoY = (size - logoH) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(targetSize / 2, targetSize / 2, (logoW / 2) + 6, 0, 2 * Math.PI);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.restore();
 
-        // White background circle
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(size / 2, size / 2, (logoW / 2) + 6, 0, 2 * Math.PI);
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.restore();
-
-        if (logoMode === "upload" && logoDataUrl) {
+      if (logoMode === "upload" && logoDataUrl) {
+        const img = new Image();
+        img.src = logoDataUrl;
+        await new Promise((r) => { img.onload = r; });
+        ctx.drawImage(img, logoX, logoY, logoW, logoH);
+      } else if (logoMode === "preset" && selectedPresetIcon !== "none") {
+        const preset = PRESET_ICONS.find((p) => p.id === selectedPresetIcon);
+        if (preset?.svg) {
+          const blob = new Blob([preset.svg.replace('stroke="currentColor"', `stroke="${fgColor}"`).replace('fill="currentColor"', `fill="${fgColor}"`)], { type: "image/svg+xml" });
+          const url = URL.createObjectURL(blob);
           const img = new Image();
-          img.src = logoDataUrl;
+          img.src = url;
           await new Promise((r) => { img.onload = r; });
           ctx.drawImage(img, logoX, logoY, logoW, logoH);
-        } else if (logoMode === "preset" && selectedPresetIcon !== "none") {
-          const preset = PRESET_ICONS.find((p) => p.id === selectedPresetIcon);
-          if (preset?.svg) {
-            const blob = new Blob([preset.svg.replace('stroke="currentColor"', `stroke="${fgColor}"`).replace('fill="currentColor"', `fill="${fgColor}"`)], { type: "image/svg+xml" });
-            const url = URL.createObjectURL(blob);
-            const img = new Image();
-            img.src = url;
-            await new Promise((r) => { img.onload = r; });
-            ctx.drawImage(img, logoX, logoY, logoW, logoH);
-            URL.revokeObjectURL(url);
-          }
+          URL.revokeObjectURL(url);
         }
       }
-    } catch {}
-    setGenerating(false);
-  }, [currentData, size, fgColor, bgColor, errorLevel, margin, logoMode, logoDataUrl, selectedPresetIcon, logoSize]);
+    }
+  } catch {}
+}, [currentData, fgColor, bgColor, errorLevel, margin, logoMode, logoDataUrl, selectedPresetIcon, logoSize]);
 
-  useEffect(() => { drawQR(); }, [drawQR]);
+const drawQR = useCallback(async () => {
+  setGenerating(true);
+  await drawQRToCanvas(canvasRef.current, size);
+  setGenerating(false);
+}, [drawQRToCanvas, size]);
+
+useEffect(() => { drawQR(); }, [drawQR]);
+
+useEffect(() => {
+  if (activeTab !== "print") return;
+  (async () => {
+    await drawQRToCanvas(printCanvasRef.current, 200);
+    if (printCanvasRef.current) {
+      setPrintQRDataUrl(printCanvasRef.current.toDataURL("image/png"));
+    }
+  })();
+}, [activeTab, drawQRToCanvas]);
 
   /* ============================================
      DOWNLOAD
@@ -515,7 +533,7 @@ export default function QRCodeGenerator() {
      PRINT
   ============================================ */
   function handlePrint() {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current || printCanvasRef.current;
     if (!canvas) return;
     const dataUrl = canvas.toDataURL("image/png");
     const win = window.open("", "_blank");
@@ -555,6 +573,232 @@ export default function QRCodeGenerator() {
     win.document.write(`<button class="print-btn no-print" onclick="window.print()">Print</button>`);
     win.document.write(`</body></html>`);
     win.document.close();
+  }
+
+      function buildPrintHTML(qrDataUrl) {
+    const isPoster = printStyle === "poster";
+    const isCard = printStyle === "card";
+    const isMinimal = printStyle === "minimal";
+    return `
+      <div id="print-capture" style="
+        background-color: ${printBgColor};
+        color: ${printTextColor};
+        padding: ${isPoster ? "48px 36px" : isCard ? "32px 28px" : "20px"};
+        border-radius: ${isMinimal ? "0" : "20px"};
+        ${isCard ? `border: 2px solid #075a01; box-shadow: 0 10px 40px rgba(0,0,0,0.08);` : ""}
+        max-width: 360px;
+        width: 360px;
+        text-align: center;
+        font-family: system-ui, -apple-system, sans-serif;
+        box-sizing: border-box;
+      ">
+        ${isPoster ? `<div style="height: 6px; background: ${printAccent}; border-radius: 999px; margin: 0 auto 24px; width: 60px;"></div>` : ""}
+        ${isPoster && printSubLabel ? `<p style="font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: ${printAccent}; margin: 0 0 12px;">${printSubLabel}</p>` : ""}
+        <div style="
+          background: ${isCard ? "#fff" : "transparent"};
+          padding: ${isCard ? "16px" : "0"};
+          border-radius: ${isCard ? "16px" : "0"};
+          display: inline-block;
+        ">
+          <img src="${qrDataUrl}" style="width: 200px; height: 200px; display: block;" />
+        </div>
+        ${printLabel ? `<p style="margin: ${isPoster ? "28px" : "20px"} 0 0; font-size: ${isPoster ? "22px" : "17px"}; font-weight: 800; line-height: 1.3;">${printLabel}</p>` : ""}
+        ${!isPoster && printSubLabel ? `<p style="margin: 8px 0 0; font-size: 13px; opacity: 0.7; line-height: 1.4;">${printSubLabel}</p>` : ""}
+        ${isCard ? `<div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed ${printAccent}66; font-size: 10px; opacity: 0.5; letter-spacing: 0.05em;">Scan with any camera</div>` : ""}
+      </div>
+    `;
+  }
+
+        async function captureStyledQR() {
+    const srcCanvas = printCanvasRef.current;
+    if (!srcCanvas || srcCanvas.width === 0) return null;
+
+    const isPoster = printStyle === "poster";
+    const isCard = printStyle === "card";
+    const isMinimal = printStyle === "minimal";
+
+    // Scale (for crisp output)
+    const SCALE = 3;
+    const W = 360 * SCALE;
+    const padX = (isPoster ? 36 : isCard ? 28 : 20) * SCALE;
+    const padY = (isPoster ? 48 : isCard ? 32 : 20) * SCALE;
+    const qrSize = 200 * SCALE;
+    const qrPad = isCard ? 16 * SCALE : 0;
+    const borderRadius = isMinimal ? 0 : 20 * SCALE;
+
+    // Calculate height
+    let h = padY;
+    if (isPoster) h += (6 + 24) * SCALE;
+    if (isPoster && printSubLabel) h += (11 + 12) * SCALE;
+    h += qrSize + qrPad * 2;
+    if (printLabel) h += (isPoster ? 28 : 20) * SCALE + (isPoster ? 22 : 17) * SCALE * 1.3;
+    if (!isPoster && printSubLabel) h += 8 * SCALE + 13 * SCALE * 1.4;
+    if (isCard) h += (20 + 16 + 10) * SCALE;
+    h += padY;
+
+    const out = document.createElement("canvas");
+    out.width = W;
+    out.height = h;
+    const ctx = out.getContext("2d");
+
+    // Background with rounded corners
+    ctx.fillStyle = printBgColor;
+    if (borderRadius > 0) {
+      ctx.beginPath();
+      ctx.moveTo(borderRadius, 0);
+      ctx.lineTo(W - borderRadius, 0);
+      ctx.quadraticCurveTo(W, 0, W, borderRadius);
+      ctx.lineTo(W, h - borderRadius);
+      ctx.quadraticCurveTo(W, h, W - borderRadius, h);
+      ctx.lineTo(borderRadius, h);
+      ctx.quadraticCurveTo(0, h, 0, h - borderRadius);
+      ctx.lineTo(0, borderRadius);
+      ctx.quadraticCurveTo(0, 0, borderRadius, 0);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.fillRect(0, 0, W, h);
+    }
+
+    // Card border (green)
+    if (isCard) {
+      ctx.strokeStyle = "#075a01";
+      ctx.lineWidth = 2 * SCALE;
+      ctx.beginPath();
+      const r = borderRadius - SCALE;
+      const inset = SCALE;
+      ctx.moveTo(r + inset, inset);
+      ctx.lineTo(W - r - inset, inset);
+      ctx.quadraticCurveTo(W - inset, inset, W - inset, r + inset);
+      ctx.lineTo(W - inset, h - r - inset);
+      ctx.quadraticCurveTo(W - inset, h - inset, W - r - inset, h - inset);
+      ctx.lineTo(r + inset, h - inset);
+      ctx.quadraticCurveTo(inset, h - inset, inset, h - r - inset);
+      ctx.lineTo(inset, r + inset);
+      ctx.quadraticCurveTo(inset, inset, r + inset, inset);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    let y = padY;
+
+    // Poster top accent bar
+    if (isPoster) {
+      const barW = 60 * SCALE;
+      const barH = 6 * SCALE;
+      ctx.fillStyle = printAccent;
+      ctx.beginPath();
+      ctx.roundRect((W - barW) / 2, y, barW, barH, barH / 2);
+      ctx.fill();
+      y += barH + 24 * SCALE;
+    }
+
+    // Poster sub label
+    if (isPoster && printSubLabel) {
+      ctx.fillStyle = printAccent;
+      ctx.font = `700 ${11 * SCALE}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText(printSubLabel.toUpperCase(), W / 2, y + 11 * SCALE);
+      y += 11 * SCALE + 12 * SCALE;
+    }
+
+    // QR code (with optional white card background)
+    const qrX = (W - qrSize - qrPad * 2) / 2;
+    if (isCard) {
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.roundRect(qrX, y, qrSize + qrPad * 2, qrSize + qrPad * 2, 16 * SCALE);
+      ctx.fill();
+    }
+    ctx.drawImage(srcCanvas, qrX + qrPad, y + qrPad, qrSize, qrSize);
+    y += qrSize + qrPad * 2;
+
+    // Main label
+    if (printLabel) {
+      y += (isPoster ? 28 : 20) * SCALE;
+      const fontSize = (isPoster ? 22 : 17) * SCALE;
+      ctx.fillStyle = printTextColor;
+      ctx.font = `800 ${fontSize}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText(printLabel, W / 2, y + fontSize);
+      y += fontSize * 1.3;
+    }
+
+    // Sub label (non-poster)
+    if (!isPoster && printSubLabel) {
+      y += 8 * SCALE;
+      const fontSize = 13 * SCALE;
+      ctx.fillStyle = printTextColor;
+      ctx.globalAlpha = 0.7;
+      ctx.font = `400 ${fontSize}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText(printSubLabel, W / 2, y + fontSize);
+      ctx.globalAlpha = 1;
+      y += fontSize * 1.4;
+    }
+
+    // Card footer
+    if (isCard) {
+      y += 20 * SCALE;
+      ctx.strokeStyle = printAccent + "66";
+      ctx.lineWidth = 1 * SCALE;
+      ctx.setLineDash([4 * SCALE, 4 * SCALE]);
+      ctx.beginPath();
+      ctx.moveTo(padX, y);
+      ctx.lineTo(W - padX, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      y += 16 * SCALE;
+      ctx.fillStyle = printTextColor;
+      ctx.globalAlpha = 0.5;
+      ctx.font = `400 ${10 * SCALE}px system-ui, -apple-system, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText("Scan with any camera", W / 2, y + 10 * SCALE);
+      ctx.globalAlpha = 1;
+    }
+
+    return out;
+  }
+
+  async function downloadPrintLayoutPNG() {
+    if (!printCanvasRef.current || printCanvasRef.current.width === 0) { notify("Generate a QR first"); return; }
+    setDownloadingPrint(true);
+    try {
+      const canvas = await captureStyledQR();
+      if (!canvas) throw new Error("Capture failed");
+      const link = document.createElement("a");
+      link.download = `qr-print-${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      notify("PNG downloaded");
+    } catch (e) { console.error(e); notify("Download failed"); }
+    setDownloadingPrint(false);
+  }
+
+  async function downloadPrintLayoutPDF() {
+    if (!printCanvasRef.current || printCanvasRef.current.width === 0) { notify("Generate a QR first"); return; }
+    setDownloadingPrint(true);
+    try {
+      const canvas = await captureStyledQR();
+      if (!canvas) throw new Error("Capture failed");
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgRatio = canvas.height / canvas.width;
+      let imgWidth = pdfWidth - 40;
+      let imgHeight = imgWidth * imgRatio;
+      if (imgHeight > pdfHeight - 40) {
+        imgHeight = pdfHeight - 40;
+        imgWidth = imgHeight / imgRatio;
+      }
+      const x = (pdfWidth - imgWidth) / 2;
+      const y = (pdfHeight - imgHeight) / 2;
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+      pdf.save(`qr-print-${Date.now()}.pdf`);
+      notify("PDF downloaded");
+    } catch (e) { console.error(e); notify("Download failed"); }
+    setDownloadingPrint(false);
   }
 
   /* ============================================
@@ -715,7 +959,7 @@ export default function QRCodeGenerator() {
                 <Ico d={MODES.find((m2) => m2.id === mode)?.icon || IC.link} className="h-4 w-4 text-[#f97316]" />
                 {MODES.find((m2) => m2.id === mode)?.label} Details
               </h3>
-              <InputForm />
+              {InputForm()}
             </div>
 
             {/* Customisation */}
@@ -1090,11 +1334,13 @@ export default function QRCodeGenerator() {
 
       {/* ============ PRINT TAB ============ */}
       {activeTab === "print" && (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 xl:grid-cols-[1fr_1.2fr]">
+          {/* LEFT — Settings */}
           <div className="space-y-4">
             <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-5 shadow-sm space-y-4">
               <h3 className="text-xs sm:text-sm font-bold text-gray-900">Print Layout</h3>
 
+              {/* Layout Type */}
               <div>
                 <label className="mb-2 block text-xs font-semibold text-gray-700">Layout Type</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -1107,6 +1353,26 @@ export default function QRCodeGenerator() {
                 </div>
               </div>
 
+              {/* Style Picker (only for center layout) */}
+              {printLayout === "center" && (
+                <div>
+                  <label className="mb-2 block text-xs font-semibold text-gray-700">Style</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "minimal", label: "Minimal" },
+                      { id: "card", label: "Card" },
+                      { id: "poster", label: "Poster" },
+                    ].map((s) => (
+                      <button key={s.id} onClick={() => setPrintStyle(s.id)}
+                        className={`rounded-xl py-2.5 text-xs font-bold transition ${printStyle === s.id ? "bg-[#f97316] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Labels */}
               {printLayout === "center" && (
                 <>
                   <div>
@@ -1118,6 +1384,50 @@ export default function QRCodeGenerator() {
                     <label className="mb-1 block text-xs font-semibold text-gray-700">Sub Label</label>
                     <input type="text" value={printSubLabel} onChange={(e) => setPrintSubLabel(e.target.value)}
                       placeholder="e.g. fancydigitals.com.ng" className={ic} />
+                  </div>
+
+                  {/* Colors */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="mb-1 block text-[10px] font-semibold text-gray-700">Background</label>
+                      <div className="flex items-center gap-1.5 rounded-xl border border-gray-200 p-1.5">
+                        <input type="color" value={printBgColor} onChange={(e) => setPrintBgColor(e.target.value)} className="h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent" />
+                        <code className="text-[9px] font-mono text-gray-600 truncate">{printBgColor}</code>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-semibold text-gray-700">Text</label>
+                      <div className="flex items-center gap-1.5 rounded-xl border border-gray-200 p-1.5">
+                        <input type="color" value={printTextColor} onChange={(e) => setPrintTextColor(e.target.value)} className="h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent" />
+                        <code className="text-[9px] font-mono text-gray-600 truncate">{printTextColor}</code>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-semibold text-gray-700">Accent</label>
+                      <div className="flex items-center gap-1.5 rounded-xl border border-gray-200 p-1.5">
+                        <input type="color" value={printAccent} onChange={(e) => setPrintAccent(e.target.value)} className="h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent" />
+                        <code className="text-[9px] font-mono text-gray-600 truncate">{printAccent}</code>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Background presets */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { bg: "#ffffff", text: "#111827", accent: "#f97316", label: "White" },
+                      { bg: "#075a01", text: "#ffffff", accent: "#ff914d", label: "Green" },
+                      { bg: "#1e3a5f", text: "#ffffff", accent: "#fbbf24", label: "Navy" },
+                      { bg: "#111827", text: "#ffffff", accent: "#f97316", label: "Dark" },
+                      { bg: "#fef3c7", text: "#92400e", accent: "#f59e0b", label: "Cream" },
+                      { bg: "#fce7f3", text: "#9f1239", accent: "#e11d48", label: "Pink" },
+                    ].map((p) => (
+                      <button key={p.label}
+                        onClick={() => { setPrintBgColor(p.bg); setPrintTextColor(p.text); setPrintAccent(p.accent); }}
+                        className="flex items-center gap-1 rounded-lg border border-gray-100 px-2 py-1 text-[10px] font-semibold text-gray-600 hover:bg-gray-50 transition">
+                        <span className="h-3 w-3 rounded-full border border-gray-200" style={{ backgroundColor: p.bg }} />
+                        {p.label}
+                      </button>
+                    ))}
                   </div>
                 </>
               )}
@@ -1136,21 +1446,38 @@ export default function QRCodeGenerator() {
                   {batchResults.length === 0 && (
                     <div className="mt-3 rounded-xl bg-yellow-50 border border-yellow-100 p-3">
                       <p className="text-xs text-yellow-700 font-semibold">No batch QR codes yet</p>
-                      <p className="text-[10px] text-yellow-600 mt-0.5">Go to Batch CSV tab and generate QR codes first, then return here to print them in a grid.</p>
+                      <p className="text-[10px] text-yellow-600 mt-0.5">Go to Batch CSV tab and generate QR codes first.</p>
                     </div>
                   )}
                 </div>
               )}
 
-              <button onClick={handlePrint} disabled={!hasData && printLayout === "center"}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gray-900 py-3 text-sm font-bold text-white hover:bg-black disabled:opacity-30 transition">
-                <Ico d={IC.print} className="h-4 w-4" /> Open Print Preview
-              </button>
+              {/* Action Buttons */}
+              <div className="space-y-2 pt-2">
+                {printLayout === "center" && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button onClick={downloadPrintLayoutPNG} disabled={!hasData || downloadingPrint}
+                      className="flex items-center justify-center gap-1.5 rounded-xl bg-[#f97316] py-3 text-xs font-bold text-white hover:bg-[#ea6c0a] disabled:opacity-30 transition">
+                      <Ico d={IC.download} className="h-3.5 w-3.5" />
+                      {downloadingPrint ? "..." : "PNG"}
+                    </button>
+                    <button onClick={downloadPrintLayoutPDF} disabled={!hasData || downloadingPrint}
+                      className="flex items-center justify-center gap-1.5 rounded-xl bg-gray-900 py-3 text-xs font-bold text-white hover:bg-black disabled:opacity-30 transition">
+                      <Ico d={IC.download} className="h-3.5 w-3.5" />
+                      {downloadingPrint ? "..." : "PDF"}
+                    </button>
+                  </div>
+                )}
+                <button onClick={handlePrint} disabled={!hasData && printLayout === "center"}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-30 transition">
+                  <Ico d={IC.print} className="h-4 w-4" /> Open Print Preview
+                </button>
+              </div>
 
               <div className="rounded-xl bg-[#f97316]/5 border border-[#f97316]/10 p-3">
                 <p className="text-[10px] font-bold text-[#f97316] mb-1">Print Tips</p>
                 <ul className="space-y-1 text-[10px] text-gray-600">
-                  <li>→ Use 300px+ size for crisp print quality</li>
+                  <li>→ Download PNG for sharing, PDF for printing</li>
                   <li>→ H error correction survives real-world wear</li>
                   <li>→ Test scan the printed QR before bulk printing</li>
                   <li>→ Leave at least 5mm white space around the QR</li>
@@ -1159,19 +1486,91 @@ export default function QRCodeGenerator() {
             </div>
           </div>
 
-          {/* Print preview */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-5 shadow-sm">
-            <h3 className="mb-4 text-xs sm:text-sm font-bold text-gray-900">Layout Preview</h3>
-            <div className="rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50 p-6 min-h-[300px] flex flex-col items-center justify-center">
+          {/* RIGHT — Live Stylish Preview */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900">Live Preview</h3>
+              <span className="text-[10px] text-gray-400">Downloads exactly what you see</span>
+            </div>
+
+            <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-4 sm:p-6 flex items-center justify-center min-h-[400px]">
               {hasData ? (
-                <>
-                  <canvas ref={canvasRef} className="rounded-xl max-w-[200px] w-full" style={{ imageRendering: "pixelated" }} />
-                  {printLabel && <p className="mt-4 text-base font-bold text-gray-900 text-center">{printLabel}</p>}
-                  {printSubLabel && <p className="mt-1 text-sm text-gray-500 text-center">{printSubLabel}</p>}
-                  <div className="mt-4 w-full border-t border-gray-100 pt-3 text-center">
-                    <p className="text-[10px] text-gray-300">fancydigitals.com.ng/tools/qr-code-generator</p>
+                <div
+                  style={{
+                    backgroundColor: printBgColor,
+                    color: printTextColor,
+                    padding: printStyle === "poster" ? "48px 36px" : printStyle === "card" ? "32px 28px" : "20px",
+                    borderRadius: printStyle === "minimal" ? "0" : "20px",
+                    boxShadow: printStyle === "card" ? "0 10px 40px rgba(0,0,0,0.08)" : "none",
+                    border: printStyle === "card" ? `2px solid #075a01` : "none",
+                    maxWidth: "360px",
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  {/* Poster top accent bar */}
+                  {printStyle === "poster" && (
+                    <div style={{ height: "6px", background: printAccent, borderRadius: "999px", marginBottom: "24px", width: "60px", marginLeft: "auto", marginRight: "auto" }} />
+                  )}
+
+                  {/* Poster sub-label above */}
+                  {printStyle === "poster" && printSubLabel && (
+                    <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: printAccent, marginBottom: "12px" }}>
+                      {printSubLabel}
+                    </p>
+                  )}
+
+                  {/* QR Canvas wrapper */}
+                  <div style={{
+                    background: printStyle === "card" ? "#fff" : "transparent",
+                    padding: printStyle === "card" ? "16px" : "0",
+                    borderRadius: printStyle === "card" ? "16px" : "0",
+                    display: "inline-block",
+                  }}>
+                    <canvas ref={printCanvasRef} style={{ width: "200px", height: "200px", imageRendering: "pixelated", display: "block" }} />
+                    {printQRDataUrl && (
+                      <img src={printQRDataUrl} alt="QR" style={{ display: "none" }} />
+                    )}
                   </div>
-                </>
+
+                  {/* Main Label */}
+                  {printLabel && (
+                    <p style={{
+                      marginTop: printStyle === "poster" ? "28px" : "20px",
+                      fontSize: printStyle === "poster" ? "22px" : "17px",
+                      fontWeight: 800,
+                      lineHeight: 1.3,
+                    }}>
+                      {printLabel}
+                    </p>
+                  )}
+
+                  {/* Sub Label (not for poster — shown above) */}
+                  {printStyle !== "poster" && printSubLabel && (
+                    <p style={{
+                      marginTop: "8px",
+                      fontSize: "13px",
+                      opacity: 0.7,
+                      lineHeight: 1.4,
+                    }}>
+                      {printSubLabel}
+                    </p>
+                  )}
+
+                  {/* Card bottom divider */}
+                  {printStyle === "card" && (
+                    <div style={{
+                      marginTop: "20px",
+                      paddingTop: "16px",
+                      borderTop: `1px dashed ${printAccent}40`,
+                      fontSize: "10px",
+                      opacity: 0.5,
+                      letterSpacing: "0.05em",
+                    }}>
+                      Scan with any camera
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="text-center">
                   <Ico d={IC.print} className="h-10 w-10 text-gray-200 mx-auto mb-2" />
