@@ -56,7 +56,7 @@ async function tryWithKey({ apiKey, model, prompt }) {
   return text;
 }
 
-async function generateWithGemini(prompt) {
+export async function generateWithGemini(prompt) {
   // Backoff: 10s → 30s → 60s for rate limit errors
   const rateLimitBackoffs = [10000, 30000, 60000];
 
