@@ -1,4 +1,66 @@
-// PPP-based pricing for 10 major markets
+// ============================================
+// PLAN DEFINITIONS
+// ============================================
+export const PLANS = {
+  FREE: "FREE",
+  PRO_MONTHLY: "PRO_MONTHLY",
+  LIFETIME: "LIFETIME",
+};
+
+export function isPro(plan) {
+  return plan === PLANS.PRO_MONTHLY || plan === PLANS.LIFETIME;
+}
+
+export function isLifetime(plan) {
+  return plan === PLANS.LIFETIME;
+}
+
+// ============================================
+// PLAN LIMITS
+// ============================================
+export const PLAN_LIMITS = {
+  FREE: {
+    publishedPages: 1,        // max 1 active published page
+    clientSites: 0,           // no client portal
+    customDomains: 0,         // no custom domains
+    resumePerDay: 3,
+    coverLetterPerDay: 3,
+    landingPagePerDay: 2,
+    extraLanguages: false,
+    brandColors: false,
+    extendedLeadForm: false,
+  },
+  PRO_MONTHLY: {
+    publishedPages: Infinity,
+    clientSites: 3,
+    customDomains: 1,
+    resumePerDay: Infinity,
+    coverLetterPerDay: Infinity,
+    landingPagePerDay: Infinity,
+    extraLanguages: true,
+    brandColors: true,
+    extendedLeadForm: true,
+  },
+  LIFETIME: {
+    publishedPages: Infinity,
+    clientSites: 3,
+    customDomains: 1,
+    resumePerDay: Infinity,
+    coverLetterPerDay: Infinity,
+    landingPagePerDay: Infinity,
+    extraLanguages: true,
+    brandColors: true,
+    extendedLeadForm: true,
+  },
+};
+
+export function getLimits(plan) {
+  return PLAN_LIMITS[plan] || PLAN_LIMITS.FREE;
+}
+
+// ============================================
+// PPP-BASED REGIONAL PRICING
+// ============================================
 export const REGIONAL_PRICING = {
   US: { code: "USD", symbol: "$", monthly: 4.99, yearly: 39, lifetime: 49, flag: "🇺🇸", country: "United States" },
   GB: { code: "GBP", symbol: "£", monthly: 3.99, yearly: 31, lifetime: 39, flag: "🇬🇧", country: "United Kingdom" },
@@ -14,7 +76,6 @@ export const REGIONAL_PRICING = {
   MX: { code: "MXN", symbol: "$", monthly: 89, yearly: 699, lifetime: 899, flag: "🇲🇽", country: "Mexico" },
 };
 
-// EU countries map to EU pricing
 const EU_COUNTRIES = ["DE", "FR", "ES", "IT", "NL", "BE", "AT", "PT", "IE", "FI", "GR", "PL", "CZ", "HU", "RO", "SE", "DK", "SK", "BG", "HR", "LU", "SI", "LV", "EE", "CY", "MT", "LT"];
 
 export function getRegionForCountry(countryCode) {
@@ -27,7 +88,7 @@ export function getRegionForCountry(countryCode) {
 
 export function formatPrice(amount, currency) {
   const { symbol, code } = REGIONAL_PRICING[currency] || REGIONAL_PRICING.US;
-  if (code === "USD" || code === "GBP" || code === "EUR" || code === "CAD" || code === "AUD") {
+  if (["USD", "GBP", "EUR", "CAD", "AUD"].includes(code)) {
     return `${symbol}${amount.toFixed(2)}`;
   }
   return `${symbol}${amount.toLocaleString()}`;

@@ -1,24 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { isPro, getLimits } from "@/lib/pricing";
 
-const FREE_DAILY_LIMITS = {
-  "ai-resume-builder": 3,
-  "ai-cover-letter": 3,
-  "ai-business-name": 5,
-  "ai-bio-generator": 5,
-  "ai-landing-page-generator": 2,
-  "default": 5,
+const TOOL_LIMIT_KEY = {
+  "ai-resume-builder": "resumePerDay",
+  "ai-cover-letter": "coverLetterPerDay",
+  "ai-landing-page-generator": "landingPagePerDay",
 };
 
-// Anonymous users get 1 free per day per IP
 const ANON_DAILY_LIMIT = 1;
 
 export function getLimitForTool(toolSlug) {
-  return FREE_DAILY_LIMITS[toolSlug] || FREE_DAILY_LIMITS.default;
+  const key = TOOL_LIMIT_KEY[toolSlug];
+  if (!key) return 5;
+  return getLimits("FREE")[key];
 }
 
 // ============================================
-// AUTHENTICATED USERS (logged in)
+// AUTHENTICATED USERS
 // ============================================
 export async function checkUsage(toolSlug) {
   const supabase = await createClient();
@@ -31,10 +30,14 @@ export async function checkUsage(toolSlug) {
     .eq("id", user.id)
     .single();
 
-  if (profile.plan !== "free") return { allowed: true };
+  const plan = profile?.plan || "FREE";
+  const limits = getLimits(plan);
+  const limitKey = TOOL_LIMIT_KEY[toolSlug];
+  const dailyLimit = limitKey ? limits[limitKey] : 5;
+
+  if (dailyLimit === Infinity) return { allowed: true };
 
   const today = new Date().toISOString().split("T")[0];
-  const limit = getLimitForTool(toolSlug);
 
   const { data } = await supabase
     .from("usage")
@@ -45,8 +48,8 @@ export async function checkUsage(toolSlug) {
     .maybeSingle();
 
   const currentCount = data?.count || 0;
-  if (currentCount >= limit) return { allowed: false, remaining: 0 };
-  return { allowed: true, remaining: limit - currentCount };
+  if (currentCount >= dailyLimit) return { allowed: false, remaining: 0 };
+  return { allowed: true, remaining: dailyLimit - currentCount };
 }
 
 export async function incrementUsage(toolSlug) {
@@ -87,9 +90,11 @@ export async function checkAndIncrementUsage(toolSlug) {
     .eq("id", user.id)
     .single();
 
-  const isPro = profile?.plan !== "free";
+  const plan = profile?.plan || "FREE";
+  const limits = getLimits(plan);
+  const limitKey = TOOL_LIMIT_KEY[toolSlug];
+  const dailyLimit = limitKey ? limits[limitKey] : 5;
   const today = new Date().toISOString().split("T")[0];
-  const limit = getLimitForTool(toolSlug);
 
   const { data: usage } = await supabase
     .from("usage")
@@ -101,11 +106,11 @@ export async function checkAndIncrementUsage(toolSlug) {
 
   const currentCount = usage?.count || 0;
 
-  if (!isPro && currentCount >= limit) {
+  if (dailyLimit !== Infinity && currentCount >= dailyLimit) {
     return {
       allowed: false,
-      error: `Daily limit reached (${limit}/day on Free plan). Upgrade to Pro for unlimited access.`,
-      limit,
+      error: `Daily limit reached (${dailyLimit}/day on Free plan). Upgrade to Pro for unlimited access.`,
+      limit: dailyLimit,
       used: currentCount,
     };
   }
@@ -124,9 +129,10 @@ export async function checkAndIncrementUsage(toolSlug) {
   return {
     allowed: true,
     used: currentCount + 1,
-    limit: isPro ? null : limit,
+    limit: dailyLimit === Infinity ? null : dailyLimit,
     userId: user.id,
-    isPro,
+    isPro: isPro(plan),
+    plan,
   };
 }
 
@@ -147,14 +153,11 @@ export async function getTodayUsage(toolSlug) {
 }
 
 // ============================================
-// ANONYMOUS USERS (no login) — rate-limited by IP
+// ANONYMOUS USERS
 // ============================================
 export async function checkAnonymousUsage(toolSlug, ipAddress) {
-  if (!ipAddress) {
-    return { allowed: false, error: "Cannot identify request" };
-  }
+  if (!ipAddress) return { allowed: false, error: "Cannot identify request" };
 
-  // Use service role to bypass RLS for anonymous tracking
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -164,7 +167,6 @@ export async function checkAnonymousUsage(toolSlug, ipAddress) {
   const today = new Date().toISOString().split("T")[0];
   const ipKey = `${ipAddress}_${toolSlug}_${today}`;
 
-  // Check usage from anonymous_usage table
   const { data: existing } = await supabaseAdmin
     .from("anonymous_usage")
     .select("*")
@@ -183,7 +185,6 @@ export async function checkAnonymousUsage(toolSlug, ipAddress) {
     };
   }
 
-  // Increment
   if (existing) {
     await supabaseAdmin
       .from("anonymous_usage")

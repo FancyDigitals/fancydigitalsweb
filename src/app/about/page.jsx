@@ -3,34 +3,38 @@ import AboutClient from "./client";
 const BASE_URL = "https://fancydigitals.com.ng";
 
 export const metadata = {
-  title: "Bashir Ismail (Fancy) — Founder of Fancy Digitals | Digital Agency Nigeria",
+  title: "Bashir Ismail (Fancy) — Technology Entrepreneur & Startup Founder | Nigeria",
   description:
-    "Meet Bashir Ismail, founder of Fancy Digitals — a Nigerian digital agency building AI tools, landing pages, resumes, and premium web systems for founders worldwide.",
+    "Bashir Ismail, known as Fancy, is a Nigerian technology entrepreneur, startup founder, AI engineer, and product builder. Founder of Fancy Digitals, SafetyGrid, and BeVibesHub.",
   keywords: [
     "Bashir Ismail",
     "Bashir Ismail founder",
+    "Bashir Ismail technology entrepreneur",
+    "Bashir Ismail AI engineer",
+    "Bashir Ismail startup founder Nigeria",
+    "Bashir Fancy",
     "Fancy Digitals founder",
     "Bashir Ismail Fancy Digitals",
+    "SafetyGrid founder",
+    "BeVibesHub founder",
+    "Nigerian technology entrepreneur",
+    "Nigerian startup founder",
+    "AI engineer Nigeria",
+    "product builder Nigeria",
+    "digital product builder Africa",
     "Fancy Digitals Nigeria",
-    "digital agency founder Nigeria",
-    "web design founder Lagos",
-    "AI tools founder Nigeria",
     "Nigerian SaaS founder",
-    "AI landing page generator founder",
-    "AI resume builder founder",
-    "Bashir Fancy",
-    "Fancy digital architect",
-    "founder Fancy Digitals Nigeria",
+    "AI tools founder Nigeria",
     "best web designer Nigeria",
-    "Nigerian digital architect",
-    "Lagos web developer founder",
+    "Lagos tech founder",
     "Bashir Ismail digital studio",
+    "African tech entrepreneur",
   ],
   alternates: { canonical: `${BASE_URL}/about` },
   openGraph: {
-    title: "Bashir Ismail — Founder of Fancy Digitals",
+    title: "Bashir Ismail — Technology Entrepreneur & Startup Founder",
     description:
-      "The founder behind Fancy Digitals — building AI tools and premium digital systems for businesses worldwide.",
+      "Founder of Fancy Digitals, SafetyGrid, and BeVibesHub. Building AI-powered software, digital tools, and technology companies from Africa.",
     url: `${BASE_URL}/about`,
     type: "profile",
     images: [
@@ -38,31 +42,33 @@ export const metadata = {
         url: `${BASE_URL}/images/founder.jpg`,
         width: 1200,
         height: 630,
-        alt: "Bashir Ismail, Founder of Fancy Digitals",
+        alt: "Bashir Ismail (Fancy), Technology Entrepreneur and Startup Founder",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bashir Ismail — Founder of Fancy Digitals",
-    description: "Building AI tools and premium digital systems from Nigeria.",
+    title: "Bashir Ismail — Technology Entrepreneur & Startup Founder",
+    description:
+      "Founder of Fancy Digitals, SafetyGrid, and BeVibesHub. Building technology companies from Africa.",
     images: [`${BASE_URL}/images/founder.jpg`],
   },
 };
 
 export default function AboutPage() {
-  // All structured data for SEO — Google rich results
   const personSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: "Bashir Ismail",
-    alternateName: ["Fancy", "Bashir Fancy"],
-    jobTitle: "Founder & Digital Architect",
+    alternateName: ["Fancy", "Bashir Fancy", "Bashir Ismail Fancy"],
+    jobTitle: "Technology Entrepreneur, Startup Founder & AI Engineer",
     description:
-      "Founder of Fancy Digitals — a digital agency building AI tools, landing pages, and premium web systems for global clients.",
+      "Bashir Ismail is a Nigerian technology entrepreneur, startup founder, AI engineer, and digital product builder. He is the founder of Fancy Digitals, SafetyGrid, and BeVibesHub.",
     url: `${BASE_URL}/about`,
     image: `${BASE_URL}/images/founder.jpg`,
+    nationality: { "@type": "Country", name: "Nigeria" },
     sameAs: [
+      "https://fancydigitals.com.ng",
       "https://wa.me/2349034360785",
     ],
     worksFor: {
@@ -70,17 +76,24 @@ export default function AboutPage() {
       name: "Fancy Digitals",
       url: BASE_URL,
     },
+    founder: [
+  { "@type": "Organization", name: "Fancy Digitals", url: "https://fancydigitals.com.ng" },
+  { "@type": "Organization", name: "SafetyGrid", url: "https://safetygrid.app" },
+  { "@type": "Organization", name: "BeVibesHub", url: "https://bevibeshub.com.ng" },
+],
     knowsAbout: [
-      "Web Design",
+      "Artificial Intelligence",
+      "Software Engineering",
       "Frontend Engineering",
-      "AI Tools Development",
-      "Landing Page Design",
-      "Digital Strategy",
       "Product Design",
-      "Brand Identity",
+      "Brand Strategy",
       "SEO",
+      "Digital Marketing",
+      "Automation",
+      "SaaS Development",
+      "Public Safety Technology",
+      "Digital Publishing",
     ],
-    nationality: { "@type": "Country", name: "Nigeria" },
   };
 
   const organizationSchema = {
@@ -96,15 +109,17 @@ export default function AboutPage() {
     },
     foundingDate: "2022",
     description:
-      "A premium digital studio building AI tools, landing pages, resumes, and scalable web systems for founders and businesses worldwide.",
+      "A Nigerian digital agency and AI SaaS platform building AI-powered tools, landing pages, resumes, and digital infrastructure for founders and businesses worldwide.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "NG",
       addressLocality: "Lagos",
     },
     sameAs: [
-      "https://wa.me/2349034360785",
-    ],
+  "https://wa.me/2349034360785",
+  "https://safetygrid.app",
+  "https://bevibeshub.com.ng",
+],
   };
 
   const faqSchema = {
@@ -116,23 +131,23 @@ export default function AboutPage() {
         name: "Who is Bashir Ismail?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Bashir Ismail, known as Fancy, is the founder of Fancy Digitals — a Nigerian digital agency building AI tools, landing pages, resumes, and premium web systems for businesses worldwide.",
+          text: "Bashir Ismail, known as Fancy, is a Nigerian technology entrepreneur, startup founder, AI engineer, and digital product builder. He is the founder of Fancy Digitals, SafetyGrid, and BeVibesHub — three independent technology ventures built to solve real-world problems.",
         },
       },
       {
         "@type": "Question",
-        name: "What is Fancy Digitals?",
+        name: "What companies has Bashir Ismail founded?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Fancy Digitals is a digital agency based in Nigeria that builds AI-powered tools (AI Resume Builder, AI Cover Letter, AI Landing Page Generator), free utility tools, custom websites, and provides SEO, branding, and digital strategy services.",
+          text: "Bashir Ismail has founded three companies: Fancy Digitals (AI SaaS platform and digital agency), SafetyGrid (public safety technology), and BeVibesHub (digital publishing platform).",
         },
       },
       {
         "@type": "Question",
-        name: "What AI tools has Bashir built?",
+        name: "What technologies does Bashir Ismail work with?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Bashir has built AI Resume Builder, AI Cover Letter Generator, AI Landing Page Generator, and a suite of free productivity tools including QR Code Generator, Password Generator, Invoice Maker, and more.",
+          text: "Bashir works with AI engineering, software development, frontend engineering (Next.js, React), SEO, product design, brand strategy, automation, and digital publishing systems.",
         },
       },
       {
@@ -140,15 +155,7 @@ export default function AboutPage() {
         name: "How can I work with Bashir Ismail?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "You can contact Bashir through the Fancy Digitals contact page, by phone at +234 904 554 7761, or via WhatsApp at +234 903 436 0785.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Where is Fancy Digitals based?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Fancy Digitals is based in Lagos, Nigeria, and serves clients across Nigeria, Africa, and globally.",
+          text: "You can contact Bashir through the Fancy Digitals website, by phone at +234 904 554 7761, or via WhatsApp at +234 903 436 0785.",
         },
       },
     ],
@@ -159,28 +166,16 @@ export default function AboutPage() {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-      { "@type": "ListItem", position: 2, name: "About", item: `${BASE_URL}/about` },
+      { "@type": "ListItem", position: 2, name: "About Bashir Ismail", item: `${BASE_URL}/about` },
     ],
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <AboutClient />
     </>
   );
