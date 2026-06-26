@@ -122,6 +122,12 @@ const toneConfig = {
   // Email capture state
   const [leadEmail, setLeadEmail] = useState("");
   const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState(""); // Add
+const [gender, setGender] = useState(""); // Add
+const [city, setCity] = useState(""); // Add
+const [state, setState] = useState(""); // Add
+const [country, setCountry] = useState(""); // Add
+const [intent, setIntent] = useState(""); // Add
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -191,15 +197,20 @@ const toneConfig = {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const res = await fetch("/api/landing-pages/capture-lead", {
+            const res = await fetch("/api/landing-pages/capture-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pageId,
-          slug,
           email: leadEmail,
-          name: leadName || null,
-          source,
+          name: leadName,
+          phone: leadPhone,
+          gender: gender,
+          city: city,
+          state: state,
+          country: country,
+          intent: intent,
+          message: `Lead from ${source || "form"}`,
         }),
       });
       const data = await res.json();
@@ -763,44 +774,35 @@ const toneConfig = {
                 </div>
 
                 <form onSubmit={(e) => handleLeadSubmit(e, "cta-modal")} className="space-y-3">
-                  <div>
-                    <input
-                      type="text"
-                      value={leadName}
-                      onChange={(e) => setLeadName(e.target.value)}
-                      placeholder="Your name (optional)"
-                      className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="email"
-                      value={leadEmail}
-                      onChange={(e) => setLeadEmail(e.target.value)}
-                      required
-                      placeholder="Your email"
-                      className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gray-400"
-                    />
-                  </div>
-                  {submitError && (
-                    <p className="text-xs text-red-600 flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" />
-                      {submitError}
-                    </p>
-                  )}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full rounded-xl py-3 text-sm font-bold text-white disabled:opacity-50 transition shadow-lg"
-                    style={{ background: brand }}
-                  >
-                    {submitting ? (
-                      <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</span>
-                    ) : (
-                      page.hero?.cta
-                    )}
-                  </button>
-                </form>
+  {/* Universal Fields */}
+  <input type="text" value={leadName} onChange={(e) => setLeadName(e.target.value)} placeholder="Full Name" className={inputClass} required />
+  <input type="email" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} placeholder="Email Address" className={inputClass} required />
+  <input type="tel" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)} placeholder="Phone Number" className={inputClass} required />
+
+  {/* Extended Fields (Only if enabled) */}
+  {page._meta?.includeExtendedLeadForm && (
+    <>
+      <select value={gender} onChange={(e) => setGender(e.target.value)} className={inputClass} required>
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+      <div className="grid grid-cols-2 gap-2">
+        <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className={inputClass} required />
+        <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="State" className={inputClass} required />
+      </div>
+      <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Country" className={inputClass} required />
+      <textarea value={intent} onChange={(e) => setIntent(e.target.value)} placeholder="What do you intend to do with our brand?" className={inputClass + " resize-none"} rows={2} required />
+    </>
+  )}
+
+  {submitError && <p className="text-xs text-red-600 flex items-center gap-1"><AlertCircle className="h-3 w-3" />{submitError}</p>}
+  
+  <button type="submit" disabled={submitting} className="w-full rounded-xl py-3 text-sm font-bold text-white shadow-lg" style={{ background: brand }}>
+    {submitting ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : page.hero?.cta}
+  </button>
+</form>
 
                 <button
                   onClick={() => setShowCtaModal(false)}

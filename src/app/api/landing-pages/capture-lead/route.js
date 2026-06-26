@@ -39,10 +39,15 @@ export async function POST(request) {
       user_id: pageRow.user_id,
       email,
       name: name || null,
-      phone: phone || null,
-      message: message || null,
-      ip_address: ipAddress,
-      user_agent: userAgent,
+      phone: body.phone || "", // Add
+  gender: body.gender || "", // Add
+  city: body.city || "", // Add
+  state: body.state || "", // Add
+  country: body.country || "", // Add
+  intent: body.intent || "", // Add
+  message: body.message || `Lead from CTA Modal`,
+  ip_address: request.headers.get("x-forwarded-for") || "127.0.0.1",
+  user_agent: request.headers.get("user-agent") || "unknown",
     });
 
     if (error) throw error;

@@ -45,6 +45,8 @@ export async function POST(request) {
       footerAddress,
       footerEmail,
       footerPhone,
+      includeExtendedLeadForm,
+      tawkWidgetId,
     } = body;
 
     if (!businessName || !description) {
@@ -122,6 +124,8 @@ ${featuresList || "None provided — extract from description"}
 - Include Lead Magnet: ${includeLeadMagnet ? `Yes — Title: "${leadMagnetTitle || "Free Guide"}", Description: "${leadMagnetDescription || "Get our free guide"}"` : "No"}
 - Include Video Section: ${includeVideo ? `Yes — Video Title context: "${videoTitle || "See it in action"}"` : "No"}
 - Include Custom Footer: ${includeFooter ? "Yes" : "No"}
+- Include Live Chat: ${body.includeChat ? "Yes (tawk.to)" : "No"}
+- Include Extended Lead Form: ${body.includeExtendedLeadForm ? "Yes (Name, Email, Phone, Gender, Location, Intent)" : "No"}
 
 WRITING RULES:
 - Hero headline: 6-10 words. Specific benefit or pain point.
@@ -175,7 +179,7 @@ Return JSON only:
     "headline": "string in ${lang} like 'Meet the team'",
     "subheadline": "string in ${lang}",
     "members": [
-      ${(teamMembers || []).filter(m => m && (m.name || m.role)).map(m => `{ "name": "${(m.name || "").replace(/"/g, '\\"')}", "role": "${(m.role || "").replace(/"/g, '\\"')}", "bio": "1-2 sentence bio in ${lang} based on '${(m.bio || "").replace(/"/g, '\\"')}'", "photo": "${m.photo || ""}" }`).join(",\n      ")}
+      ${(teamMembers || []).filter(m => m && (m.name || m.role)).map(m => `{ "name": "${(m.name || "").replace(/"/g, '\\"')}", "role": "${(m.role || "").replace(/"/g, '\\"')}", "bio": "1-2 sentence bio in ${lang} based on '${(m.bio || "").replace(/"/g, '\\"')}'", "photo": "" }`).join(",\n      ")}
     ]
   },` : `"team": null,`}
   ${includeLeadMagnet ? `"leadMagnet": {
@@ -206,6 +210,11 @@ Return JSON only:
     "tagline": "1-sentence company description in ${lang}",
     "copyright": "© 2025 ${businessName}. ${isEnglish ? "All rights reserved." : "string in " + lang}"
   },` : `"footer": null,`}
+
+    "config": {
+    "hasChat": ${body.includeChat ? "true" : "false"},
+    "hasExtendedLeads": ${body.includeExtendedLeadForm ? "true" : "false"}
+  },
   "finalCta": {
     "headline": "string in ${lang} (different angle from hero)",
     "subheadline": "string in ${lang}",
@@ -219,7 +228,14 @@ Return JSON only:
 
 Write like a real conversion copywriter. Be specific. Be human. No fluff. No AI tells. Every word in ${lang}.`;
 
+    console.log("Prompt length:", prompt.length);
     const pageData = await generateJSON(prompt);
+    if (includeTeam && pageData.team?.members) {
+  pageData.team.members = pageData.team.members.map((member, i) => ({
+    ...member,
+    photo: teamMembers[i]?.photo || "",
+  }));
+}
 
     // Attach user-uploaded testimonial photos by index
     if (includeTestimonials && pageData.testimonials?.items && userTestimonials?.length) {
@@ -250,6 +266,7 @@ Write like a real conversion copywriter. Be specific. Be human. No fluff. No AI 
       language: language || "en",
       tawkPropertyId: body.tawkPropertyId || "",
       tawkWidgetId: body.tawkWidgetId || "",
+      includeExtendedLeadForm: !!includeExtendedLeadForm,
     };
 
     const supabase = await createClient();

@@ -41,17 +41,48 @@ async function tryWithKey({ apiKey, model, prompt }) {
   console.log(`[Gemini] Trying model=${model} key=${keyLabel}`);
 
   const response = await ai.models.generateContent({
-    model,
-    contents: prompt,
-    config: {
-      maxOutputTokens: 8192,
-      temperature: 0.7,
-    },
-  });
+  model,
+  contents: prompt,
+  config: {
+    responseMimeType: "application/json",
+    maxOutputTokens: 8192,
+    temperature: 0.2,
+  },
+});
 
-  const text =
-    response?.text ||
-    response?.candidates?.[0]?.content?.parts?.[0]?.text;
+  // Log full response structure for debugging
+  console.log("[Gemini] Response keys:", Object.keys(response || {}));
+  console.log("[Gemini] response.text type:", typeof response?.text);
+
+  // In @google/genai, response.text is a getter/method — call it if function
+  let text = null;
+
+  if (typeof response?.text === "function") {
+    text = response.text();
+    console.log("[Gemini] Called response.text() as function");
+  } else if (typeof response?.text === "string") {
+    text = response.text;
+    console.log("[Gemini] Used response.text as string");
+  } else {
+    // Deep fallback
+    text =
+      response?.candidates?.[0]?.content?.parts?.[0]?.text ??
+      response?.candidates?.[0]?.output ??
+      null;
+    console.log("[Gemini] Used deep fallback, got:", typeof text);
+  }
+
+  if (!text) {
+    console.error("[Gemini] Full response dump:", JSON.stringify(response, null, 2).slice(0, 500));
+    throw new Error("Empty or unreadable response from Gemini");
+  }
+
+  if (typeof text !== "string") {
+    text = String(text);
+  }
+
+  require("fs").writeFileSync("gemini-output.txt", text);
+console.log("Saved Gemini response to gemini-output.txt");
 
   return text;
 }
@@ -130,14 +161,28 @@ export async function generateJSON(prompt) {
       .replace(/```\s*$/i, "")
       .trim();
   }
+  console.log("Last closing brace at:", cleaned.lastIndexOf("}"));
+console.log("Total length:", cleaned.length);
+
+const lastBrace = cleaned.lastIndexOf("}");
+console.log(
+  cleaned.slice(Math.max(0, lastBrace - 300), Math.min(cleaned.length, lastBrace + 300))
+);
 
   try {
     return JSON.parse(cleaned);
   } catch (err) {
-    console.error("=== JSON PARSE FAILED ===");
-    console.error("Raw text length:", text.length);
-    console.error("Raw text (last 500 chars):", text.slice(-500));
-    console.error("Cleaned text (last 500 chars):", cleaned.slice(-500));
-    throw new Error("AI returned invalid format. Please try again.");
-  }
+  console.error("=== JSON PARSE FAILED ===");
+  console.error(err);
+
+  console.error("Raw text length:", text.length);
+
+  console.error("First 1000 chars:");
+  console.error(cleaned.slice(0, 1000));
+
+  console.error("Last 1000 chars:");
+  console.error(cleaned.slice(-1000));
+
+  throw err;
+}
 }

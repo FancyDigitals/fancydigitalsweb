@@ -585,7 +585,7 @@ function copyAllText(p) {
                   className={`${inputClass} resize-none`}
                   required
                 />
-                <p className="mt-1 text-xs text-gray-400">{form.description.length} characters — more detail = better page</p>
+                <p className="mt-1 text-xs text-gray-400" suppressHydrationWarning>{form.description.length} characters — more detail = better page</p>
               </div>
 
               <div>
