@@ -18,6 +18,7 @@ export async function GET() {
       .from("client_sites")
       .select("id, client_email, site_name, is_active, created_at, page_id, client_id")
       .eq("builder_id", user.id)
+      .eq("is_active", true)
       .order("created_at", { ascending: false });
 
     // Get client names
