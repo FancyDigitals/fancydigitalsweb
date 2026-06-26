@@ -1372,17 +1372,20 @@ function copyAllText(p) {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Choose your URL</label>
                     <div className="flex items-center rounded-xl border border-gray-200 overflow-hidden focus-within:border-[#075a01] focus-within:ring-2 focus-within:ring-[#075a01]/20 transition">
                       <span className="bg-gray-50 px-3 py-2.5 text-xs text-gray-500 border-r border-gray-200 whitespace-nowrap">
-                        fancydigitals.com.ng/p/
-                      </span>
+  https://
+</span>
                       <input
-                        type="text"
-                        value={publishSlug}
-                        onChange={(e) => updatePublishSlug(e.target.value)}
-                        placeholder="my-business"
-                        maxLength={30}
-                        className="flex-1 px-3 py-2.5 text-sm outline-none"
-                        disabled={publishing}
-                      />
+  type="text"
+  value={publishSlug}
+  onChange={(e) => updatePublishSlug(e.target.value)}
+  placeholder="my-business"
+  maxLength={30}
+  className="flex-1 px-3 py-2.5 text-sm outline-none"
+  disabled={publishing}
+/>
+<span className="bg-gray-50 px-3 py-2.5 text-xs text-gray-500 border-l border-gray-200 whitespace-nowrap">
+  .fancydigitals.com.ng
+</span>
                     </div>
                     <div className="mt-2 min-h-[20px]">
                       {slugStatus.checking && (
