@@ -10,13 +10,14 @@ export default function DashboardDetector({
   children,
 }) {
   const pathname = usePathname();
-    const isDashboard =
+  const hideChrome =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/signin") ||
     pathname.startsWith("/signup") ||
-    pathname.startsWith("/p/");
+    pathname.startsWith("/p/") ||
+    pathname.startsWith("/client");
 
-  if (isDashboard) {
+  if (hideChrome) {
     return <>{children}</>;
   }
 
