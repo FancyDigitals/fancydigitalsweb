@@ -238,8 +238,14 @@ const [intent, setIntent] = useState(""); // Add
 
       {/* NAV */}
       <nav className={T.nav}>
-        <div className="flex items-center gap-2">
-          {form.logo && <img src={form.logo} alt="" className={T.logo} />}
+        <div className="flex items-center gap-2.5">
+          {form.logo && (
+            <img
+              src={form.logo}
+              alt={form.businessName}
+              className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl object-contain bg-white shadow-md ring-1 ring-gray-100 p-1"
+            />
+          )}
           <span className={T.brandName} style={{ color: toneConfig.brandNameColor }}>{form.businessName}</span>
         </div>
 
