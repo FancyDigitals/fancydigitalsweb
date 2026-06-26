@@ -465,7 +465,10 @@ const [intent, setIntent] = useState(""); // Add
 }`}>
   {page.team.members.map((m, i) => (
               <div key={i} className="text-center">
-                <div className="mx-auto h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border-4 mb-3" style={{ borderColor: `${brand}20` }}>
+                <div
+  className="mx-auto h-28 w-28 sm:h-32 sm:w-32 rounded-full overflow-hidden border-4 mb-4 shadow-xl ring-4 ring-white"
+  style={{ borderColor: brand }}
+>
                   {m.photo ? (
                     <img src={m.photo} alt={m.name} className="h-full w-full object-cover" />
                   ) : (
