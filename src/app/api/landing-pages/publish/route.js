@@ -141,12 +141,10 @@ export async function POST(request) {
       result = data;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://fancydigitals.com.ng";
-
     return NextResponse.json({
       success: true,
       slug: result.slug,
-      url: `${baseUrl}/p/${result.slug}`,
+      url: `https://${result.slug}.fancydigitals.com.ng`,
       pageId: result.id,
     });
   } catch (error) {

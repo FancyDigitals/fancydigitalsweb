@@ -242,7 +242,7 @@ export default function LandingPagesDashboardClient({ pages: initialPages, userI
           const isExpanded = expandedPage === page.id;
           const isInviteOpen = showInviteFor === page.id;
           const pageLeads = leads[page.id] || [];
-          const liveUrl = `${SITE_URL}/p/${page.slug}`;
+          const liveUrl = `https://${page.slug}.fancydigitals.com.ng`;
 
           return (
             <div
