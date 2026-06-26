@@ -454,8 +454,16 @@ const [intent, setIntent] = useState(""); // Add
             <h2 className={T.h2}>{page.team.headline}</h2>
             {page.team.subheadline && <p className="mt-3 text-sm text-gray-600 max-w-xl mx-auto">{page.team.subheadline}</p>}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {page.team.members.map((m, i) => (
+          <div className={`grid gap-4 max-w-5xl mx-auto ${
+  page.team.members.length === 1
+    ? "grid-cols-1 max-w-xs"
+    : page.team.members.length === 2
+    ? "grid-cols-2 max-w-md"
+    : page.team.members.length === 3
+    ? "grid-cols-2 md:grid-cols-3 max-w-2xl"
+    : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+}`}>
+  {page.team.members.map((m, i) => (
               <div key={i} className="text-center">
                 <div className="mx-auto h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border-4 mb-3" style={{ borderColor: `${brand}20` }}>
                   {m.photo ? (
