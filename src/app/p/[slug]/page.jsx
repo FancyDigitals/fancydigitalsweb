@@ -7,7 +7,7 @@ export async function generateMetadata({ params }) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("published_pages")
-    .select("page_data, business_name")
+    .select("page_data, form_data, business_name")
     .eq("slug", slug)
     .eq("is_published", true)
     .maybeSingle();
@@ -17,12 +17,25 @@ export async function generateMetadata({ params }) {
   }
 
   const seo = data.page_data?.seo || {};
+  const logo = data.form_data?.logo || "";
+
+  // Build icon config — supports base64 data URLs and regular URLs
+  const iconConfig = logo
+    ? {
+        icon: [{ url: logo }],
+        shortcut: [{ url: logo }],
+        apple: [{ url: logo }],
+      }
+    : undefined;
+
   return {
     title: seo.title || `${data.business_name}`,
     description: seo.description || `Visit ${data.business_name}`,
+    icons: iconConfig,
     openGraph: {
       title: seo.title || data.business_name,
       description: seo.description,
+      images: logo ? [{ url: logo }] : undefined,
     },
   };
 }
