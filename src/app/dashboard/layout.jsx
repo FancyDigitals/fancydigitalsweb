@@ -11,6 +11,7 @@ import {
   LogOut,
   ChevronRight,
   Globe,
+  Users,
 } from "lucide-react";
 
 export default async function DashboardLayout({ children }) {
@@ -46,6 +47,7 @@ export default async function DashboardLayout({ children }) {
     { label: "Tools", href: "/tools", icon: Wrench },
     { label: "Projects", href: "/dashboard/projects", icon: FolderOpen },
     { label: "Landing Pages", href: "/dashboard/landing-pages", icon: Globe, badge: unseenLeadsCount },
+    { label: "Clients", href: "/dashboard/clients", icon: Users },
     { label: "Billing", href: "/dashboard/billing", icon: CreditCard },
     { label: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
@@ -167,7 +169,7 @@ export default async function DashboardLayout({ children }) {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white/90 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {navItems.map((item) => (
             <Link
               key={item.href}
