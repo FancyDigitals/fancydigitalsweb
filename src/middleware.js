@@ -1,44 +1,65 @@
 import { updateSession } from "./lib/supabase/middleware";
 import { NextResponse } from "next/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 const ROOT_DOMAIN = "fancydigitals.com.ng";
 
-// Subdomains that are NOT client landing pages — skip rewrite
 const RESERVED_SUBDOMAINS = [
-  "www",
-  "blog",
-  "portal",
-  "api",
-  "admin",
-  "app",
-  "mail",
-  "ftp",
-  "cpanel",
-  "webmail",
+  "www", "blog", "portal", "api", "admin", "app",
+  "mail", "ftp", "cpanel", "webmail",
 ];
+
+const admin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 export async function middleware(request) {
   const url = request.nextUrl.clone();
-  const hostname = request.headers.get("host") || "";
+  const hostname = (request.headers.get("host") || "").toLowerCase();
   const path = url.pathname;
 
-  // Extract subdomain
-  let subdomain = null;
+  // Skip internal paths
+  const isInternal =
+    path.startsWith("/_next") ||
+    path.startsWith("/api") ||
+    path.includes(".");
 
+  // CASE 1: Subdomain of fancydigitals.com.ng
   if (hostname.endsWith(`.${ROOT_DOMAIN}`)) {
-    subdomain = hostname.replace(`.${ROOT_DOMAIN}`, "");
+    const subdomain = hostname.replace(`.${ROOT_DOMAIN}`, "");
+    if (subdomain && !RESERVED_SUBDOMAINS.includes(subdomain) && !isInternal) {
+      url.pathname = `/p/${subdomain}${path === "/" ? "" : path}`;
+      return NextResponse.rewrite(url);
+    }
   }
 
-  // If subdomain exists and is not reserved, rewrite to /p/[slug]
-  if (
-    subdomain &&
-    !RESERVED_SUBDOMAINS.includes(subdomain) &&
-    !path.startsWith("/_next") &&
-    !path.startsWith("/api") &&
-    !path.includes(".")
-  ) {
-    url.pathname = `/p/${subdomain}${path === "/" ? "" : path}`;
-    return NextResponse.rewrite(url);
+  // CASE 2: Custom domain (not fancydigitals.com.ng at all)
+  else if (hostname !== ROOT_DOMAIN && !hostname.includes("localhost") && !hostname.includes("vercel.app") && !isInternal) {
+    try {
+      const { data: customDomain } = await admin
+        .from("custom_domains")
+        .select("page_id, status")
+        .eq("domain", hostname)
+        .eq("status", "verified")
+        .maybeSingle();
+
+      if (customDomain) {
+        const { data: page } = await admin
+          .from("published_pages")
+          .select("slug")
+          .eq("id", customDomain.page_id)
+          .eq("is_published", true)
+          .maybeSingle();
+
+        if (page?.slug) {
+          url.pathname = `/p/${page.slug}${path === "/" ? "" : path}`;
+          return NextResponse.rewrite(url);
+        }
+      }
+    } catch (err) {
+      console.error("[middleware-custom-domain]", err);
+    }
   }
 
   // Client portal protection

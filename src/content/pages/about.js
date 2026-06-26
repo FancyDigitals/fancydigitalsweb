@@ -6,7 +6,7 @@ export const aboutPage = {
     image: "/about/founder.jpg",
     bio: [
       "Bashir Ismail, widely known as Fancy, is the founder of Fancy Digitals — a premium digital studio built on clarity, structure, and long-term thinking.",
-      "With nearly a decade of experience across design, development, content, SEO, and email marketing, he brings rare cross-disciplinary perspective.",
+      "With over 9 years of experience across design, development, content, SEO, and email marketing, he brings a rare cross-disciplinary perspective.",
     ],
   },
 
@@ -21,18 +21,15 @@ export const aboutPage = {
   values: [
     {
       title: "Cross-disciplinary mastery",
-      description:
-        "Design, development, content, and growth working together as one system.",
+      description: "Design, development, content, and growth working together as one system.",
     },
     {
       title: "Calm execution",
-      description:
-        "Thoughtful structure reduces stress and improves outcomes.",
+      description: "Thoughtful structure reduces stress and improves outcomes.",
     },
     {
       title: "Certified and evolving",
-      description:
-        "Over 15 certifications across digital and technology disciplines.",
+      description: "Over 15 certifications across digital and technology disciplines.",
     },
   ],
 

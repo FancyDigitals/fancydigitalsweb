@@ -22,6 +22,9 @@ import {
   Send,
   Check,
   Copy,
+  Link2,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fancydigitals.com.ng";
@@ -51,6 +54,15 @@ export default function LandingPagesDashboardClient({ pages: initialPages, userI
   const [inviting, setInviting] = useState(null);
   const [inviteResult, setInviteResult] = useState(null);
   const [copiedInvite, setCopiedInvite] = useState(false);
+  // Custom domain state
+const [showDomainFor, setShowDomainFor] = useState(null);
+const [domains, setDomains] = useState({});
+const [loadingDomains, setLoadingDomains] = useState({});
+const [newDomain, setNewDomain] = useState("");
+const [addingDomain, setAddingDomain] = useState(false);
+const [domainResult, setDomainResult] = useState(null);
+const [verifyingId, setVerifyingId] = useState(null);
+const [removingDomainId, setRemovingDomainId] = useState(null);
 
   async function loadLeads(pageId) {
     if (leads[pageId]) {
@@ -185,6 +197,95 @@ export default function LandingPagesDashboardClient({ pages: initialPages, userI
     setCopiedInvite(true);
     setTimeout(() => setCopiedInvite(false), 2000);
   }
+
+  async function openDomainPanel(pageId) {
+  if (showDomainFor === pageId) {
+    setShowDomainFor(null);
+    return;
+  }
+  setShowDomainFor(pageId);
+  setNewDomain("");
+  setDomainResult(null);
+  setError("");
+  await loadDomains(pageId);
+}
+
+async function loadDomains(pageId) {
+  setLoadingDomains((prev) => ({ ...prev, [pageId]: true }));
+  try {
+    const res = await fetch(`/api/landing-pages/custom-domain?pageId=${pageId}`);
+    const data = await res.json();
+    setDomains((prev) => ({ ...prev, [pageId]: data.domains || [] }));
+  } catch {
+    setError("Failed to load domains");
+  } finally {
+    setLoadingDomains((prev) => ({ ...prev, [pageId]: false }));
+  }
+}
+
+async function handleAddDomain(pageId) {
+  if (!newDomain.trim()) return;
+  setAddingDomain(true);
+  setError("");
+  setDomainResult(null);
+  try {
+    const res = await fetch("/api/landing-pages/custom-domain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pageId, domain: newDomain.trim() }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to add domain");
+    setDomainResult(data);
+    setNewDomain("");
+    await loadDomains(pageId);
+  } catch (e) {
+    setError(e.message);
+  } finally {
+    setAddingDomain(false);
+  }
+}
+
+async function handleVerifyDomain(domainId, pageId) {
+  setVerifyingId(domainId);
+  setError("");
+  try {
+    const res = await fetch("/api/landing-pages/custom-domain", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domainId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Verify failed");
+    if (!data.verified) {
+      setError("Domain not yet verified. DNS can take 5-60 minutes to propagate. Try again later.");
+    }
+    await loadDomains(pageId);
+  } catch (e) {
+    setError(e.message);
+  } finally {
+    setVerifyingId(null);
+  }
+}
+
+async function handleRemoveDomain(domainId, pageId) {
+  if (!confirm("Remove this domain? Visitors using it will no longer reach your page.")) return;
+  setRemovingDomainId(domainId);
+  setError("");
+  try {
+    const res = await fetch("/api/landing-pages/custom-domain", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domainId }),
+    });
+    if (!res.ok) throw new Error("Failed to remove");
+    await loadDomains(pageId);
+  } catch (e) {
+    setError(e.message);
+  } finally {
+    setRemovingDomainId(null);
+  }
+}
 
   if (pages.length === 0) {
     return (
@@ -354,6 +455,19 @@ export default function LandingPagesDashboardClient({ pages: initialPages, userI
                       <Send className="h-3.5 w-3.5" />
                       Invite Client
                     </button>
+
+                                        {/* Custom Domain button */}
+                    <button
+                      onClick={() => openDomainPanel(page.id)}
+                      className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                        showDomainFor === page.id
+                          ? "bg-purple-600 text-white"
+                          : "bg-purple-50 text-purple-700 hover:bg-purple-100"
+                      }`}
+                    >
+                      <Link2 className="h-3.5 w-3.5" />
+                      Custom Domain
+                    </button>
                   </div>
                 </div>
               </div>
@@ -464,6 +578,166 @@ export default function LandingPagesDashboardClient({ pages: initialPages, userI
                       </p>
                     </div>
                   )}
+                </div>
+              )}
+
+                            {/* Custom Domain Panel */}
+              {showDomainFor === page.id && (
+                <div className="border-t border-purple-100 bg-purple-50/40 p-4 sm:p-5">
+                  <p className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Link2 className="h-4 w-4 text-purple-600" />
+                    Connect Custom Domain
+                  </p>
+
+                  {/* Existing domains list */}
+                  {loadingDomains[page.id] ? (
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Loading domains...
+                    </div>
+                  ) : (domains[page.id]?.length > 0) ? (
+                    <div className="space-y-2 mb-4">
+                      {domains[page.id].map((d) => {
+                        const dns = d.verification_data?.config;
+                        const isApex = !d.domain.includes(".") || d.domain.split(".").length === 2;
+                        const dnsType = isApex ? "A" : "CNAME";
+                        const dnsName = isApex ? "@" : d.domain.split(".")[0];
+                        const dnsValue = isApex ? "76.76.21.21" : "cname.vercel-dns.com";
+
+                        return (
+                          <div key={d.id} className="rounded-xl bg-white border border-purple-100 p-3">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="text-sm font-bold text-gray-900 truncate">
+                                    {d.domain}
+                                  </p>
+                                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                    d.status === "verified"
+                                      ? "bg-green-100 text-green-700"
+                                      : "bg-amber-100 text-amber-700"
+                                  }`}>
+                                    {d.status === "verified" ? "✓ Verified" : "Pending DNS"}
+                                  </span>
+                                </div>
+                                {d.status === "verified" && (
+                                  <a
+                                    href={`https://${d.domain}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[11px] text-purple-600 hover:underline flex items-center gap-1 mt-0.5"
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                    Visit live
+                                  </a>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {d.status !== "verified" && (
+                                  <button
+                                    onClick={() => handleVerifyDomain(d.id, page.id)}
+                                    disabled={verifyingId === d.id}
+                                    className="inline-flex items-center gap-1 rounded-lg bg-purple-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-purple-700 disabled:opacity-50 transition"
+                                  >
+                                    {verifyingId === d.id
+                                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                                      : <RefreshCw className="h-3 w-3" />
+                                    }
+                                    Check
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleRemoveDomain(d.id, page.id)}
+                                  disabled={removingDomainId === d.id}
+                                  className="inline-flex items-center rounded-lg bg-red-50 p-1.5 text-red-600 hover:bg-red-100 disabled:opacity-50 transition"
+                                >
+                                  {removingDomainId === d.id
+                                    ? <Loader2 className="h-3 w-3 animate-spin" />
+                                    : <Trash2 className="h-3 w-3" />
+                                  }
+                                </button>
+                              </div>
+                            </div>
+
+                            {d.status !== "verified" && (
+                              <div className="rounded-lg bg-gray-50 border border-gray-200 p-2.5 mt-2">
+                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                  Add this DNS record at your registrar
+                                </p>
+                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                  <div>
+                                    <p className="text-[9px] text-gray-400 mb-0.5">Type</p>
+                                    <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-gray-900 font-mono text-[11px]">
+                                      {dnsType}
+                                    </code>
+                                  </div>
+                                  <div>
+                                    <p className="text-[9px] text-gray-400 mb-0.5">Name</p>
+                                    <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-gray-900 font-mono text-[11px]">
+                                      {dnsName}
+                                    </code>
+                                  </div>
+                                  <div>
+                                    <p className="text-[9px] text-gray-400 mb-0.5">Value</p>
+                                    <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-gray-900 font-mono text-[11px] break-all">
+                                      {dnsValue}
+                                    </code>
+                                  </div>
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-2">
+                                  DNS takes 5-60 minutes to propagate. Click <strong>Check</strong> after adding.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+
+                  {/* Success message after add */}
+                  {domainResult && (
+                    <div className="rounded-xl bg-green-50 border border-green-200 p-3 mb-3">
+                      <p className="text-xs font-bold text-green-800 mb-1">
+                        Domain added! Now configure DNS.
+                      </p>
+                      <p className="text-[11px] text-green-700">
+                        Scroll up to see the DNS instructions for your domain.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Add new domain form */}
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={newDomain}
+                      onChange={(e) => setNewDomain(e.target.value)}
+                      placeholder="yourdomain.com or www.yourdomain.com"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400 transition"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleAddDomain(page.id)}
+                        disabled={!newDomain.trim() || addingDomain}
+                        className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      >
+                        {addingDomain
+                          ? <><Loader2 className="h-4 w-4 animate-spin" /> Adding...</>
+                          : <><Plus className="h-4 w-4" /> Add Domain</>
+                        }
+                      </button>
+                      <button
+                        onClick={() => setShowDomainFor(null)}
+                        className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
+                      >
+                        Close
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-gray-400">
+                      You'll get DNS instructions after adding. SSL is automatic.
+                    </p>
+                  </div>
                 </div>
               )}
 
