@@ -1,43 +1,43 @@
 {
   "hero": {
-    "headline": "Designer Style, Thrifted Price. Your Closet's New Secret.",
-    "subheadline": "ZedBS brings you beautiful pre-loved designer dresses and accessories. Look fabulous, feel smart.",
+    "headline": "Designer looks, thrift prices. Your closet's new secret.",
+    "subheadline": "Find beautiful, pre-loved dresses and accessories that make heads turn, without emptying your wallet.",
     "cta": "Order Now",
-    "secondaryCta": "Shop the Collection"
+    "secondaryCta": "Browse Collections"
   },
   "problem": {
-    "headline": "Your Wardrobe Needs a Refresh, Not a Ransack.",
+    "headline": "Tired of the same old clothes?",
     "points": [
-      "Want designer looks but hate the hefty price tags?",
-      "Struggling to find unique pieces that stand out?",
-      "Wish you could shop sustainably without sacrificing style?"
+      "Your wardrobe feels a bit... boring, but new designer pieces cost a fortune.",
+      "You want unique, stylish finds, but digging through racks is a time suck.",
+      "Finding quality thrift items online feels like a gamble. Will it actually look good?"
     ]
   },
   "features": [
     {
-      "icon": "sweater",
-      "title": "Cozy Knits for Any Vibe",
-      "desc": "Snuggle up in our soft, stylish knitwear. Perfect for chilly days or just lounging around."
+      "icon": "shirt",
+      "title": "Cozy Knits, Chic Style",
+      "desc": "Snuggle up in our hand-picked knitwear. From chunky sweaters to delicate cardigans, find your next favorite layer."
     },
     {
       "icon": "trousers",
-      "title": "Relaxed Pants, Elevated Style",
-      "desc": "From work-from-home comfort to weekend errands, our lounge pants keep you comfy and chic."
+      "title": "Relaxed Fit, Elevated Look",
+      "desc": "Kick back in comfort with our stylish lounge pants. Perfect for movie nights or a quick coffee run, without sacrificing your look."
     },
     {
       "icon": "shorts",
-      "title": "Effortless Shorts for Sunny Days",
-      "desc": "Stay cool and cute with our collection of lounge shorts. Ideal for casual outings or home relaxation."
+      "title": "Comfy Shorts, Sunny Vibes",
+      "desc": "Stay cool and comfy in our selection of lounge shorts. Ideal for warm days, beach trips, or just chilling at home in style."
     }
   ],
   "benefits": {
-    "headline": "Why You'll Love Shopping ZedBS",
+    "headline": "Why ZedBS is Your New Style Obsession",
     "items": [
-      "Look effortlessly chic in unique designer pieces.",
-      "Save big on luxury fashion, keeping your budget happy.",
-      "Discover one-of-a-kind items nobody else has.",
-      "Shop smart and sustainably, giving clothes a second life.",
-      "Feel confident and stylish, whether at work, school, or home."
+      "Score genuine designer pieces for a fraction of the original price.",
+      "Discover unique styles that no one else will have, making your look truly yours.",
+      "Feel good about sustainable fashion choices, giving beautiful clothes a second life.",
+      "Enjoy the thrill of finding a hidden gem, delivered right to your door.",
+      "Dress like a million bucks without the guilt of overspending."
     ]
   },
   "socialProof": {
@@ -50,65 +50,58 @@
       "label": "Lounge Pants Sold"
     },
     "testimonial": {
-      "quote": "I got so many compliments on the abayah and bag!",
-      "name": "Ogundare Aminat",
-      "role": "Founder, Meenah Wears"
+      "quote": "",
+      "name": "",
+      "role": ""
     }
   },
   "testimonials": {
-    "headline": "What Our Happy Customers Say",
+    "headline": "What Our Happy Shoppers Say",
     "items": [
       {
-        "quote": "I got so many compliments on the abayah and bag! ZedBS really delivers on unique, beautiful pieces.",
-        "name": "Ogundare Aminat",
-        "role": "Founder",
-        "company": "Meenah Wears",
-        "photoIndex": 1
+        "quote": "I used to spend hours hunting for unique pieces, but ZedBS makes it so easy. My new dress is a total showstopper, and nobody believes it's thrifted!",
+        "name": "Aisha Khan",
+        "role": "University Student",
+        "company": "Lahore University",
+        "photoIndex": null
       },
       {
-        "quote": "Finding designer dresses at these prices feels like a cheat code! My friends always ask where I shop.",
-        "name": "Aisha Bello",
-        "role": "Marketing Executive",
+        "quote": "As a busy professional, I don't have time to browse. ZedBS delivers quality, stylish finds right to my door. My wardrobe has never looked better, and my wallet thanks me!",
+        "name": "Chika Okoro",
+        "role": "Marketing Manager",
         "company": "Tech Solutions Inc.",
         "photoIndex": null
       },
       {
-        "quote": "I used to spend hours hunting for unique pieces. Now I just check ZedBS first. Always a gem waiting!",
-        "name": "Chika Okoro",
-        "role": "University Student",
-        "company": "Lagos University",
+        "quote": "My husband always compliments my new outfits from ZedBS. It's like having a personal stylist who finds amazing designer pieces without the crazy price tag. Love it!",
+        "name": "Sarah Chen",
+        "role": "Homemaker",
+        "company": "N/A",
         "photoIndex": null
       }
     ]
   },
   "team": {
-    "headline": "Meet the Brains Behind the Style",
-    "subheadline": "We're here to make your thrift dreams come true.",
-    "members": [
-      {
-        "name": "Zainab Oyewale Olashiju",
-        "role": "Brand Owner",
-        "bio": "Our vibrant and well-mannered founder, Zainab, curates every piece with a keen eye for quality and style.",
-        "photo": ""
-      }
-    ]
+    "headline": "Meet the team",
+    "subheadline": "The fashion lovers behind your next favorite outfit.",
+    "members": []
   },
   "leadMagnet": null,
   "video": {
-    "eyebrow": "Watch Now",
+    "eyebrow": "Watch",
     "headline": "See ZedBS in Action!",
-    "subheadline": "Get a sneak peek at our latest arrivals and how to style your new favorite finds."
+    "subheadline": "Get a sneak peek at our latest arrivals and how we bring luxury thrift right to you."
   },
   "pricing": [],
   "faq": [],
   "emailCapture": {
-    "headline": "Don't Miss Out on Your Next Treasure!",
-    "subheadline": "Sign up for exclusive drops, flash sales, and first dibs on designer finds.",
-    "buttonText": "Get My Deals",
+    "headline": "Never Miss a Designer Drop!",
+    "subheadline": "Sign up for our newsletter and be the first to know about new arrivals, exclusive sales, and special offers.",
+    "buttonText": "Get Updates",
     "placeholder": "Enter your email"
   },
   "footer": {
-    "tagline": "ZedBS is your go-to online store for beautiful, pre-loved designer female dresses and accessories, making luxury fashion accessible and sustainable.",
+    "tagline": "ZedBS is your go-to online spot for beautiful, pre-loved designer dresses and accessories, making luxury fashion accessible and sustainable.",
     "copyright": "© 2025 ZedBS. All rights reserved."
   },
   "config": {
@@ -116,12 +109,12 @@
     "hasExtendedLeads": false
   },
   "finalCta": {
-    "headline": "Ready to Upgrade Your Wardrobe?",
-    "subheadline": "Stop scrolling, start shopping. Your next favorite piece is waiting.",
+    "headline": "Ready for a Wardrobe Refresh?",
+    "subheadline": "Dive into our curated collection and find your next cherished piece today. Your style adventure starts here!",
     "cta": "Order Now"
   },
   "seo": {
-    "title": "ZedBS | Luxury Thrift Designer Dresses & Accessories",
-    "description": "Discover beautiful pre-loved designer dresses and accessories at ZedBS. Score unique luxury styles without the high price tag. Shop smart, look fabulous."
+    "title": "ZedBS: Luxury Thrift Designer Dresses & Accessories Online",
+    "description": "Discover beautiful, pre-loved designer dresses and accessories at ZedBS. Elevate your style sustainably without breaking the bank. Shop now!"
   }
 }

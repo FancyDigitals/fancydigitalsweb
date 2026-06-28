@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Globe,
   Users,
+  Sparkles,
 } from "lucide-react";
 
 export default async function DashboardLayout({ children }) {
@@ -42,9 +43,10 @@ export default async function DashboardLayout({ children }) {
       unseenLeadsCount = count || 0;
     }
   }
-    const navItems = [
+      const navItems = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Tools", href: "/tools", icon: Wrench },
+    { label: "AI Visibility", href: "/dashboard/ai-visibility", icon: Sparkles },
     { label: "Projects", href: "/dashboard/projects", icon: FolderOpen },
     { label: "Landing Pages", href: "/dashboard/landing-pages", icon: Globe, badge: unseenLeadsCount },
     { label: "Clients", href: "/dashboard/clients", icon: Users },
@@ -169,7 +171,7 @@ export default async function DashboardLayout({ children }) {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white/90 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-8">
           {navItems.map((item) => (
             <Link
               key={item.href}

@@ -8,11 +8,14 @@ export const PLANS = {
 };
 
 export function isPro(plan) {
-  return plan === PLANS.PRO_MONTHLY || plan === PLANS.LIFETIME;
+  if (!plan) return false;
+  const p = String(plan).toUpperCase();
+  return p === "PRO_MONTHLY" || p === "LIFETIME" || p === "PRO";
 }
 
 export function isLifetime(plan) {
-  return plan === PLANS.LIFETIME;
+  if (!plan) return false;
+  return String(plan).toUpperCase() === "LIFETIME";
 }
 
 // ============================================
@@ -20,9 +23,9 @@ export function isLifetime(plan) {
 // ============================================
 export const PLAN_LIMITS = {
   FREE: {
-    publishedPages: 1,        // max 1 active published page
-    clientSites: 0,           // no client portal
-    customDomains: 0,         // no custom domains
+    publishedPages: 1,
+    clientSites: 0,
+    customDomains: 0,
     resumePerDay: 3,
     coverLetterPerDay: 3,
     landingPagePerDay: 2,
@@ -55,7 +58,8 @@ export const PLAN_LIMITS = {
 };
 
 export function getLimits(plan) {
-  return PLAN_LIMITS[plan] || PLAN_LIMITS.FREE;
+  const p = String(plan || "FREE").toUpperCase();
+  return PLAN_LIMITS[p] || PLAN_LIMITS.FREE;
 }
 
 // ============================================
