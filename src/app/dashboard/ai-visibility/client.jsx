@@ -25,6 +25,8 @@ import {
   Crown,
   ChevronRight,
   ArrowRight,
+  Swords,
+  Info,
 } from "lucide-react";
 
 const SCORE_ICONS = {
@@ -147,17 +149,39 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
       <div className="mx-auto max-w-7xl">
 
         {/* HEADER */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ff914d] mb-2">
-            <Sparkles className="h-4 w-4" />
-            <span>AI Visibility Intelligence</span>
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ff914d] mb-2">
+              <Sparkles className="h-4 w-4" />
+              <span>AI Readiness Intelligence</span>
+            </div>
+            <h1 className="text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
+              Is your website ready for AI?
+            </h1>
+            <p className="mt-2 max-w-2xl text-gray-500">
+              Measure how well your site is technically prepared to be understood, parsed, and cited by AI assistants like ChatGPT, Gemini, Claude, and Perplexity.
+            </p>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
-            See your business through AI eyes.
-          </h1>
-          <p className="mt-2 max-w-2xl text-gray-500">
-            Analyze how ChatGPT, Gemini, Perplexity, and other AI assistants understand and rank your business — and get a clear plan to improve.
-          </p>
+          <a
+            href="/dashboard/ai-visibility/compare"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#ff914d]/40 hover:shadow-md"
+          >
+            <Swords className="h-4 w-4 text-[#ff914d]" />
+            Compare vs. Competitor
+          </a>
+        </div>
+
+        {/* Honest Disclaimer */}
+        <div className="mb-8 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
+          <div className="flex items-start gap-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+            <div className="text-xs text-blue-900">
+              <p className="font-bold">What this measures (and what it doesn't):</p>
+              <p className="mt-1 text-blue-800/80">
+                This tool measures <strong>on-page AI readiness</strong> schema, content, technical SEO, and structured data. It does NOT measure real-world authority (backlinks, brand mentions, traffic, press). A high score means your site is technically prepared. Combined with real authority, that's what gets you recommended by AI.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* SCAN FORM */}
@@ -228,16 +252,22 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
             </div>
             <div className="divide-y divide-gray-100">
               {scans.map((scan) => (
-                <div key={scan.id} className="flex items-center gap-4 p-5 transition-colors hover:bg-gray-50">
-                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${scoreBgColor(scan.overall_score)}`}>
-                    <span className={`text-lg font-black ${scoreColor(scan.overall_score)}`}>
-                      {scan.overall_score}
-                    </span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-gray-900">{scan.domain}</p>
-                    <p className="truncate text-xs text-gray-500">{new Date(scan.created_at).toLocaleString()}</p>
-                  </div>
+                <div key={scan.id} className="group flex items-center gap-4 p-5 transition-colors hover:bg-gray-50">
+                  <a
+                    href={`/dashboard/ai-visibility/${scan.id}`}
+                    className="flex flex-1 items-center gap-4 min-w-0"
+                  >
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${scoreBgColor(scan.overall_score)}`}>
+                      <span className={`text-lg font-black ${scoreColor(scan.overall_score)}`}>
+                        {scan.overall_score}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold text-gray-900 group-hover:text-[#075a01]">{scan.domain}</p>
+                      <p className="truncate text-xs text-gray-500">{new Date(scan.created_at).toLocaleString()}</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-gray-300 group-hover:text-[#075a01]" />
+                  </a>
                   <button
                     onClick={() => handleDelete(scan.id)}
                     className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -283,13 +313,13 @@ function ScanResult({ result }) {
         <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:p-8">
           <ScoreRing score={overall} size={160} />
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Visibility Score for</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Readiness Score for</p>
             <h2 className="mt-1 text-2xl font-black text-gray-900 md:text-3xl">{domain}</h2>
             <p className={`mt-2 text-base font-bold ${scoreColor(overall)}`}>
-              {overall >= 80 && "Excellent — AI assistants will likely recommend you."}
-              {overall >= 60 && overall < 80 && "Good — but there's room to grow."}
-              {overall >= 40 && overall < 60 && "Needs work — AI may overlook you."}
-              {overall < 40 && "Critical — AI assistants struggle to understand your site."}
+              {overall >= 80 && "Excellent — your site is technically AI-ready."}
+              {overall >= 60 && overall < 80 && "Good — but key signals are missing."}
+              {overall >= 40 && overall < 60 && "Needs work — AI struggles to parse your site."}
+              {overall < 40 && "Critical — major AI-readability gaps to fix."}
             </p>
             <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
               <span className="flex items-center gap-1">

@@ -159,15 +159,13 @@ export default function FreeAIVisibilityClient() {
           </div>
 
           <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-gray-900 md:text-6xl">
-            How does
-            <span className="bg-gradient-to-r from-[#075a01] via-[#0a8f01] to-[#ff914d] bg-clip-text text-transparent"> ChatGPT </span>
-            see your website?
+            Is your website
+            <span className="bg-gradient-to-r from-[#075a01] via-[#0a8f01] to-[#ff914d] bg-clip-text text-transparent"> AI-ready</span>?
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-gray-600 md:text-lg">
-            Get your free <strong>AI Visibility Score</strong> in 30 seconds.
-            See exactly how AI assistants like ChatGPT, Gemini, Claude, and Perplexity understand
-            your business — and what to fix to get recommended more often.
+            Get your free <strong>AI Readiness Score</strong> in 30 seconds.
+            See exactly how well your site is prepared to be understood, parsed, and cited by AI assistants like ChatGPT, Gemini, and Perplexity.
           </p>
 
           {/* AI logos row */}
@@ -427,13 +425,13 @@ function ScanResult({ result }) {
         <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:p-8">
           <ScoreRing score={overall} size={160} />
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Visibility Score for</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Readiness Score for</p>
             <h2 className="mt-1 text-2xl font-black text-gray-900 md:text-3xl">{domain}</h2>
             <p className={`mt-2 text-base font-bold ${scoreColor(overall)}`}>
-              {overall >= 80 && "Excellent — AI assistants will likely recommend you."}
-              {overall >= 60 && overall < 80 && "Good — but there's room to grow."}
-              {overall >= 40 && overall < 60 && "Needs work — AI may overlook you."}
-              {overall < 40 && "Critical — AI assistants struggle to understand your site."}
+              {overall >= 80 && "Excellent — your site is technically AI-ready."}
+              {overall >= 60 && overall < 80 && "Good — but key signals are missing."}
+              {overall >= 40 && overall < 60 && "Needs work — AI struggles to parse your site."}
+              {overall < 40 && "Critical — major AI-readability gaps to fix."}
             </p>
           </div>
         </div>

@@ -1,15 +1,18 @@
 import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 
-const PRIMARY_KEY = process.env.GEMINI_API_KEY;
-const SECONDARY_KEY = process.env.GEMINI_API_KEY_2;
+// ─── API KEYS ────────────────────────────────────────────────────────────────
+const GEMINI_KEY_1 = process.env.GEMINI_API_KEY;
+const GEMINI_KEY_2 = process.env.GEMINI_API_KEY_2;
+const GROQ_KEY = process.env.GROQ_API_KEY;
 
-if (!PRIMARY_KEY) {
+if (!GEMINI_KEY_1) {
   throw new Error("Missing GEMINI_API_KEY in environment variables");
 }
 
-// ✅ Models ordered by: most capable → fastest fallback
-// gemini-2.5-flash first because it's the one that actually worked
-const MODEL_FALLBACKS = [
+// ─── PROVIDER CONFIGS ────────────────────────────────────────────────────────
+
+const GEMINI_MODELS = [
   "gemini-2.5-flash",
   "gemini-2.0-flash",
   "gemini-2.5-flash-lite",
@@ -18,142 +21,201 @@ const MODEL_FALLBACKS = [
   "gemini-1.5-flash-8b",
 ];
 
+const GROQ_MODELS = [
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant",
+  "gemma2-9b-it",
+  "mixtral-8x7b-32768",
+];
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isRateLimitError(error) {
+function classifyError(error) {
   const msg = (error?.message || "").toLowerCase();
-  return (
-    msg.includes("429") ||
-    msg.includes("quota") ||
-    msg.includes("rate") ||
-    msg.includes("resource_exhausted") ||
-    msg.includes("overloaded") ||
-    msg.includes("503") ||
-    msg.includes("high demand")
-  );
+  if (msg.includes("429") || msg.includes("quota") || msg.includes("resource_exhausted")) return "QUOTA";
+  if (msg.includes("rate") || msg.includes("high demand")) return "RATE";
+  if (msg.includes("503") || msg.includes("overloaded") || msg.includes("unavailable")) return "OVERLOADED";
+  if (msg.includes("401") || msg.includes("403") || msg.includes("permission") || msg.includes("api key")) return "AUTH";
+  return "OTHER";
 }
 
-async function tryWithKey({ apiKey, model, prompt }) {
-  const ai = new GoogleGenAI({ apiKey });
-  const keyLabel = apiKey === PRIMARY_KEY ? "PRIMARY" : "SECONDARY";
-  console.log(`[Gemini] Trying model=${model} key=${keyLabel}`);
+// ─── GEMINI PROVIDER ─────────────────────────────────────────────────────────
 
-  const response = await ai.models.generateContent({
-  model,
-  contents: prompt,
-  config: {
-    responseMimeType: "application/json",
+async function tryGemini({ apiKey, model, prompt, jsonMode }) {
+  const ai = new GoogleGenAI({ apiKey });
+  const keyLabel = apiKey === GEMINI_KEY_1 ? "PRIMARY" : "SECONDARY";
+  console.log(`[AI] Trying Gemini model=${model} key=${keyLabel}`);
+
+  const config = {
     maxOutputTokens: 8192,
     temperature: 0.2,
-  },
-});
+  };
+  if (jsonMode) {
+    config.responseMimeType = "application/json";
+  }
 
-  // Log full response structure for debugging
-  console.log("[Gemini] Response keys:", Object.keys(response || {}));
-  console.log("[Gemini] response.text type:", typeof response?.text);
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+    config,
+  });
 
-  // In @google/genai, response.text is a getter/method — call it if function
   let text = null;
-
   if (typeof response?.text === "function") {
     text = response.text();
-    console.log("[Gemini] Called response.text() as function");
   } else if (typeof response?.text === "string") {
     text = response.text;
-    console.log("[Gemini] Used response.text as string");
   } else {
-    // Deep fallback
     text =
       response?.candidates?.[0]?.content?.parts?.[0]?.text ??
       response?.candidates?.[0]?.output ??
       null;
-    console.log("[Gemini] Used deep fallback, got:", typeof text);
   }
 
-  if (!text) {
-    console.error("[Gemini] Full response dump:", JSON.stringify(response, null, 2).slice(0, 500));
-    throw new Error("Empty or unreadable response from Gemini");
+  if (!text) throw new Error("Empty response from Gemini");
+  return typeof text === "string" ? text : String(text);
+}
+
+// ─── GROQ PROVIDER ──────────────────────────────────────────────────────────
+
+async function tryGroq({ model, prompt, jsonMode }) {
+  if (!GROQ_KEY) throw new Error("No Groq API key");
+
+  const groq = new Groq({ apiKey: GROQ_KEY });
+  console.log(`[AI] Trying Groq model=${model}`);
+
+  // Convert Gemini prompt format to Groq/OpenAI format
+  let userMessage = "";
+  if (typeof prompt === "string") {
+    userMessage = prompt;
+  } else if (Array.isArray(prompt)) {
+    userMessage = prompt.map((p) => {
+      if (typeof p === "string") return p;
+      if (p?.parts) return p.parts.map((part) => part?.text || "").join("\n");
+      if (p?.text) return p.text;
+      return JSON.stringify(p);
+    }).join("\n\n");
+  } else if (prompt?.parts) {
+    userMessage = prompt.parts.map((p) => p?.text || "").join("\n");
+  } else {
+    userMessage = JSON.stringify(prompt);
   }
 
-  if (typeof text !== "string") {
-    text = String(text);
-  }
+  const messages = [
+    {
+      role: "system",
+      content: jsonMode
+        ? "You are a helpful assistant. You MUST respond with valid JSON only. No markdown, no explanation, just raw JSON."
+        : "You are a helpful assistant.",
+    },
+    { role: "user", content: userMessage },
+  ];
 
-  require("fs").writeFileSync("gemini-output.txt", text);
-console.log("Saved Gemini response to gemini-output.txt");
+  const completion = await groq.chat.completions.create({
+    model,
+    messages,
+    temperature: 0.2,
+    max_tokens: 8192,
+    response_format: jsonMode ? { type: "json_object" } : undefined,
+  });
 
+  const text = completion?.choices?.[0]?.message?.content;
+  if (!text) throw new Error("Empty response from Groq");
   return text;
 }
 
-export async function generateWithGemini(prompt) {
-  // Backoff: 10s → 30s → 60s for rate limit errors
-  const rateLimitBackoffs = [10000, 30000, 60000];
+// ─── MAIN ENGINE ─────────────────────────────────────────────────────────────
 
-  const keysToTry = SECONDARY_KEY
-    ? [PRIMARY_KEY, SECONDARY_KEY]
-    : [PRIMARY_KEY];
+export async function generateWithGemini(prompt, { jsonMode = true } = {}) {
+  const geminiKeys = GEMINI_KEY_2 ? [GEMINI_KEY_1, GEMINI_KEY_2] : [GEMINI_KEY_1];
 
   let lastError = null;
+  let quotaHits = 0;
+  let totalAttempts = 0;
 
-  for (const model of MODEL_FALLBACKS) {
-    for (const key of keysToTry) {
-      for (let attempt = 0; attempt < rateLimitBackoffs.length; attempt++) {
-        try {
-          const result = await tryWithKey({ apiKey: key, model, prompt });
+  // ── PHASE 1: Try all Gemini models with both keys ──
+  for (const model of GEMINI_MODELS) {
+    for (const key of geminiKeys) {
+      totalAttempts++;
+      try {
+        const result = await tryGemini({ apiKey: key, model, prompt, jsonMode });
+        console.log(`[AI] ✅ Gemini success model=${model}`);
+        return result;
+      } catch (error) {
+        lastError = error;
+        const errType = classifyError(error);
+        const keyLabel = key === GEMINI_KEY_1 ? "PRIMARY" : "SECONDARY";
+        console.warn(`[AI] ❌ Gemini ${errType} model=${model} key=${keyLabel}: ${error.message?.slice(0, 120)}`);
 
-          if (!result) {
-            throw new Error("Empty response from Gemini");
-          }
-
-          const keyLabel = key === PRIMARY_KEY ? "PRIMARY" : "SECONDARY";
-          console.log(`[Gemini] ✅ Success model=${model} key=${keyLabel}`);
-          return result;
-
-        } catch (error) {
-          lastError = error;
-          const keyLabel = key === PRIMARY_KEY ? "PRIMARY" : "SECONDARY";
-
-          if (isRateLimitError(error)) {
-            console.warn(
-              `[Gemini] ⚠️ Rate limit model=${model} key=${keyLabel} attempt=${attempt + 1}`
-            );
-
-            if (attempt < rateLimitBackoffs.length - 1) {
-              const wait = rateLimitBackoffs[attempt];
-              console.log(`[Gemini] Waiting ${wait / 1000}s before retry...`);
-              await sleep(wait);
-              // retry same model + key
-            } else {
-              console.warn(
-                `[Gemini] Max retries hit for model=${model} key=${keyLabel}. Moving on.`
-              );
-              break; // move to next key
-            }
-          } else {
-            // Non-rate error — don't retry this key, move on immediately
-            console.error(
-              `[Gemini] ❌ Non-rate error model=${model} key=${keyLabel}:`,
-              error.message?.slice(0, 120)
-            );
-            break;
+        if (errType === "QUOTA") {
+          quotaHits++;
+          continue;
+        }
+        if (errType === "OVERLOADED") {
+          await sleep(3000);
+          try {
+            const result = await tryGemini({ apiKey: key, model, prompt, jsonMode });
+            console.log(`[AI] ✅ Gemini success after overload retry`);
+            return result;
+          } catch {
+            continue;
           }
         }
+        continue;
       }
     }
-
-    console.warn(`[Gemini] Both keys failed for model=${model}. Trying next model.`);
   }
 
-  console.error("[Gemini] All models and keys exhausted.");
-  throw new Error("AI service is busy. Please try again in a minute.");
+  console.warn(`[AI] ⚠️ All Gemini attempts failed (${totalAttempts} tries, ${quotaHits} quota hits). Falling back to Groq.`);
+
+  // ── PHASE 2: Try all Groq models ──
+  if (GROQ_KEY) {
+    for (const model of GROQ_MODELS) {
+      try {
+        const result = await tryGroq({ model, prompt, jsonMode });
+        console.log(`[AI] ✅ Groq success model=${model}`);
+        return result;
+      } catch (error) {
+        lastError = error;
+        const errType = classifyError(error);
+        console.warn(`[AI] ❌ Groq ${errType} model=${model}: ${error.message?.slice(0, 120)}`);
+
+        if (errType === "OVERLOADED") {
+          await sleep(2000);
+          try {
+            const result = await tryGroq({ model, prompt, jsonMode });
+            return result;
+          } catch {
+            continue;
+          }
+        }
+        continue;
+      }
+    }
+  }
+
+  // ── ALL FAILED ──
+  console.error("[AI] All providers exhausted.", {
+    totalAttempts,
+    quotaHits,
+    groqAvailable: !!GROQ_KEY,
+    lastError: lastError?.message?.slice(0, 200),
+  });
+
+  if (quotaHits >= geminiKeys.length * 2) {
+    throw new Error(
+      "AI service has reached today's quota limit. Please try again tomorrow, or upgrade to Pro for priority access."
+    );
+  }
+
+  throw new Error("AI service is temporarily unavailable. Please try again in a few minutes.");
 }
 
 export async function generateJSON(prompt) {
-  const text = await generateWithGemini(prompt);
+  const text = await generateWithGemini(prompt, { jsonMode: true });
 
-  // Strip markdown code fences if Gemini wraps in ```json ... ```
   let cleaned = text.trim();
   if (cleaned.startsWith("```")) {
     cleaned = cleaned
@@ -161,28 +223,12 @@ export async function generateJSON(prompt) {
       .replace(/```\s*$/i, "")
       .trim();
   }
-  console.log("Last closing brace at:", cleaned.lastIndexOf("}"));
-console.log("Total length:", cleaned.length);
-
-const lastBrace = cleaned.lastIndexOf("}");
-console.log(
-  cleaned.slice(Math.max(0, lastBrace - 300), Math.min(cleaned.length, lastBrace + 300))
-);
 
   try {
     return JSON.parse(cleaned);
   } catch (err) {
-  console.error("=== JSON PARSE FAILED ===");
-  console.error(err);
-
-  console.error("Raw text length:", text.length);
-
-  console.error("First 1000 chars:");
-  console.error(cleaned.slice(0, 1000));
-
-  console.error("Last 1000 chars:");
-  console.error(cleaned.slice(-1000));
-
-  throw err;
-}
+    console.error("[AI] JSON parse failed. First 500:", cleaned.slice(0, 500));
+    console.error("[AI] Last 500:", cleaned.slice(-500));
+    throw new Error("AI returned an invalid response format. Please try again.");
+  }
 }

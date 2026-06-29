@@ -46,7 +46,7 @@ export default async function DashboardLayout({ children }) {
       const navItems = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Tools", href: "/tools", icon: Wrench },
-    { label: "AI Visibility", href: "/dashboard/ai-visibility", icon: Sparkles },
+    { label: "AI Readiness", href: "/dashboard/ai-visibility", icon: Sparkles },
     { label: "Projects", href: "/dashboard/projects", icon: FolderOpen },
     { label: "Landing Pages", href: "/dashboard/landing-pages", icon: Globe, badge: unseenLeadsCount },
     { label: "Clients", href: "/dashboard/clients", icon: Users },
