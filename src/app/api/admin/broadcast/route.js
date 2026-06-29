@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -16,9 +16,8 @@ export async function POST(req) {
       return Response.json({ error: "Subject and message are required" }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = createAdminClient();
 
-    // Fetch all users
     const { data: users, error: dbError } = await supabase
       .from("profiles")
       .select("email, full_name")
@@ -34,9 +33,7 @@ export async function POST(req) {
 
     let sent = 0;
     let failed = 0;
-    const errors = [];
 
-    // Send in batches of 10 to avoid Resend rate limits
     const BATCH_SIZE = 10;
     for (let i = 0; i < users.length; i += BATCH_SIZE) {
       const batch = users.slice(i, i + BATCH_SIZE);
@@ -57,12 +54,11 @@ export async function POST(req) {
             sent++;
           } catch (err) {
             failed++;
-            errors.push({ email: user.email, error: err.message });
+            console.error("Failed to send to:", user.email, err.message);
           }
         })
       );
 
-      // Small delay between batches
       if (i + BATCH_SIZE < users.length) {
         await new Promise((r) => setTimeout(r, 500));
       }
@@ -76,11 +72,13 @@ export async function POST(req) {
 }
 
 function buildEmail({ firstName, subject, message }) {
-  // Convert line breaks to HTML paragraphs
   const paragraphs = message
     .split("\n")
     .filter((line) => line.trim())
-    .map((line) => `<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#374151;">${line.trim()}</p>`)
+    .map(
+      (line) =>
+        `<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#374151;">${line.trim()}</p>`
+    )
     .join("");
 
   return `
@@ -101,10 +99,8 @@ function buildEmail({ firstName, subject, message }) {
           <tr>
             <td align="center" style="padding-bottom:32px;">
               <a href="https://fancydigitals.com.ng" style="text-decoration:none;">
-                <div style="display:inline-flex;align-items:center;gap:10px;">
-                  <div style="background:#075a01;border-radius:10px;padding:8px 14px;">
-                    <span style="color:white;font-size:16px;font-weight:900;letter-spacing:-0.5px;">Fancy Digitals</span>
-                  </div>
+                <div style="display:inline-block;background:#075a01;border-radius:10px;padding:8px 18px;">
+                  <span style="color:white;font-size:16px;font-weight:900;letter-spacing:-0.5px;">Fancy Digitals</span>
                 </div>
               </a>
             </td>
@@ -113,30 +109,22 @@ function buildEmail({ firstName, subject, message }) {
           <!-- CARD -->
           <tr>
             <td style="background:#ffffff;border-radius:20px;padding:40px 40px 32px;border:1px solid #e5e7eb;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
-
-              <!-- GREETING -->
               <p style="margin:0 0 24px;font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px;">
                 Hey ${firstName},
               </p>
-
-              <!-- MESSAGE -->
               ${paragraphs}
-
-              <!-- CTA -->
               <div style="margin:32px 0 8px;text-align:center;">
                 <a
                   href="https://fancydigitals.com.ng/free-ai-visibility-checker"
-                  style="display:inline-block;background:#075a01;color:#ffffff;font-size:14px;font-weight:700;padding:14px 32px;border-radius:12px;text-decoration:none;letter-spacing:0.2px;"
+                  style="display:inline-block;background:#075a01;color:#ffffff;font-size:14px;font-weight:700;padding:14px 32px;border-radius:12px;text-decoration:none;"
                 >
                   Check My AI Recommendation Score
                 </a>
               </div>
-
               <p style="margin:24px 0 0;font-size:14px;color:#6b7280;line-height:1.6;">
                 Always rooting for your success,<br/>
                 <strong style="color:#111827;">Bashir — Fancy Digitals</strong>
               </p>
-
             </td>
           </tr>
 
