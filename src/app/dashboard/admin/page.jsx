@@ -19,5 +19,5 @@ export default async function AdminPage() {
     redirect("/dashboard");
   }
 
-  return <AdminClient />;
+  return <AdminClient adminEmail={user.email} />;
 }

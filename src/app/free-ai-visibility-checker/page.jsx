@@ -3,9 +3,8 @@ import FreeAIVisibilityClient from "./client";
 const BASE_URL = "https://fancydigitals.com.ng";
 
 export const metadata = {
-  title: "Free AI Visibility Checker — See How ChatGPT, Gemini & Perplexity Rank Your Website",
-  description:
-    "Free tool to analyze how AI assistants like ChatGPT, Gemini, Claude, and Perplexity understand and rank your website. Get your AI visibility score and a prioritized improvement plan in 30 seconds.",
+  title: "Free AI Recommendation Engine | Is Your Business Recommended by AI? | Fancy Digitals",
+  description: "Check your free AI Recommendation Score in 30 seconds. See if ChatGPT, Gemini, Claude and Perplexity recommend your business and exactly how to fix it.",
   keywords: [
     "AI visibility checker",
     "free AI SEO tool",

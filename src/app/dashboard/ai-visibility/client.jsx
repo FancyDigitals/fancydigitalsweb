@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   XCircle,
   Trash2,
-  ExternalLink,
   Globe,
   Zap,
   Shield,
@@ -87,6 +86,7 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [scanId, setScanId] = useState(null);
   const [error, setError] = useState("");
   const [scans, setScans] = useState(initialScans);
 
@@ -97,6 +97,7 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
     setLoading(true);
     setError("");
     setResult(null);
+    setScanId(null);
 
     try {
       const res = await fetch("/api/ai-visibility/scan", {
@@ -112,9 +113,8 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
       }
 
       setResult(data.result);
-
-      // Add to scans list
       if (data.scanId) {
+        setScanId(data.scanId);
         setScans((prev) => [
           {
             id: data.scanId,
@@ -127,6 +127,10 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
           ...prev,
         ]);
       }
+
+      setTimeout(() => {
+        document.getElementById("scan-result")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (err) {
       setError(err.message || "Network error");
     } finally {
@@ -153,13 +157,13 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ff914d] mb-2">
               <Sparkles className="h-4 w-4" />
-              <span>AI Readiness Intelligence</span>
+              <span>AI Recommendation Engine</span>
             </div>
             <h1 className="text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
-              Is your website ready for AI?
+              Is your business recommended by AI?
             </h1>
             <p className="mt-2 max-w-2xl text-gray-500">
-              Measure how well your site is technically prepared to be understood, parsed, and cited by AI assistants like ChatGPT, Gemini, Claude, and Perplexity.
+              Measure how well your site is prepared to be understood, parsed, and recommended by AI assistants like ChatGPT, Gemini, Claude, and Perplexity.
             </p>
           </div>
           <a
@@ -171,14 +175,14 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
           </a>
         </div>
 
-        {/* Honest Disclaimer */}
+        {/* DISCLAIMER */}
         <div className="mb-8 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
           <div className="flex items-start gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
             <div className="text-xs text-blue-900">
               <p className="font-bold">What this measures (and what it doesn't):</p>
               <p className="mt-1 text-blue-800/80">
-                This tool measures <strong>on-page AI readiness</strong> schema, content, technical SEO, and structured data. It does NOT measure real-world authority (backlinks, brand mentions, traffic, press). A high score means your site is technically prepared. Combined with real authority, that's what gets you recommended by AI.
+                This tool measures <strong>on-page AI readiness</strong> — schema, content, technical SEO, and structured data. It does NOT measure real-world authority (backlinks, brand mentions, traffic, press). A high score means your site is technically prepared. Combined with real authority, that's what gets you recommended by AI.
               </p>
             </div>
           </div>
@@ -221,7 +225,10 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
           {!isPro && (
             <p className="mt-3 flex items-center gap-1.5 text-xs text-gray-500">
               <Crown className="h-3 w-3 text-[#ff914d]" />
-              Free plan: 3 scans per day. <a href="/pricing" className="ml-1 font-semibold text-[#075a01] hover:underline">Upgrade for unlimited</a>
+              Free plan: 3 scans per day.{" "}
+              <a href="/pricing" className="ml-1 font-semibold text-[#075a01] hover:underline">
+                Upgrade for unlimited
+              </a>
             </p>
           )}
 
@@ -235,13 +242,19 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
           {loading && (
             <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600">
               <p className="font-medium">This usually takes 20–45 seconds.</p>
-              <p className="mt-1 text-xs text-gray-500">Running PageSpeed analysis, parsing schema, checking Knowledge Graph, and calculating 10 visibility signals...</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Running PageSpeed analysis, parsing schema, checking Knowledge Graph, and calculating 10 signals...
+              </p>
             </div>
           )}
         </form>
 
         {/* RESULT */}
-        {result && <ScanResult result={result} />}
+        {result && (
+          <div id="scan-result">
+            <ScanResult result={result} isPro={isPro} scanId={scanId} />
+          </div>
+        )}
 
         {/* RECENT SCANS */}
         {scans.length > 0 && !result && (
@@ -287,7 +300,9 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
               <Sparkles className="h-6 w-6 text-[#075a01]" />
             </div>
             <h3 className="text-lg font-bold text-gray-900">Start your first scan</h3>
-            <p className="mt-2 text-sm text-gray-500">Enter a URL above to see how AI assistants understand your business.</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Enter a URL above to see how AI assistants understand your business.
+            </p>
           </div>
         )}
 
@@ -296,8 +311,8 @@ export default function AIVisibilityClient({ initialScans, isPro }) {
   );
 }
 
-// ─── RESULT COMPONENT ───────────────────────────────────────────────────────
-function ScanResult({ result }) {
+// ─── SCAN RESULT ─────────────────────────────────────────────────────────────
+function ScanResult({ result, isPro, scanId }) {
   const { overall, scores, signals, recommendations, domain } = result;
 
   const sortedRecs = [...recommendations].sort((a, b) => {
@@ -308,41 +323,41 @@ function ScanResult({ result }) {
   return (
     <div className="space-y-6">
 
-      {/* OVERALL SCORE CARD */}
+      {/* OVERALL SCORE */}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-sm">
         <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:p-8">
           <ScoreRing score={overall} size={160} />
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Readiness Score for</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Recommendation Score for</p>
             <h2 className="mt-1 text-2xl font-black text-gray-900 md:text-3xl">{domain}</h2>
             <p className={`mt-2 text-base font-bold ${scoreColor(overall)}`}>
-              {overall >= 80 && "Excellent — your site is technically AI-ready."}
+              {overall >= 80 && "Excellent — AI assistants can easily recommend your site."}
               {overall >= 60 && overall < 80 && "Good — but key signals are missing."}
               {overall >= 40 && overall < 60 && "Needs work — AI struggles to parse your site."}
-              {overall < 40 && "Critical — major AI-readability gaps to fix."}
+              {overall < 40 && "Critical — AI assistants are unlikely to recommend you."}
             </p>
-            <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-gray-500">
               <span className="flex items-center gap-1">
                 <AlertCircle className="h-3 w-3 text-red-500" />
-                {recommendations.filter(r => r.priority === "critical").length} critical
+                {recommendations.filter((r) => r.priority === "critical").length} critical
               </span>
               <span className="flex items-center gap-1">
                 <TrendingUp className="h-3 w-3 text-orange-500" />
-                {recommendations.filter(r => r.priority === "high").length} high
+                {recommendations.filter((r) => r.priority === "high").length} high
               </span>
               <span className="flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3 text-blue-500" />
-                {recommendations.filter(r => r.priority === "medium" || r.priority === "low").length} other
+                {recommendations.filter((r) => r.priority === "medium" || r.priority === "low").length} other
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* INDIVIDUAL SCORES */}
+      {/* SIGNAL BREAKDOWN */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
         <h3 className="mb-1 text-lg font-bold text-gray-900">Signal Breakdown</h3>
-        <p className="mb-6 text-sm text-gray-500">How your site scored across 10 AI visibility signals.</p>
+        <p className="mb-6 text-sm text-gray-500">How your site scored across 10 AI recommendation signals.</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(scores).map(([key, score]) => {
             const Icon = SCORE_ICONS[key] || Sparkles;
@@ -372,7 +387,7 @@ function ScanResult({ result }) {
       {/* RECOMMENDATIONS */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
         <h3 className="mb-1 text-lg font-bold text-gray-900">Your Improvement Plan</h3>
-        <p className="mb-6 text-sm text-gray-500">Prioritized actions to boost your AI visibility.</p>
+        <p className="mb-6 text-sm text-gray-500">All {sortedRecs.length} prioritized actions to boost your AI recommendation score.</p>
 
         {sortedRecs.length === 0 ? (
           <div className="rounded-xl bg-green-50 p-6 text-center">
@@ -393,7 +408,7 @@ function ScanResult({ result }) {
                     {rec.priority === "low" && <ChevronRight className="h-4 w-4" />}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center gap-2">
+                    <div className="mb-1">
                       <span className={`rounded-full bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${style.text}`}>
                         {style.label}
                       </span>
@@ -415,46 +430,116 @@ function ScanResult({ result }) {
           <SignalGroup
             title="Meta Tags"
             items={[
-              { label: "Title", value: signals.meta.title || "Missing", ok: !!signals.meta.title },
-              { label: "Description", value: signals.meta.description || "Missing", ok: !!signals.meta.description },
-              { label: "OG Image", value: signals.meta.ogImage ? "Present" : "Missing", ok: !!signals.meta.ogImage },
-              { label: "Canonical", value: signals.meta.canonical ? "Present" : "Missing", ok: !!signals.meta.canonical },
+              { label: "Title", value: signals.meta?.title || "Missing", ok: !!signals.meta?.title },
+              { label: "Description", value: signals.meta?.description || "Missing", ok: !!signals.meta?.description },
+              { label: "OG Image", value: signals.meta?.ogImage ? "Present" : "Missing", ok: !!signals.meta?.ogImage },
+              { label: "Canonical", value: signals.meta?.canonical ? "Present" : "Missing", ok: !!signals.meta?.canonical },
             ]}
           />
           <SignalGroup
             title="Structured Data"
             items={[
-              { label: "Schema count", value: `${signals.schema.count} found`, ok: signals.schema.count > 0 },
-              { label: "Organization", value: signals.schema.hasOrganization ? "Yes" : "No", ok: signals.schema.hasOrganization },
-              { label: "FAQ", value: signals.schema.hasFAQ ? "Yes" : "No", ok: signals.schema.hasFAQ },
-              { label: "Breadcrumb", value: signals.schema.hasBreadcrumb ? "Yes" : "No", ok: signals.schema.hasBreadcrumb },
+              { label: "Schema count", value: `${signals.schema?.count || 0} found`, ok: (signals.schema?.count || 0) > 0 },
+              { label: "Organization", value: signals.schema?.hasOrganization ? "Yes" : "No", ok: signals.schema?.hasOrganization },
+              { label: "FAQ", value: signals.schema?.hasFAQ ? "Yes" : "No", ok: signals.schema?.hasFAQ },
+              { label: "Breadcrumb", value: signals.schema?.hasBreadcrumb ? "Yes" : "No", ok: signals.schema?.hasBreadcrumb },
             ]}
           />
           <SignalGroup
             title="Content"
             items={[
-              { label: "Word count", value: `${signals.content.wordCount} words`, ok: signals.content.wordCount >= 300 },
-              { label: "H1 tags", value: signals.content.h1Count, ok: signals.content.h1Count === 1 },
-              { label: "H2 tags", value: signals.content.h2Count, ok: signals.content.h2Count >= 2 },
-              { label: "Alt text coverage", value: `${signals.content.altRatio}%`, ok: signals.content.altRatio >= 80 },
+              { label: "Word count", value: `${signals.content?.wordCount || 0} words`, ok: (signals.content?.wordCount || 0) >= 300 },
+              { label: "H1 tags", value: signals.content?.h1Count || 0, ok: signals.content?.h1Count === 1 },
+              { label: "H2 tags", value: signals.content?.h2Count || 0, ok: (signals.content?.h2Count || 0) >= 2 },
+              { label: "Alt text coverage", value: `${signals.content?.altRatio || 0}%`, ok: (signals.content?.altRatio || 0) >= 80 },
             ]}
           />
           <SignalGroup
             title="Trust & Identity"
             items={[
-              { label: "HTTPS", value: signals.technical.https ? "Yes" : "No", ok: signals.technical.https },
+              { label: "HTTPS", value: signals.technical?.https ? "Yes" : "No", ok: signals.technical?.https },
               { label: "Knowledge Graph", value: signals.knowledgeGraph ? "Found" : "Not found", ok: signals.knowledgeGraph },
-              { label: "Social profiles", value: Object.values(signals.social).filter(Boolean).length, ok: Object.values(signals.social).filter(Boolean).length >= 2 },
-              { label: "Language tag", value: signals.meta.lang || "Missing", ok: !!signals.meta.lang },
+              { label: "Social profiles", value: Object.values(signals.social || {}).filter(Boolean).length, ok: Object.values(signals.social || {}).filter(Boolean).length >= 2 },
+              { label: "Language tag", value: signals.meta?.lang || "Missing", ok: !!signals.meta?.lang },
             ]}
           />
         </div>
       </div>
 
+      {/* ── NEXT STEP CTA ── */}
+      {isPro ? (
+        // PRO USER — take them to competitor compare
+        <div className="overflow-hidden rounded-2xl border border-[#ff914d]/30 bg-gradient-to-br from-[#fff7f3] to-white p-8 shadow-sm">
+          <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#ff914d]/10">
+                <Swords className="h-6 w-6 text-[#ff914d]" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#ff914d]">Next Step</p>
+                <h3 className="mt-1 text-lg font-black text-gray-900">
+                  How do you compare to your competitors?
+                </h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  You have your score. Now see if your competitors score higher — and where you can overtake them.
+                </p>
+              </div>
+            </div>
+            <a
+              href="/dashboard/ai-visibility/compare"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#ff914d] px-6 py-3 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#e8833d]"
+            >
+              Compare vs. Competitor
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      ) : (
+        // FREE USER — upgrade banner
+        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#075a01] to-[#0a8f01] p-8 shadow-xl">
+          <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                <Crown className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-white/60">Next Step — Pro Feature</p>
+                <h3 className="mt-1 text-lg font-black text-white">
+                  See how you compare to your competitors
+                </h3>
+                <p className="mt-1 text-sm text-white/80">
+                  Upgrade to Pro for competitor comparison, unlimited scans, and full improvement plans.
+                </p>
+                <ul className="mt-3 space-y-1">
+                  {[
+                    "Unlimited AI recommendation scans",
+                    "Competitor score comparison",
+                    "Full improvement plan — all recommendations",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-xs text-white/80">
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-white" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <a
+              href="/pricing"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-[#075a01] shadow-lg transition-all hover:-translate-y-0.5"
+            >
+              Upgrade to Pro
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
 
+// ─── SUB COMPONENTS ──────────────────────────────────────────────────────────
 function ScoreRing({ score, size = 160 }) {
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
@@ -465,14 +550,7 @@ function ScoreRing({ score, size = 160 }) {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="#e5e7eb"
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke="#e5e7eb" strokeWidth={strokeWidth} fill="none" />
         <circle
           cx={size / 2}
           cy={size / 2}

@@ -8,10 +8,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Shield,
-  User as UserIcon,
-  Calendar,
   ArrowRight,
   X,
+  Send,
+  Mail,
+  Users,
 } from "lucide-react";
 
 const PLAN_OPTIONS = [
@@ -26,7 +27,7 @@ function planBadge(plan) {
   return opt || PLAN_OPTIONS[0];
 }
 
-export default function AdminClient() {
+export default function AdminClient({ adminEmail }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -54,10 +55,10 @@ export default function AdminClient() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-5xl space-y-8">
 
         {/* HEADER */}
-        <div className="mb-8">
+        <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#ff914d]">
             <Shield className="h-4 w-4" />
             <span>Admin Panel</span>
@@ -66,12 +67,12 @@ export default function AdminClient() {
             User & Plan Management
           </h1>
           <p className="mt-2 text-gray-500">
-            Manage user plans. Upgrades and downgrades automatically trigger welcome/downgrade emails.
+            Manage user plans and send broadcast emails to all users.
           </p>
         </div>
 
         {/* SEARCH */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
@@ -107,16 +108,13 @@ export default function AdminClient() {
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#075a01] text-sm font-bold text-white">
                       {(u.full_name || u.email)[0]?.toUpperCase()}
                     </div>
-
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-semibold text-gray-900">{u.full_name || "—"}</p>
                       <p className="truncate text-xs text-gray-500">{u.email}</p>
                     </div>
-
                     <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${badge.color}`}>
                       {badge.label}
                     </span>
-
                     <button
                       onClick={() => setSelectedUser(u)}
                       className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 transition-all hover:border-[#075a01]/30 hover:text-[#075a01]"
@@ -130,6 +128,9 @@ export default function AdminClient() {
             </div>
           )}
         </div>
+
+        {/* BROADCAST EMAIL SECTION */}
+        <BroadcastSection adminEmail={adminEmail} userCount={users.length} />
 
       </div>
 
@@ -148,8 +149,213 @@ export default function AdminClient() {
   );
 }
 
-// ─── MODAL ─────────────────────────────────────────────────────────────────
+// ─── BROADCAST SECTION ───────────────────────────────────────────────────────
+function BroadcastSection({ adminEmail, userCount }) {
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
 
+  const TEMPLATES = [
+    {
+      label: "AI Recommendation Tool Launch",
+      subject: "Your business can now be recommended by AI",
+      message: `We just launched something powerful for your business.
+
+Introducing the AI Recommendation Engine — a free tool that shows you exactly how likely ChatGPT, Gemini, Claude, and Perplexity are to recommend your business when someone asks them a question.
+
+Here's what you get for free:
+- Your AI Recommendation Score out of 100
+- Breakdown across 10 key signals
+- Top 3 improvement actions you can take today
+
+Most businesses in Nigeria have no idea they're invisible to AI assistants. Now you can find out — and fix it.
+
+Click below to check your score. It takes 30 seconds and no signup is required to share it with others.`,
+    },
+  ];
+
+  function applyTemplate(tpl) {
+    setSubject(tpl.subject);
+    setMessage(tpl.message);
+    setResult(null);
+    setError("");
+  }
+
+  async function handleSend() {
+    if (!subject.trim() || !message.trim()) {
+      setError("Subject and message are required.");
+      return;
+    }
+
+    if (
+      !confirm(
+        `Send this email to ALL ${userCount} users?\n\nSubject: ${subject}\n\nThis cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setSending(true);
+    setError("");
+    setResult(null);
+
+    try {
+      const res = await fetch("/api/admin/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminEmail, subject, message }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Broadcast failed");
+        return;
+      }
+
+      setResult(data);
+    } catch (err) {
+      setError(err.message || "Network error");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+      {/* Header */}
+      <div className="border-b border-gray-100 p-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#075a01]/10">
+            <Mail className="h-5 w-5 text-[#075a01]" />
+          </div>
+          <div>
+            <h2 className="text-lg font-black text-gray-900">Broadcast Email</h2>
+            <p className="text-sm text-gray-500">
+              Send an email to all{" "}
+              <span className="font-bold text-gray-900">{userCount} users</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-5">
+
+        {/* Template picker */}
+        <div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+            Quick Templates
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {TEMPLATES.map((tpl) => (
+              <button
+                key={tpl.label}
+                onClick={() => applyTemplate(tpl)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-700 transition-all hover:border-[#075a01]/30 hover:bg-[#075a01]/5 hover:text-[#075a01]"
+              >
+                <Loader2 className="h-3 w-3" />
+                {tpl.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Recipients */}
+        <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+          <Users className="h-4 w-4 text-gray-400" />
+          <span className="text-sm text-gray-600">
+            Sending to:{" "}
+            <strong className="text-gray-900">All {userCount} registered users</strong>
+          </span>
+        </div>
+
+        {/* Subject */}
+        <div>
+          <label className="mb-1.5 block text-xs font-bold text-gray-700">
+            Subject Line <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Your business can now be recommended by AI"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+          />
+        </div>
+
+        {/* Message */}
+        <div>
+          <label className="mb-1.5 block text-xs font-bold text-gray-700">
+            Message <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Write your message here..."
+            rows={10}
+            className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+          />
+          <p className="mt-1.5 text-xs text-gray-400">
+            Each line break becomes a new paragraph. The email will include a CTA button to the AI Recommendation tool automatically.
+          </p>
+        </div>
+
+        {error && (
+          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {result && (
+          <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <p className="font-bold text-green-900">Broadcast sent successfully</p>
+            </div>
+            <div className="flex gap-6 text-sm">
+              <span className="text-green-700">
+                <strong>{result.sent}</strong> delivered
+              </span>
+              {result.failed > 0 && (
+                <span className="text-red-600">
+                  <strong>{result.failed}</strong> failed
+                </span>
+              )}
+              <span className="text-gray-500">
+                of <strong>{result.total}</strong> total
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Send Button */}
+        <button
+          onClick={handleSend}
+          disabled={sending || !subject.trim() || !message.trim()}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#075a01] px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0a8f01] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {sending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Sending to {userCount} users...
+            </>
+          ) : (
+            <>
+              <Send className="h-4 w-4" />
+              Send to All {userCount} Users
+            </>
+          )}
+        </button>
+
+      </div>
+    </div>
+  );
+}
+
+// ─── UPGRADE MODAL ───────────────────────────────────────────────────────────
 function UpgradeModal({ user, onClose, onSuccess }) {
   const [newPlan, setNewPlan] = useState("PRO_MONTHLY");
   const [loading, setLoading] = useState(false);
@@ -163,7 +369,11 @@ function UpgradeModal({ user, onClose, onSuccess }) {
       setError("User is already on this plan");
       return;
     }
-    if (!confirm(`Change ${user.email} from ${currentPlan} to ${newPlan}?\n\nAn email will be sent automatically.`)) {
+    if (
+      !confirm(
+        `Change ${user.email} from ${currentPlan} to ${newPlan}?\n\nAn email will be sent automatically.`
+      )
+    ) {
       return;
     }
 
@@ -228,9 +438,11 @@ function UpgradeModal({ user, onClose, onSuccess }) {
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
-                  newPlan === opt.value ? "border-[#075a01]" : "border-gray-300"
-                }`}>
+                <div
+                  className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
+                    newPlan === opt.value ? "border-[#075a01]" : "border-gray-300"
+                  }`}
+                >
                   {newPlan === opt.value && (
                     <div className="h-1.5 w-1.5 rounded-full bg-[#075a01]" />
                   )}

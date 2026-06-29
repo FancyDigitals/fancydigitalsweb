@@ -26,6 +26,10 @@ import {
   Bot,
   Eye,
   Target,
+  Send,
+  Building2,
+  KeyRound,
+  Briefcase,
 } from "lucide-react";
 
 const SCORE_ICONS = {
@@ -61,6 +65,24 @@ const PRIORITY_STYLE = {
   low: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", label: "Low" },
 };
 
+const INDUSTRIES = [
+  "E-commerce",
+  "Healthcare",
+  "Finance & Fintech",
+  "Education",
+  "Real Estate",
+  "Technology / SaaS",
+  "Legal",
+  "Hospitality & Travel",
+  "Food & Beverage",
+  "Fashion & Beauty",
+  "Logistics & Supply Chain",
+  "Media & Entertainment",
+  "Non-profit",
+  "Construction & Engineering",
+  "Other",
+];
+
 function scoreColor(s) {
   if (s >= 80) return "text-green-600";
   if (s >= 60) return "text-yellow-600";
@@ -82,8 +104,8 @@ function scoreBgColor(s) {
 
 const FAQS = [
   {
-    q: "What is AI visibility?",
-    a: "AI visibility is how likely AI assistants like ChatGPT, Gemini, Claude, and Perplexity are to recommend or cite your website when users ask them questions. It depends on signals like schema markup, content quality, entity clarity, and Knowledge Graph presence.",
+    q: "What is AI recommendation readiness?",
+    a: "AI recommendation readiness measures how likely AI assistants like ChatGPT, Gemini, Claude, and Perplexity are to recommend or cite your business when users ask them questions. It depends on signals like schema markup, content quality, entity clarity, and Knowledge Graph presence.",
   },
   {
     q: "Is this really free?",
@@ -94,8 +116,8 @@ const FAQS = [
     a: "We analyze your website across 10 signals AI assistants use to evaluate businesses: technical SEO, structured data, meta tags, content quality, page speed, mobile experience, Knowledge Graph presence, entity clarity, AI readability, and trust signals.",
   },
   {
-    q: "Why does AI visibility matter?",
-    a: "Modern users increasingly ask AI assistants for recommendations instead of using traditional Google search. If your business isn't optimized for AI visibility, you're invisible to a growing share of potential customers.",
+    q: "Why does AI recommendation matter?",
+    a: "Modern users increasingly ask AI assistants for recommendations instead of using traditional Google search. If your business isn't optimized for AI recommendation, you're invisible to a growing share of potential customers.",
   },
   {
     q: "What is GEO (Generative Engine Optimization)?",
@@ -133,7 +155,6 @@ export default function FreeAIVisibilityClient() {
         return;
       }
       setResult(data.result);
-      // Scroll to result
       setTimeout(() => {
         document.getElementById("scan-result")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
@@ -155,22 +176,22 @@ export default function FreeAIVisibilityClient() {
         <div className="relative mx-auto max-w-4xl text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#075a01]/20 bg-[#075a01]/5 px-4 py-2">
             <Sparkles className="h-4 w-4 text-[#075a01]" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#075a01]">Free AI SEO Tool · No Signup</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#075a01]">Free GEO Tool · No Signup Required</span>
           </div>
 
           <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-gray-900 md:text-6xl">
-            Is your website
-            <span className="bg-gradient-to-r from-[#075a01] via-[#0a8f01] to-[#ff914d] bg-clip-text text-transparent"> AI-ready</span>?
+            Is your business
+            <span className="bg-gradient-to-r from-[#075a01] via-[#0a8f01] to-[#ff914d] bg-clip-text text-transparent"> recommended by AI</span>?
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-gray-600 md:text-lg">
-            Get your free <strong>AI Readiness Score</strong> in 30 seconds.
-            See exactly how well your site is prepared to be understood, parsed, and cited by AI assistants like ChatGPT, Gemini, and Perplexity.
+            Get your free <strong>AI Recommendation Score</strong> in 30 seconds.
+            See exactly how well your site is prepared to be understood, parsed, and recommended by AI assistants like ChatGPT, Gemini, and Perplexity.
           </p>
 
           {/* AI logos row */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-gray-400">
-            <span>Optimized for:</span>
+            <span>Analyzed for:</span>
             <span className="flex items-center gap-1.5"><Bot className="h-3.5 w-3.5" />ChatGPT</span>
             <span className="flex items-center gap-1.5"><Bot className="h-3.5 w-3.5" />Gemini</span>
             <span className="flex items-center gap-1.5"><Bot className="h-3.5 w-3.5" />Claude</span>
@@ -205,7 +226,7 @@ export default function FreeAIVisibilityClient() {
                 ) : (
                   <>
                     <Search className="h-4 w-4" />
-                    Analyze Free
+                    Check Now Free
                   </>
                 )}
               </button>
@@ -234,7 +255,7 @@ export default function FreeAIVisibilityClient() {
 
             {loading && (
               <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-left text-sm text-gray-600">
-                <p className="font-medium">Analyzing across 10 AI visibility signals...</p>
+                <p className="font-medium">Analyzing across 10 AI recommendation signals...</p>
                 <p className="mt-1 text-xs text-gray-500">Running PageSpeed analysis, parsing schema, checking Knowledge Graph. Takes 20–45 seconds.</p>
               </div>
             )}
@@ -242,18 +263,22 @@ export default function FreeAIVisibilityClient() {
         </div>
       </section>
 
-      {/* ── RESULT ── */}
+      {/* ── RESULT + BOOST FORM ── */}
       {result && (
         <section id="scan-result" className="bg-gray-50 px-6 py-16 md:py-20">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-5xl space-y-8">
+
             <ScanResult result={result} />
 
-            {/* Upgrade CTA after result */}
-            <div className="mt-8 overflow-hidden rounded-2xl bg-gradient-to-br from-[#075a01] to-[#0a8f01] p-8 text-center shadow-2xl md:p-12">
+            {/* ── BOOST FORM ── */}
+            <BoostForm scannedUrl={url} score={result.overall} />
+
+            {/* Upgrade CTA */}
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#075a01] to-[#0a8f01] p-8 text-center shadow-2xl md:p-12">
               <Sparkles className="mx-auto mb-4 h-8 w-8 text-[#ff914d]" />
               <h3 className="text-2xl font-black text-white md:text-3xl">Want unlimited scans + auto-fix tools?</h3>
               <p className="mx-auto mt-3 max-w-xl text-white/80">
-                Upgrade to Pro for unlimited AI visibility scans, schema generators, and one-click optimizations.
+                Upgrade to Pro for unlimited AI recommendation scans, schema generators, and one-click optimizations.
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Link
@@ -270,6 +295,7 @@ export default function FreeAIVisibilityClient() {
                 </Link>
               </div>
             </div>
+
           </div>
         </section>
       )}
@@ -326,7 +352,7 @@ export default function FreeAIVisibilityClient() {
               {
                 Icon: Eye,
                 title: "AI is the new search",
-                desc: "Over 1 billion people now ask AI assistants instead of Googling. If you're not AI-visible, you're invisible.",
+                desc: "Over 1 billion people now ask AI assistants instead of Googling. If you're not AI-recommended, you're invisible.",
               },
               {
                 Icon: Target,
@@ -336,7 +362,7 @@ export default function FreeAIVisibilityClient() {
               {
                 Icon: TrendingUp,
                 title: "Early movers win big",
-                desc: "Most businesses haven't optimized for AI yet. The window to dominate your niche is open right now.",
+                desc: "Most businesses haven't optimized for AI recommendation yet. The window to dominate your niche is open right now.",
               },
             ].map(({ Icon, title, desc }) => (
               <div key={title} className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
@@ -409,7 +435,220 @@ export default function FreeAIVisibilityClient() {
   );
 }
 
-// ─── RESULT COMPONENT ───────────────────────────────────────────────────────
+// ─── BOOST FORM ──────────────────────────────────────────────────────────────
+function BoostForm({ scannedUrl, score }) {
+  const [form, setForm] = useState({
+    businessName: "",
+    website: scannedUrl || "",
+    industry: "",
+    targetKeywords: "",
+    email: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  function handleChange(e) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.businessName || !form.website || !form.email) {
+      setFormError("Please fill in all required fields.");
+      return;
+    }
+    setFormError("");
+    setSubmitting(true);
+
+    try {
+      const res = await fetch("/api/ai-recommendation/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setFormError(data.error || "Submission failed. Try again.");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setFormError("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="rounded-2xl border border-green-200 bg-green-50 p-10 text-center">
+        <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-green-600" />
+        <h3 className="text-xl font-black text-green-900">Request Received!</h3>
+        <p className="mt-2 text-sm text-green-700">
+          We will review your site and reach out to you at <strong>{form.email}</strong> with a personalized AI recommendation strategy.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-[#075a01]/20 bg-white shadow-sm">
+      {/* Header */}
+      <div className="border-b border-gray-100 bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-6 py-6 md:px-8">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
+            <Target className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-white">
+              Get Your Business Recommended by AI
+            </h3>
+            <p className="mt-1 text-sm text-white/80">
+              {score < 60
+                ? `Your score is ${score}/100. Our team can help you fix this.`
+                : `Your score is ${score}/100. Let's push it higher.`}
+              {" "}Fill the form below and we'll reach out with a personalized strategy.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-5 p-6 md:p-8">
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* Business Name */}
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-gray-700">
+              Business Name <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                name="businessName"
+                value={form.businessName}
+                onChange={handleChange}
+                placeholder="Acme Nigeria Ltd"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Website */}
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-gray-700">
+              Website <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Globe className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                name="website"
+                value={form.website}
+                onChange={handleChange}
+                placeholder="yourwebsite.com"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Industry */}
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-gray-700">
+              Industry
+            </label>
+            <div className="relative">
+              <Briefcase className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <select
+                name="industry"
+                value={form.industry}
+                onChange={handleChange}
+                className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+              >
+                <option value="">Select industry</option>
+                {INDUSTRIES.map((ind) => (
+                  <option key={ind} value={ind}>{ind}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-gray-700">
+              Email Address <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Send className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@company.com"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Target Keywords — full width */}
+        <div>
+          <label className="mb-1.5 block text-xs font-bold text-gray-700">
+            Target Keywords / Queries
+          </label>
+          <div className="relative">
+            <KeyRound className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
+            <textarea
+              name="targetKeywords"
+              value={form.targetKeywords}
+              onChange={handleChange}
+              placeholder="e.g. best logistics company in Lagos, fast delivery Nigeria"
+              rows={3}
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20 resize-none"
+            />
+          </div>
+          <p className="mt-1.5 text-xs text-gray-500">What questions do you want AI to recommend you for?</p>
+        </div>
+
+        {formError && (
+          <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {formError}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff914d] px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#e8833d] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            <>
+              <Target className="h-4 w-4" />
+              Request AI Recommendation Boost
+            </>
+          )}
+        </button>
+
+        <p className="text-center text-xs text-gray-400">
+          No payment required. Our team will contact you within 24 hours.
+        </p>
+      </form>
+    </div>
+  );
+}
+
+// ─── RESULT COMPONENT ────────────────────────────────────────────────────────
 function ScanResult({ result }) {
   const { overall, scores, signals, recommendations, domain } = result;
 
@@ -425,13 +664,13 @@ function ScanResult({ result }) {
         <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:p-8">
           <ScoreRing score={overall} size={160} />
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Readiness Score for</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">AI Recommendation Score for</p>
             <h2 className="mt-1 text-2xl font-black text-gray-900 md:text-3xl">{domain}</h2>
             <p className={`mt-2 text-base font-bold ${scoreColor(overall)}`}>
-              {overall >= 80 && "Excellent — your site is technically AI-ready."}
+              {overall >= 80 && "Excellent — AI assistants can easily recommend your site."}
               {overall >= 60 && overall < 80 && "Good — but key signals are missing."}
               {overall >= 40 && overall < 60 && "Needs work — AI struggles to parse your site."}
-              {overall < 40 && "Critical — major AI-readability gaps to fix."}
+              {overall < 40 && "Critical — AI assistants are unlikely to recommend you."}
             </p>
           </div>
         </div>
@@ -440,7 +679,7 @@ function ScanResult({ result }) {
       {/* Signal breakdown */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
         <h3 className="mb-1 text-lg font-bold text-gray-900">Signal Breakdown</h3>
-        <p className="mb-6 text-sm text-gray-500">How your site scored across 10 AI visibility signals.</p>
+        <p className="mb-6 text-sm text-gray-500">How your site scored across 10 AI recommendation signals.</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(scores).map(([key, score]) => {
             const Icon = SCORE_ICONS[key] || Sparkles;
@@ -464,10 +703,10 @@ function ScanResult({ result }) {
         </div>
       </div>
 
-      {/* Top 3 recommendations preview */}
+      {/* Top recommendations */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
         <h3 className="mb-1 text-lg font-bold text-gray-900">Top Improvements</h3>
-        <p className="mb-6 text-sm text-gray-500">Your highest-impact actions to boost AI visibility.</p>
+        <p className="mb-6 text-sm text-gray-500">Your highest-impact actions to get recommended by AI.</p>
 
         {sortedRecs.length === 0 ? (
           <div className="rounded-xl bg-green-50 p-6 text-center">
