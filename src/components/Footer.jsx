@@ -14,15 +14,19 @@ export default function Footer() {
       { label: "Tools", href: "/tools" },
       { label: "About", href: "/about" },
     ],
+    examples: [
+      { label: "Resume Examples", href: "/resume-for" },
+      { label: "Cover Letter Examples", href: "/cover-letter-for" },
+    ],
     legal: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
     ],
     social: [
-  { label: "Twitter", href: "#" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/bashir-ismail-a00498141/" },
-  { label: "Instagram", href: "https://instagram.com/fancy_digitals" },
-],
+      { label: "Twitter", href: "#" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/bashir-ismail-a00498141/" },
+      { label: "Instagram", href: "https://instagram.com/fancy_digitals" },
+    ],
   };
 
   return (
@@ -37,30 +41,26 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-5">
             <a href="/" className="group inline-flex items-center gap-3 mb-6">
-
-              {/* Logo */}
               <div className="flex items-center justify-center rounded-xl bg-white p-2 shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-transform group-hover:scale-110">
-  <Image
-    src="/logo.png"
-    alt="Fancy Digitals Logo"
-    width={32}
-    height={32}
-    className="object-contain"
-    priority
-  />
-</div>
+                <Image
+                  src="/logo.png"
+                  alt="Fancy Digitals Logo"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                  priority
+                />
+              </div>
 
               <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                 Digital Studio
               </span>
-
             </a>
 
             <p className="max-w-sm text-base leading-relaxed text-gray-400">
               Crafting premium digital experiences that combine intentional design with high-performance engineering.
             </p>
 
-            {/* Newsletter Mini */}
             <div className="mt-8 max-w-sm">
               <p className="text-sm font-semibold mb-3 text-gray-300">Stay updated</p>
 
@@ -79,8 +79,9 @@ export default function Footer() {
           </div>
 
           {/* Links Columns */}
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-7">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-7">
 
+            {/* Studio */}
             <div className="flex flex-col gap-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-white">Studio</h4>
               <ul className="flex flex-col gap-3">
@@ -94,17 +95,13 @@ export default function Footer() {
               </ul>
             </div>
 
+            {/* Examples (NEW SEO BOOST COLUMN) */}
             <div className="flex flex-col gap-4">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-white">Social</h4>
+              <h4 className="text-xs font-bold uppercase tracking-widest text-white">Examples</h4>
               <ul className="flex flex-col gap-3">
-                {links.social.map((link) => (
+                {links.examples.map((link) => (
                   <li key={link.label}>
-                    <a
-  href={link.href}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="text-sm text-gray-500 hover:text-[#0a9001] transition-colors"
->
+                    <a href={link.href} className="text-sm text-gray-500 hover:text-[#0a8f01] transition-colors">
                       {link.label}
                     </a>
                   </li>
@@ -112,6 +109,26 @@ export default function Footer() {
               </ul>
             </div>
 
+            {/* Social */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-white">Social</h4>
+              <ul className="flex flex-col gap-3">
+                {links.social.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-500 hover:text-[#0a9001] transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
             <div className="flex flex-col gap-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-white">Contact</h4>
               <address className="not-italic flex flex-col gap-3 text-sm text-gray-500">
