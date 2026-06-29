@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -11,7 +11,7 @@ export async function POST(req) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = createAdminClient();
 
     // Save to DB
     const { error: dbError } = await supabase
