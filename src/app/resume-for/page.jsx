@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { jobRoles } from "@/data/job-roles";
+import { JOB_ROLES } from "@/data/job-roles"; // Changed to JOB_ROLES
 import { Briefcase, ChevronRight } from "lucide-react";
 
 export const metadata = {
@@ -21,11 +21,11 @@ export default function ResumeHub() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jobRoles.map((role) => (
+          {JOB_ROLES.map((role) => ( // Changed to JOB_ROLES
             <Link
               key={role.slug}
               href={`/resume-for/${role.slug}`}
-              className="group p-4 bg-white border border-gray-200 rounded-xl hover:border-[#0a8f01] hover:shadow-md transition-all flex items-center justify-between"
+              className="group p-4 bg-white border border-gray-200 rounded-xl hover:border-[#075a01] hover:shadow-md transition-all flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-50 rounded-lg group-hover:bg-[#075a01] group-hover:text-white transition-colors text-[#075a01]">

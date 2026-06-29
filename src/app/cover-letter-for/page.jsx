@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { jobRoles } from "@/data/job-roles";
+import { JOB_ROLES } from "@/data/job-roles"; // Changed to JOB_ROLES
 import { FileText, ChevronRight } from "lucide-react";
 
 export const metadata = {
@@ -21,7 +21,7 @@ export default function CoverLetterHub() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jobRoles.map((role) => (
+          {JOB_ROLES.map((role) => ( // Changed to JOB_ROLES
             <Link
               key={role.slug}
               href={`/cover-letter-for/${role.slug}`}
