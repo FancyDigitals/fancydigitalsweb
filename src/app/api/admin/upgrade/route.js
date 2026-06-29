@@ -58,8 +58,8 @@ export async function POST(request) {
       });
     }
 
-    // Update plan (we save lowercase to match existing data pattern)
-    const planForDb = planUpper === "FREE" ? "free" : planUpper;
+    // DB constraint requires lowercase: free, pro_monthly, pro_yearly, lifetime
+    const planForDb = planUpper.toLowerCase();
 
     const updateData = {
       plan: planForDb,
