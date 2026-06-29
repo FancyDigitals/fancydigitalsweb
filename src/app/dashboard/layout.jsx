@@ -13,6 +13,7 @@ import {
   Globe,
   Users,
   Sparkles,
+  Shield,
 } from "lucide-react";
 
 export default async function DashboardLayout({ children }) {
@@ -43,7 +44,9 @@ export default async function DashboardLayout({ children }) {
       unseenLeadsCount = count || 0;
     }
   }
-      const navItems = [
+      const isAdmin = profile?.email?.toLowerCase() === "fancydigitalsng@gmail.com";
+
+  const navItems = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Tools", href: "/tools", icon: Wrench },
     { label: "AI Readiness", href: "/dashboard/ai-visibility", icon: Sparkles },
@@ -52,6 +55,7 @@ export default async function DashboardLayout({ children }) {
     { label: "Clients", href: "/dashboard/clients", icon: Users },
     { label: "Billing", href: "/dashboard/billing", icon: CreditCard },
     { label: "Settings", href: "/dashboard/settings", icon: Settings },
+    ...(isAdmin ? [{ label: "Admin", href: "/dashboard/admin", icon: Shield }] : []),
   ];
 
   return (
@@ -171,7 +175,7 @@ export default async function DashboardLayout({ children }) {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white/90 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-8">
+        <div className={`grid ${isAdmin ? "grid-cols-9" : "grid-cols-8"}`}>
           {navItems.map((item) => (
             <Link
               key={item.href}
