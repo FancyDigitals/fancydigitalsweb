@@ -156,6 +156,9 @@ export default function AdminClient({ adminEmail }) {
 function BroadcastSection({ adminEmail, allUsers }) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [banner, setBanner] = useState("");
+const [ctaText, setCtaText] = useState("");
+const [ctaUrl, setCtaUrl] = useState("");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
@@ -201,10 +204,13 @@ function BroadcastSection({ adminEmail, allUsers }) {
   }
 
   const TEMPLATES = [
-    {
-      label: "AI Recommendation Tool Launch",
-      subject: "Your business can now be recommended by AI",
-      message: `We just launched something powerful for your business.
+  {
+    label: "AI Recommendation Tool Launch",
+    subject: "Your business can now be recommended by AI",
+    banner: "email-banner-launch.png",
+    ctaText: "Check My AI Score",
+    ctaUrl: "https://fancydigitals.com.ng/free-ai-visibility-checker",
+    message: `We just launched something powerful for your business.
 
 Introducing the AI Recommendation Engine — a free tool that shows you exactly how likely ChatGPT, Gemini, Claude, and Perplexity are to recommend your business when someone asks them a question.
 
@@ -216,15 +222,111 @@ Here's what you get for free:
 Most businesses in Nigeria have no idea they're invisible to AI assistants. Now you can find out — and fix it.
 
 Click below to check your score. It takes 30 seconds.`,
-    },
-  ];
+  },
+  {
+    label: "New Feature Announcement",
+    subject: "A new feature you'll love",
+    banner: "email-banner-feature.png",
+    ctaText: "Try It Now",
+    ctaUrl: "https://fancydigitals.com.ng/dashboard",
+    message: `We've been quietly building, and today we're shipping something we think you'll love.
+
+[Describe the new feature here — what it does and why it matters to the user]
+
+It's already live in your dashboard. No setup needed. Just sign in and try it.`,
+  },
+  {
+    label: "Upgrade to Pro Promo",
+    subject: "Unlock everything Fancy Digitals can do",
+    banner: "email-banner-upgrade.png",
+    ctaText: "Upgrade to Pro",
+    ctaUrl: "https://fancydigitals.com.ng/pricing",
+    message: `You're already using Fancy Digitals on the free plan — and that's great.
+
+But you're missing the features that move the needle:
+- Unlimited AI tool usage (no daily caps)
+- Premium tones, languages, and design controls
+- Competitor comparison and full improvement plans
+- Client portals, custom domains, and more
+
+Pro pays for itself in a week. Upgrade today and unlock everything.`,
+  },
+  {
+    label: "Welcome Back (Re-engagement)",
+    subject: "We've been building. Welcome back.",
+    banner: "email-banner-reengage.png",
+    ctaText: "Open My Dashboard",
+    ctaUrl: "https://fancydigitals.com.ng/dashboard",
+    message: `It's been a minute since we saw you.
+
+Since you last logged in, we've shipped:
+- AI Recommendation Engine
+- AI Landing Page Generator
+- Client portal with custom domains
+- Faster AI tools with multi-provider fallback
+
+Your account is exactly where you left it. Take 2 minutes and see what's new.`,
+  },
+  {
+    label: "Monthly Newsletter",
+    subject: "This month at Fancy Digitals",
+    banner: "email-banner-newsletter.png",
+    ctaText: "Read the Full Update",
+    ctaUrl: "https://fancydigitals.com.ng",
+    message: `Here's what shipped this month at Fancy Digitals:
+
+1. [New tool or feature #1 — describe briefly]
+2. [New tool or feature #2 — describe briefly]
+3. [Important bug fixes or improvements]
+
+Coming next month:
+- [Tease upcoming feature 1]
+- [Tease upcoming feature 2]
+
+As always — thank you for building with us.`,
+  },
+  {
+    label: "Limited Time Offer",
+    subject: "Limited time — special offer inside",
+    banner: "email-banner-offer.png",
+    ctaText: "Claim Offer",
+    ctaUrl: "https://fancydigitals.com.ng/pricing",
+    message: `For the next 7 days only, we're offering [describe offer — e.g. 30% off Pro, free month, lifetime discount].
+
+This is our biggest offer of the year and it disappears at midnight on [date].
+
+Here's what you get:
+- [Benefit 1]
+- [Benefit 2]
+- [Benefit 3]
+
+Don't wait. Click below to claim before it's gone.`,
+  },
+  {
+    label: "Pro Tip / Tutorial",
+    subject: "Master your Fancy Digitals tools",
+    banner: "email-banner-tutorial.png",
+    ctaText: "Read the Full Guide",
+    ctaUrl: "https://fancydigitals.com.ng/dashboard",
+    message: `Most users only use 30% of what Fancy Digitals can do. Here's how to get the other 70%.
+
+Tip 1: [Pro tip about a tool]
+Tip 2: [Pro tip about a workflow]
+Tip 3: [Pro tip about a hidden feature]
+
+Try one today and you'll see a difference immediately.`,
+  },
+];
 
   function applyTemplate(tpl) {
-    setSubject(tpl.subject);
-    setMessage(tpl.message);
-    setResult(null);
-    setError("");
-  }
+  setSubject(tpl.subject);
+  setMessage(tpl.message);
+  setBanner(tpl.banner || "");
+  setCtaText(tpl.ctaText || "");
+  setCtaUrl(tpl.ctaUrl || "");
+  setResult(null);
+  setError("");
+}
 
   async function handleSend() {
     if (!subject.trim() || !message.trim()) {
@@ -254,11 +356,14 @@ Click below to check your score. It takes 30 seconds.`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          adminEmail,
-          subject,
-          message,
-          emails: recipients.map((u) => ({ email: u.email, full_name: u.full_name })),
-        }),
+  adminEmail,
+  subject,
+  message,
+  banner,
+  ctaText,
+  ctaUrl,
+  emails: recipients.map((u) => ({ email: u.email, full_name: u.full_name })),
+}),
       });
       const data = await res.json();
 
