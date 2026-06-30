@@ -85,7 +85,7 @@ function buildEmail({ firstName, subject, message }) {
     .filter((line) => line.trim())
     .map(
       (line) =>
-        `<p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#374151;">${line.trim()}</p>`
+        `<p style="margin:0 0 18px;font-size:16px;line-height:1.75;color:#1d1d1f;font-weight:400;letter-spacing:-0.01em;">${line.trim()}</p>`
     )
     .join("");
 
@@ -95,54 +95,127 @@ function buildEmail({ firstName, subject, message }) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
   <title>${subject}</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; padding: 24px 16px !important; }
+      .card { padding: 32px 24px !important; border-radius: 16px !important; }
+      .banner { border-radius: 16px !important; }
+      .hero-title { font-size: 24px !important; line-height: 1.25 !important; }
+      .cta-btn { padding: 16px 28px !important; font-size: 14px !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:40px 16px;">
-    <tr>
-      <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+<body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;">
 
+  <!-- Preheader (hidden) -->
+  <div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#f5f5f7;opacity:0;">
+    ${subject} — from Fancy Digitals
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f5f7;">
+    <tr>
+      <td align="center" style="padding:48px 24px;">
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+          <!-- LOGO -->
           <tr>
-            <td align="center" style="padding-bottom:32px;">
-              <a href="https://fancydigitals.com.ng" style="text-decoration:none;">
-                <div style="display:inline-block;background:#075a01;border-radius:10px;padding:8px 18px;">
-                  <span style="color:white;font-size:16px;font-weight:900;letter-spacing:-0.5px;">Fancy Digitals</span>
-                </div>
+            <td align="center" style="padding-bottom:24px;">
+              <a href="https://fancydigitals.com.ng" style="text-decoration:none;display:inline-block;">
+                <img
+                  src="https://fancydigitals.com.ng/logo.png"
+                  alt="Fancy Digitals"
+                  width="48"
+                  height="48"
+                  style="display:block;border:0;border-radius:10px;"
+                />
               </a>
             </td>
           </tr>
 
+          <!-- BANNER IMAGE -->
           <tr>
-            <td style="background:#ffffff;border-radius:20px;padding:40px 40px 32px;border:1px solid #e5e7eb;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
-              <p style="margin:0 0 24px;font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px;">
-                Hey ${firstName},
+            <td style="padding-bottom:32px;">
+              <a href="https://fancydigitals.com.ng" style="text-decoration:none;display:block;">
+                <img
+                  src="https://fancydigitals.com.ng/email-banner.png"
+                  alt="Fancy Digitals — We Build. We Scale. You Lead."
+                  width="600"
+                  class="banner"
+                  style="display:block;width:100%;height:auto;border:0;border-radius:20px;"
+                />
+              </a>
+            </td>
+          </tr>
+
+          <!-- MAIN CARD -->
+          <tr>
+            <td class="card" style="background:#ffffff;border-radius:24px;padding:48px 48px 40px;">
+
+              <!-- GREETING -->
+              <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#86868b;letter-spacing:0.02em;text-transform:uppercase;">
+                Hi ${firstName},
               </p>
+
+              <!-- HERO TITLE (first line of message, bold) -->
+              <h1 class="hero-title" style="margin:0 0 28px;font-size:30px;line-height:1.15;font-weight:700;color:#1d1d1f;letter-spacing:-0.03em;">
+                ${subject}
+              </h1>
+
+              <!-- DIVIDER -->
+              <div style="height:1px;background:#e5e5ea;margin:0 0 28px;"></div>
+
+              <!-- MESSAGE -->
               ${paragraphs}
-              <div style="margin:32px 0 8px;text-align:center;">
+
+              <!-- CTA -->
+              <div style="margin:36px 0 8px;text-align:center;">
                 <a
                   href="https://fancydigitals.com.ng/free-ai-visibility-checker"
-                  style="display:inline-block;background:#075a01;color:#ffffff;font-size:14px;font-weight:700;padding:14px 32px;border-radius:12px;text-decoration:none;"
+                  class="cta-btn"
+                  style="display:inline-block;background:#075a01;color:#ffffff;font-size:15px;font-weight:600;padding:16px 36px;border-radius:980px;text-decoration:none;letter-spacing:-0.01em;"
                 >
                   Check My AI Recommendation Score
                 </a>
               </div>
-              <p style="margin:24px 0 0;font-size:14px;color:#6b7280;line-height:1.6;">
-                Always rooting for your success,<br/>
-                <strong style="color:#111827;">Bashir — Fancy Digitals</strong>
+
+              <p style="margin:16px 0 0;text-align:center;font-size:13px;color:#86868b;">
+                Takes 30 seconds. No signup required.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- SIGNATURE BLOCK -->
+          <tr>
+            <td style="padding:32px 8px 0;">
+              <p style="margin:0 0 4px;font-size:15px;color:#1d1d1f;font-weight:600;letter-spacing:-0.01em;">
+                Bashir Ismail
+              </p>
+              <p style="margin:0;font-size:13px;color:#86868b;">
+                Founder, Fancy Digitals
               </p>
             </td>
           </tr>
 
+          <!-- FOOTER -->
           <tr>
-            <td style="padding:28px 0 0;text-align:center;">
-              <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">
-                Fancy Digitals · Lagos, Nigeria
-              </p>
-              <p style="margin:0;font-size:12px;color:#9ca3af;">
+            <td style="padding:48px 8px 0;">
+              <div style="height:1px;background:#e5e5ea;margin-bottom:24px;"></div>
+
+              <p style="margin:0 0 12px;font-size:12px;color:#86868b;line-height:1.6;">
                 <a href="https://fancydigitals.com.ng" style="color:#075a01;text-decoration:none;font-weight:600;">fancydigitals.com.ng</a>
                 &nbsp;·&nbsp;
-                <a href="mailto:fancydigitalsng@gmail.com" style="color:#9ca3af;text-decoration:none;">fancydigitalsng@gmail.com</a>
+                <a href="mailto:fancydigitalsng@gmail.com" style="color:#86868b;text-decoration:none;">fancydigitalsng@gmail.com</a>
+              </p>
+
+              <p style="margin:0 0 8px;font-size:11px;color:#a1a1a6;line-height:1.5;">
+                Fancy Digitals · Lagos, Nigeria
+              </p>
+
+              <p style="margin:0;font-size:11px;color:#a1a1a6;line-height:1.5;">
+                You received this email because you have an account with Fancy Digitals.
               </p>
             </td>
           </tr>
@@ -151,6 +224,7 @@ function buildEmail({ firstName, subject, message }) {
       </td>
     </tr>
   </table>
+
 </body>
 </html>
   `;
