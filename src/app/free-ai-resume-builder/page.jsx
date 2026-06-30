@@ -7,6 +7,13 @@ import {
 
 const BASE_URL = "https://fancydigitals.com.ng";
 
+import Schema from "@/components/Schema";
+import {
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from "@/lib/schema";
+
 export const metadata = {
   title: "Free AI Resume Builder — ATS Resume Maker | No Sign-Up Required",
   description:
@@ -41,48 +48,57 @@ export const metadata = {
 const TOOL_URL = "/dashboard/tools/ai-resume-builder";
 
 export default function FreeAIResumeBuilderPage() {
-  const softwareSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+  // Schemas — using centralized library
+  const softwareSchema = softwareApplicationSchema({
     name: "Fancy Digitals AI Resume Builder",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Any (Web Browser)",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      ratingCount: "847",
-      bestRating: "5",
-    },
-    description: "Free AI-powered resume builder with ATS optimization, 6 templates, and instant PDF download.",
-  };
+    description: "Free AI-powered resume builder with ATS optimization, 6 premium templates, photo upload, job match scoring, and instant PDF download. Build professional ATS-friendly resumes in 30 seconds. No credit card required.",
+    slug: "free-ai-resume-builder",
+    category: "BusinessApplication",
+    price: "0",
+  });
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: { "@type": "Answer", text: faq.a },
-    })),
-  };
+  const faqSchemaData = faqSchema(FAQS.map((f) => ({ question: f.q, answer: f.a })));
+
+  const breadcrumbData = breadcrumbSchema([
+    { name: "Home", url: BASE_URL },
+    { name: "Free AI Tools", url: `${BASE_URL}/tools` },
+    { name: "AI Resume Builder", url: `${BASE_URL}/free-ai-resume-builder` },
+  ]);
 
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: "How to Build an AI Resume in 30 Seconds",
+    description: "Step-by-step guide to creating an ATS-optimized, professional resume using AI in under a minute.",
+    totalTime: "PT30S",
     step: [
-      { "@type": "HowToStep", name: "Enter your information", text: "Fill in your name, role, experience, and skills" },
-      { "@type": "HowToStep", name: "Click Generate", text: "AI creates an ATS-optimized resume in 30 seconds" },
-      { "@type": "HowToStep", name: "Download as PDF", text: "Save or print your professional resume" },
+      {
+        "@type": "HowToStep",
+        position: 1,
+        name: "Enter your information",
+        text: "Fill in your name, target role, work experience, and skills. Takes 2 minutes.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 2,
+        name: "AI writes your resume",
+        text: "Click Generate. AI creates an ATS-optimized, achievement-focused resume in 30 seconds.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 3,
+        name: "Download as PDF",
+        text: "Save or print your professional, ATS-friendly resume and start applying immediately.",
+      },
     ],
   };
 
   return (
     <main className="min-h-screen bg-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
+      <Schema data={softwareSchema} />
+      <Schema data={faqSchemaData} />
+      <Schema data={howToSchema} />
+      <Schema data={breadcrumbData} />
 
       {/* ============ HERO ============ */}
       <section className="relative px-4 pt-12 pb-12 sm:px-6 sm:pt-20 sm:pb-16 lg:px-10 overflow-hidden">

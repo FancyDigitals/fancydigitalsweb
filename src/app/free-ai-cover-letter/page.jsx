@@ -7,6 +7,13 @@ import {
 
 const BASE_URL = "https://fancydigitals.com.ng";
 
+import Schema from "@/components/Schema";
+import {
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from "@/lib/schema";
+
 export const metadata = {
   title: "Free AI Cover Letter Generator — No Sign-Up | Fancy Digitals",
   description:

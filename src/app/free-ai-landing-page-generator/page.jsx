@@ -9,6 +9,13 @@ import {
 const BASE_URL = "https://fancydigitals.com.ng";
 const TOOL_URL = "/dashboard/tools/ai-landing-page-generator";
 
+import Schema from "@/components/Schema";
+import {
+  softwareApplicationSchema,
+  faqSchema,
+  breadcrumbSchema,
+} from "@/lib/schema";
+
 export const metadata = {
   title: "Free AI Landing Page Generator — Build & Publish in 60 Seconds",
   description:
@@ -46,50 +53,45 @@ export const metadata = {
 };
 
 export default function FreeAILandingPageGeneratorPage() {
-  const softwareSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+  // Schemas — using centralized library
+  const softwareSchema = softwareApplicationSchema({
     name: "Fancy Digitals AI Landing Page Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Any (Web Browser)",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      ratingCount: "1200",
-      bestRating: "5",
-    },
-    description:
-      "Free AI landing page generator. Describe your business, pick a tone and language, and get a fully written, publishable landing page in 60 seconds.",
-  };
+    description: "Free AI landing page generator. Describe your business, pick a tone and language, and get a fully written, publishable landing page in 60 seconds. Supports 6 visual tones, 5 languages, lead capture, custom pricing tables, FAQs, testimonials, and instant publishing.",
+    slug: "free-ai-landing-page-generator",
+    category: "BusinessApplication",
+    price: "0",
+  });
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: { "@type": "Answer", text: faq.a },
-    })),
-  };
+  const faqSchemaData = faqSchema(FAQS.map((f) => ({ question: f.q, answer: f.a })));
+
+  const breadcrumbData = breadcrumbSchema([
+    { name: "Home", url: BASE_URL },
+    { name: "Free AI Tools", url: `${BASE_URL}/tools` },
+    { name: "AI Landing Page Generator", url: `${BASE_URL}/free-ai-landing-page-generator` },
+  ]);
 
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: "How to Generate a Landing Page with AI in 60 Seconds",
+    description: "Step-by-step guide to creating a complete, conversion-optimized landing page using AI in under a minute.",
+    totalTime: "PT1M",
     step: [
       {
         "@type": "HowToStep",
+        position: 1,
         name: "Describe your business",
         text: "Enter your business name, what you offer, and who your audience is.",
       },
       {
         "@type": "HowToStep",
+        position: 2,
         name: "Pick your sections",
         text: "Choose tone, language, and which sections to include — FAQ, pricing, testimonials, and more.",
       },
       {
         "@type": "HowToStep",
+        position: 3,
         name: "Generate and publish",
         text: "AI writes the full page. Preview it, then publish live at your own URL in one click.",
       },
@@ -98,18 +100,10 @@ export default function FreeAILandingPageGeneratorPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
+      <Schema data={softwareSchema} />
+      <Schema data={faqSchemaData} />
+      <Schema data={howToSchema} />
+      <Schema data={breadcrumbData} />
 
       {/* ============ HERO ============ */}
       <section className="relative px-4 pt-12 pb-12 sm:px-6 sm:pt-20 sm:pb-16 lg:px-10 overflow-hidden">

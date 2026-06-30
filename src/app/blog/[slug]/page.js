@@ -5,6 +5,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import NewsletterForm from "@/components/NewsletterForm";
+import { headers } from "next/headers";
+import crypto from "crypto";
+import Schema from "@/components/Schema";
+import { articleSchema, breadcrumbSchema } from "@/lib/schema";
 
 /* ===============================
    Data Fetching (Supabase)
@@ -37,6 +41,61 @@ async function getRelatedPosts(categoryId, currentSlug) {
     .limit(3);
 
   return data || [];
+}
+
+async function getBanners() {
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from("promo_banners")
+      .select("*")
+      .eq("active", true)
+      .eq("show_on_blog", true)
+      .order("display_order", { ascending: true });
+
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
+async function trackUniqueView(postId) {
+  try {
+    const headersList = await headers();
+    const ip =
+      headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      headersList.get("x-real-ip") ||
+      "unknown";
+
+    // Hash the IP for privacy (don't store raw IPs)
+    const ipHash = crypto.createHash("sha256").update(ip).digest("hex");
+
+    const supabase = createAdminClient();
+
+    // Try to insert — if already exists (same IP, same post, same day), it'll fail silently
+    const { error } = await supabase
+      .from("blog_post_views")
+      .insert({
+        post_id: postId,
+        ip_hash: ipHash,
+      });
+
+    // If insert succeeded (new unique view), increment the views counter
+    if (!error) {
+      const { data: currentPost } = await supabase
+        .from("blog_posts")
+        .select("views")
+        .eq("id", postId)
+        .single();
+
+      await supabase
+        .from("blog_posts")
+        .update({ views: (currentPost?.views || 0) + 1 })
+        .eq("id", postId);
+    }
+  } catch {
+    // Silent fail — view tracking shouldn't break the page
+  }
 }
 
 async function getAllSlugs() {
@@ -193,76 +252,31 @@ export default async function PostPage(props) {
   const post = await getPost(params.slug);
   if (!post) return notFound();
 
-  const related = await getRelatedPosts(post.category_id, post.slug);
+  const [related, banners] = await Promise.all([
+    getRelatedPosts(post.category_id, post.slug),
+    getBanners(),
+  ]);
 
   const image = post.featured_image;
   const author = post.blog_authors;
   const category = post.blog_categories;
   const readingTime = `${post.reading_time || 1} min read`;
 
-  // Increment view count (fire and forget)
-  const supabase = createAdminClient();
-  supabase
-    .from("blog_posts")
-    .update({ views: (post.views || 0) + 1 })
-    .eq("id", post.id)
-    .then(() => {});
+  // Track unique view (per IP per day) — fire and forget
+  trackUniqueView(post.id).catch(() => {});
 
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    image,
-    author: {
-      "@type": "Person",
-      name: author?.display_name || "Fancy Digitals",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Fancy Digitals",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://fancydigitals.com.ng/logo.png",
-      },
-    },
-    datePublished: post.published_at || post.created_at,
-    dateModified: post.updated_at,
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://fancydigitals.com.ng/blog/${post.slug}`,
-    },
-  };
+  const articleSchemaData = articleSchema(post);
 
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Blog",
-        item: "https://fancydigitals.com.ng/blog",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: post.title,
-        item: `https://fancydigitals.com.ng/blog/${post.slug}`,
-      },
-    ],
-  };
+  const breadcrumbSchemaData = breadcrumbSchema([
+    { name: "Home", url: "https://fancydigitals.com.ng" },
+    { name: "Blog", url: "https://fancydigitals.com.ng/blog" },
+    { name: post.title, url: `https://fancydigitals.com.ng/blog/${post.slug}` },
+  ]);
 
   return (
     <main className="bg-white pt-20 pb-16 md:pt-28 md:pb-32">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+              <Schema data={articleSchemaData} />
+        <Schema data={breadcrumbSchemaData} />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
 
@@ -327,11 +341,6 @@ export default async function PostPage(props) {
                 </div>
               )}
             </header>
-
-            {/* MOBILE SIDEBAR — appears after hero on mobile */}
-            <div className="lg:hidden mb-10">
-              <Sidebar />
-            </div>
 
             {/* Content */}
             <div
@@ -413,7 +422,7 @@ export default async function PostPage(props) {
               </div>
             )}
 
-            {/* Related */}
+                        {/* Related */}
             {related.length > 0 && (
               <section>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 tracking-tight">
@@ -448,6 +457,14 @@ export default async function PostPage(props) {
                 </div>
               </section>
             )}
+
+            {/* MOBILE SIDEBAR — appears at the bottom on mobile only */}
+            <div className="lg:hidden mt-12 pt-12 border-t border-gray-100">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 tracking-tight">
+                Recommended for You
+              </h2>
+              <Sidebar banners={banners} />
+            </div>
           </article>
 
           {/* DESKTOP SIDEBAR — fixed width 340px, sticky */}
