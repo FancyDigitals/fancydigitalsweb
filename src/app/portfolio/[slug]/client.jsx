@@ -9,8 +9,6 @@ import {
   Briefcase,
   Calendar,
   User,
-  Twitter,
-  Linkedin,
   Link2,
   CheckCircle2,
   AlertTriangle,
@@ -298,19 +296,19 @@ export default function PortfolioSingleClient({ project, related }) {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => shareProject("twitter")}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 text-white transition-transform hover:scale-110"
-                title="Share on Twitter"
-              >
-                <Twitter className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => shareProject("linkedin")}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0077b5] text-white transition-transform hover:scale-110"
-                title="Share on LinkedIn"
-              >
-                <Linkedin className="h-4 w-4" />
-              </button>
+  onClick={() => shareProject("twitter")}
+  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900 text-white font-bold transition-transform hover:scale-110"
+  title="Share on Twitter"
+>
+  𝕏
+</button>
+<button
+  onClick={() => shareProject("linkedin")}
+  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0077b5] text-white font-bold transition-transform hover:scale-110"
+  title="Share on LinkedIn"
+>
+  in
+</button>
               <button
                 onClick={() => shareProject("copy")}
                 className="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#075a01] px-3 text-xs font-bold text-white transition-transform hover:scale-105"

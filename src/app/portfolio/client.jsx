@@ -9,13 +9,6 @@ import {
   Briefcase,
 } from "lucide-react";
 
-const STATS = [
-  { value: "50+", label: "Projects" },
-  { value: "98%", label: "Satisfaction" },
-  { value: "15+", label: "Industries" },
-  { value: "3x", label: "Avg ROI" },
-];
-
 export default function PortfolioClient({ projects, categories }) {
   const [activeCategory, setActiveCategory] = useState("all");
 
@@ -74,23 +67,6 @@ export default function PortfolioClient({ projects, categories }) {
             <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-gray-600 md:mt-7 md:text-lg">
               A curated selection of premium digital projects — built with intention, designed to convert.
             </p>
-          </div>
-
-          {/* Stats — compact */}
-          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-4 gap-2 md:mt-14 md:gap-3">
-            {STATS.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-xl border border-gray-100 bg-white px-2 py-3 text-center shadow-sm md:px-4 md:py-4"
-              >
-                <p className="bg-gradient-to-br from-[#075a01] to-[#ff914d] bg-clip-text text-xl font-black text-transparent md:text-3xl">
-                  {s.value}
-                </p>
-                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500 md:text-xs">
-                  {s.label}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
