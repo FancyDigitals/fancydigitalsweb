@@ -6,7 +6,7 @@ const ADMIN_EMAIL = "fancydigitalsng@gmail.com";
 
 export async function POST(req) {
   try {
-    const { adminEmail, subject, message } = await req.json();
+    const { adminEmail, subject, message, emails } = await req.json();
 
     if (adminEmail !== ADMIN_EMAIL) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,19 +16,27 @@ export async function POST(req) {
       return Response.json({ error: "Subject and message are required" }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    let users = [];
 
-    const { data: users, error: dbError } = await supabase
-      .from("profiles")
-      .select("email, full_name")
-      .not("email", "is", null);
+    if (emails && Array.isArray(emails) && emails.length > 0) {
+      // Use provided list
+      users = emails;
+    } else {
+      // Fallback — fetch all from DB
+      const supabase = createAdminClient();
+      const { data, error: dbError } = await supabase
+        .from("profiles")
+        .select("email, full_name")
+        .not("email", "is", null);
 
-    if (dbError) {
-      return Response.json({ error: "Failed to fetch users" }, { status: 500 });
+      if (dbError) {
+        return Response.json({ error: "Failed to fetch users" }, { status: 500 });
+      }
+      users = data || [];
     }
 
-    if (!users || users.length === 0) {
-      return Response.json({ error: "No users found" }, { status: 400 });
+    if (users.length === 0) {
+      return Response.json({ error: "No recipients found" }, { status: 400 });
     }
 
     let sent = 0;
@@ -95,7 +103,6 @@ function buildEmail({ firstName, subject, message }) {
       <td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
 
-          <!-- LOGO -->
           <tr>
             <td align="center" style="padding-bottom:32px;">
               <a href="https://fancydigitals.com.ng" style="text-decoration:none;">
@@ -106,7 +113,6 @@ function buildEmail({ firstName, subject, message }) {
             </td>
           </tr>
 
-          <!-- CARD -->
           <tr>
             <td style="background:#ffffff;border-radius:20px;padding:40px 40px 32px;border:1px solid #e5e7eb;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
               <p style="margin:0 0 24px;font-size:22px;font-weight:800;color:#111827;letter-spacing:-0.5px;">
@@ -128,7 +134,6 @@ function buildEmail({ firstName, subject, message }) {
             </td>
           </tr>
 
-          <!-- FOOTER -->
           <tr>
             <td style="padding:28px 0 0;text-align:center;">
               <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;">

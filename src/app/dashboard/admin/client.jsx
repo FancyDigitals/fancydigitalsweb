@@ -13,6 +13,7 @@ import {
   Send,
   Mail,
   Users,
+  Filter,
 } from "lucide-react";
 
 const PLAN_OPTIONS = [
@@ -67,7 +68,7 @@ export default function AdminClient({ adminEmail }) {
             User & Plan Management
           </h1>
           <p className="mt-2 text-gray-500">
-            Manage user plans and send broadcast emails to all users.
+            Manage user plans and send broadcast emails to all or selected users.
           </p>
         </div>
 
@@ -130,7 +131,9 @@ export default function AdminClient({ adminEmail }) {
         </div>
 
         {/* BROADCAST EMAIL SECTION */}
-        <BroadcastSection adminEmail={adminEmail} userCount={users.length} />
+        {!loading && users.length > 0 && (
+          <BroadcastSection adminEmail={adminEmail} allUsers={users} />
+        )}
 
       </div>
 
@@ -150,12 +153,52 @@ export default function AdminClient({ adminEmail }) {
 }
 
 // ─── BROADCAST SECTION ───────────────────────────────────────────────────────
-function BroadcastSection({ adminEmail, userCount }) {
+function BroadcastSection({ adminEmail, allUsers }) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+
+  // Filter state
+  const [planFilter, setPlanFilter] = useState("ALL");
+
+  // Selected emails (individual)
+  const [selectedEmails, setSelectedEmails] = useState(new Set());
+
+  // Derived: filtered users by plan
+  const filteredByPlan = planFilter === "ALL"
+    ? allUsers
+    : allUsers.filter((u) => String(u.plan || "FREE").toUpperCase() === planFilter);
+
+  // Recipients = if any individually selected → use those
+  // else → use filtered by plan
+  const hasIndividualSelection = selectedEmails.size > 0;
+  const recipients = hasIndividualSelection
+    ? allUsers.filter((u) => selectedEmails.has(u.email))
+    : filteredByPlan;
+
+  function toggleEmail(email) {
+    setSelectedEmails((prev) => {
+      const next = new Set(prev);
+      if (next.has(email)) {
+        next.delete(email);
+      } else {
+        next.add(email);
+      }
+      return next;
+    });
+    setResult(null);
+    setError("");
+  }
+
+  function selectAll() {
+    setSelectedEmails(new Set(filteredByPlan.map((u) => u.email)));
+  }
+
+  function clearSelection() {
+    setSelectedEmails(new Set());
+  }
 
   const TEMPLATES = [
     {
@@ -172,7 +215,7 @@ Here's what you get for free:
 
 Most businesses in Nigeria have no idea they're invisible to AI assistants. Now you can find out — and fix it.
 
-Click below to check your score. It takes 30 seconds and no signup is required to share it with others.`,
+Click below to check your score. It takes 30 seconds.`,
     },
   ];
 
@@ -189,9 +232,14 @@ Click below to check your score. It takes 30 seconds and no signup is required t
       return;
     }
 
+    if (recipients.length === 0) {
+      setError("No recipients selected.");
+      return;
+    }
+
     if (
       !confirm(
-        `Send this email to ALL ${userCount} users?\n\nSubject: ${subject}\n\nThis cannot be undone.`
+        `Send this email to ${recipients.length} user(s)?\n\nSubject: ${subject}\n\nThis cannot be undone.`
       )
     ) {
       return;
@@ -205,7 +253,12 @@ Click below to check your score. It takes 30 seconds and no signup is required t
       const res = await fetch("/api/admin/broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminEmail, subject, message }),
+        body: JSON.stringify({
+          adminEmail,
+          subject,
+          message,
+          emails: recipients.map((u) => ({ email: u.email, full_name: u.full_name })),
+        }),
       });
       const data = await res.json();
 
@@ -215,6 +268,7 @@ Click below to check your score. It takes 30 seconds and no signup is required t
       }
 
       setResult(data);
+      setSelectedEmails(new Set());
     } catch (err) {
       setError(err.message || "Network error");
     } finally {
@@ -234,72 +288,184 @@ Click below to check your score. It takes 30 seconds and no signup is required t
           <div>
             <h2 className="text-lg font-black text-gray-900">Broadcast Email</h2>
             <p className="text-sm text-gray-500">
-              Send an email to all{" "}
-              <span className="font-bold text-gray-900">{userCount} users</span>
+              Filter by plan or select individual users to send to.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-5">
+      <div className="p-6 space-y-6">
 
-        {/* Template picker */}
+        {/* STEP 1 — RECIPIENTS */}
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
-            Quick Templates
+          <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
+            Step 1 — Choose Recipients
           </p>
-          <div className="flex flex-wrap gap-2">
-            {TEMPLATES.map((tpl) => (
+
+          {/* Plan filter */}
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+              <Filter className="h-3.5 w-3.5" />
+              Filter by plan:
+            </div>
+            {[
+              { value: "ALL", label: "All Users" },
+              { value: "FREE", label: "Free" },
+              { value: "PRO_MONTHLY", label: "Pro Monthly" },
+              { value: "LIFETIME", label: "Lifetime" },
+            ].map((opt) => (
               <button
-                key={tpl.label}
-                onClick={() => applyTemplate(tpl)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-700 transition-all hover:border-[#075a01]/30 hover:bg-[#075a01]/5 hover:text-[#075a01]"
+                key={opt.value}
+                onClick={() => {
+                  setPlanFilter(opt.value);
+                  clearSelection();
+                  setResult(null);
+                  setError("");
+                }}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  planFilter === opt.value
+                    ? "bg-[#075a01] text-white"
+                    : "border border-gray-200 bg-gray-50 text-gray-700 hover:border-[#075a01]/30 hover:text-[#075a01]"
+                }`}
               >
-                <Loader2 className="h-3 w-3" />
-                {tpl.label}
+                {opt.label} ({opt.value === "ALL"
+                  ? allUsers.length
+                  : allUsers.filter((u) => String(u.plan || "FREE").toUpperCase() === opt.value).length})
               </button>
             ))}
           </div>
+
+          {/* User checkboxes */}
+          <div className="rounded-xl border border-gray-200 overflow-hidden">
+            {/* Select all / clear row */}
+            <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-2.5">
+              <span className="text-xs font-bold text-gray-500">
+                {filteredByPlan.length} users in this filter
+              </span>
+              <div className="flex gap-3">
+                <button
+                  onClick={selectAll}
+                  className="text-xs font-bold text-[#075a01] hover:underline"
+                >
+                  Select all
+                </button>
+                {selectedEmails.size > 0 && (
+                  <button
+                    onClick={clearSelection}
+                    className="text-xs font-bold text-red-500 hover:underline"
+                  >
+                    Clear ({selectedEmails.size})
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="max-h-64 overflow-y-auto divide-y divide-gray-100">
+              {filteredByPlan.length === 0 ? (
+                <div className="p-6 text-center text-sm text-gray-400">No users in this plan.</div>
+              ) : (
+                filteredByPlan.map((u) => {
+                  const badge = planBadge(u.plan);
+                  const checked = selectedEmails.has(u.email);
+                  return (
+                    <label
+                      key={u.email}
+                      className={`flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50 ${
+                        checked ? "bg-[#075a01]/5" : ""
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleEmail(u.email)}
+                        className="h-4 w-4 rounded border-gray-300 accent-[#075a01]"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-gray-900">
+                          {u.full_name || "—"}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">{u.email}</p>
+                      </div>
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${badge.color}`}>
+                        {badge.label}
+                      </span>
+                    </label>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Recipients summary */}
+          <div className={`mt-3 flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
+            recipients.length > 0
+              ? "border border-[#075a01]/20 bg-[#075a01]/5"
+              : "border border-gray-200 bg-gray-50"
+          }`}>
+            <Users className={`h-4 w-4 ${recipients.length > 0 ? "text-[#075a01]" : "text-gray-400"}`} />
+            <span className="text-gray-700">
+              Sending to:{" "}
+              <strong className={recipients.length > 0 ? "text-[#075a01]" : "text-gray-900"}>
+                {hasIndividualSelection
+                  ? `${recipients.length} selected user${recipients.length !== 1 ? "s" : ""}`
+                  : `All ${recipients.length} ${planFilter === "ALL" ? "" : planFilter.replace("_", " ").toLowerCase() + " "}users`}
+              </strong>
+            </span>
+          </div>
         </div>
 
-        {/* Recipients */}
-        <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-          <Users className="h-4 w-4 text-gray-400" />
-          <span className="text-sm text-gray-600">
-            Sending to:{" "}
-            <strong className="text-gray-900">All {userCount} registered users</strong>
-          </span>
-        </div>
-
-        {/* Subject */}
+        {/* STEP 2 — COMPOSE */}
         <div>
-          <label className="mb-1.5 block text-xs font-bold text-gray-700">
-            Subject Line <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="Your business can now be recommended by AI"
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
-          />
-        </div>
-
-        {/* Message */}
-        <div>
-          <label className="mb-1.5 block text-xs font-bold text-gray-700">
-            Message <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write your message here..."
-            rows={10}
-            className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
-          />
-          <p className="mt-1.5 text-xs text-gray-400">
-            Each line break becomes a new paragraph. The email will include a CTA button to the AI Recommendation tool automatically.
+          <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
+            Step 2 — Compose Email
           </p>
+
+          {/* Template picker */}
+          <div className="mb-4">
+            <p className="mb-2 text-xs font-semibold text-gray-500">Quick templates:</p>
+            <div className="flex flex-wrap gap-2">
+              {TEMPLATES.map((tpl) => (
+                <button
+                  key={tpl.label}
+                  onClick={() => applyTemplate(tpl)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-700 transition-all hover:border-[#075a01]/30 hover:bg-[#075a01]/5 hover:text-[#075a01]"
+                >
+                  {tpl.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Subject */}
+          <div className="mb-4">
+            <label className="mb-1.5 block text-xs font-bold text-gray-700">
+              Subject Line <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Your business can now be recommended by AI"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+            />
+          </div>
+
+          {/* Message */}
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-gray-700">
+              Message <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Write your message here..."
+              rows={10}
+              className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition-all focus:border-[#075a01] focus:bg-white focus:ring-2 focus:ring-[#075a01]/20"
+            />
+            <p className="mt-1.5 text-xs text-gray-400">
+              Each line break becomes a new paragraph. A CTA button to the AI Recommendation tool is added automatically.
+            </p>
+          </div>
         </div>
 
         {error && (
@@ -311,7 +477,7 @@ Click below to check your score. It takes 30 seconds and no signup is required t
 
         {result && (
           <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-4">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-2 flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
               <p className="font-bold text-green-900">Broadcast sent successfully</p>
             </div>
@@ -334,18 +500,18 @@ Click below to check your score. It takes 30 seconds and no signup is required t
         {/* Send Button */}
         <button
           onClick={handleSend}
-          disabled={sending || !subject.trim() || !message.trim()}
+          disabled={sending || !subject.trim() || !message.trim() || recipients.length === 0}
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#075a01] px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0a8f01] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Sending to {userCount} users...
+              Sending to {recipients.length} user{recipients.length !== 1 ? "s" : ""}...
             </>
           ) : (
             <>
               <Send className="h-4 w-4" />
-              Send to All {userCount} Users
+              Send to {recipients.length} User{recipients.length !== 1 ? "s" : ""}
             </>
           )}
         </button>
