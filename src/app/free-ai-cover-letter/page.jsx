@@ -53,48 +53,57 @@ export const metadata = {
 const TOOL_URL = "/dashboard/tools/ai-cover-letter";
 
 export default function FreeAICoverLetterPage() {
-  const softwareSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+  // Schemas — using centralized library
+  const softwareSchema = softwareApplicationSchema({
     name: "Fancy Digitals AI Cover Letter Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Any (Web Browser)",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      ratingCount: "1247",
-      bestRating: "5",
-    },
-    description: "Free AI-powered cover letter generator with 4 tones, job tailoring, and instant download.",
-  };
+    description: "Free AI-powered cover letter generator. Tailored to any job description with 4 professional tones (Professional, Enthusiastic, Direct, Creative), ATS keyword optimization, and instant PDF download. Write personalized cover letters in 30 seconds.",
+    slug: "free-ai-cover-letter",
+    category: "BusinessApplication",
+    price: "0",
+  });
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQS.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: { "@type": "Answer", text: faq.a },
-    })),
-  };
+  const faqSchemaData = faqSchema(FAQS.map((f) => ({ question: f.q, answer: f.a })));
+
+  const breadcrumbData = breadcrumbSchema([
+    { name: "Home", url: BASE_URL },
+    { name: "Free AI Tools", url: `${BASE_URL}/tools` },
+    { name: "AI Cover Letter Generator", url: `${BASE_URL}/free-ai-cover-letter` },
+  ]);
 
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
     name: "How to Write an AI Cover Letter in 30 Seconds",
+    description: "Step-by-step guide to creating a tailored, ATS-optimized cover letter using AI in under a minute.",
+    totalTime: "PT30S",
     step: [
-      { "@type": "HowToStep", name: "Enter job details", text: "Paste the job description and your background" },
-      { "@type": "HowToStep", name: "Choose tone & length", text: "Pick from Professional, Enthusiastic, Direct, or Creative" },
-      { "@type": "HowToStep", name: "Download instantly", text: "Get your tailored cover letter as PDF or HTML" },
+      {
+        "@type": "HowToStep",
+        position: 1,
+        name: "Enter job details",
+        text: "Paste the job description and your background information. AI extracts the keywords and requirements automatically.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 2,
+        name: "Choose tone and length",
+        text: "Pick from Professional, Enthusiastic, Direct, or Creative tones. Choose Short, Medium, or Detailed length.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 3,
+        name: "Download instantly",
+        text: "Get your tailored cover letter as PDF or HTML in seconds. Ready to send to hiring managers.",
+      },
     ],
   };
 
   return (
     <main className="min-h-screen bg-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
+      <Schema data={softwareSchema} />
+      <Schema data={faqSchemaData} />
+      <Schema data={howToSchema} />
+      <Schema data={breadcrumbData} />
 
       {/* ============ HERO ============ */}
       <section className="relative px-4 pt-8 pb-10 sm:px-6 sm:pt-16 sm:pb-14 lg:px-10 lg:pt-20 overflow-hidden">

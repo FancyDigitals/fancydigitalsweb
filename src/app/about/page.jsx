@@ -100,7 +100,8 @@ export default function AboutPage() {
         url: BASE_URL,
       },
     ],
-    founder: [
+    // Schema.org doesn't allow `founder` on Person — use `subjectOf` + Organization-side founder linking instead
+    subjectOf: [
       {
         "@type": "Organization",
         name: "Fancy Digitals",
@@ -234,8 +235,8 @@ export default function AboutPage() {
         "@type": "ContactPoint",
         telephone: "+234-903-436-0785",
         contactType: "Sales",
-        contactOption: "WhatsApp",
         availableLanguage: "English",
+        areaServed: "Worldwide",
       },
     ],
     sameAs: [

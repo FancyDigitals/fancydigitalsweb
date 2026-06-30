@@ -209,7 +209,6 @@ export default function RootLayout({ children }) {
         {/* SCHEMAS — Centralized & 2026-optimized */}
         <Schema data={organizationSchema()} />
         <Schema data={websiteSchema()} />
-        <Schema data={personSchema()} />
         <Schema data={localBusinessSchema} />
 
         <DashboardDetector
