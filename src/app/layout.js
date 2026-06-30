@@ -12,7 +12,6 @@ import Schema from "@/components/Schema";
 import {
   organizationSchema,
   websiteSchema,
-  personSchema,
 } from "@/lib/schema";
 
 const BASE_URL = "https://fancydigitals.com.ng";

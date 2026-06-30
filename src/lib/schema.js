@@ -206,36 +206,6 @@ export function softwareApplicationSchema({
   };
 }
 
-/* ===============================
-   PERSON SCHEMA (founder/author)
-================================= */
-export function personSchema() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "@id": `${BASE_URL}/about#bashir`,
-    name: FOUNDER,
-    alternateName: "Fancy",
-    jobTitle: "Founder & CEO",
-    worksFor: {
-      "@id": `${BASE_URL}/#organization`,
-    },
-    url: `${BASE_URL}/about`,
-    sameAs: [
-      "https://twitter.com/fancydigitalsng",
-      "https://linkedin.com/in/bashir-ismail",
-    ],
-    knowsAbout: [
-      "AI Marketing",
-      "SaaS Development",
-      "Digital Strategy",
-      "Brand Building",
-      "Conversion Optimization",
-    ],
-    description:
-      "Founder of Fancy Digitals. Building AI-powered tools and digital experiences for businesses worldwide.",
-  };
-}
 
 /* ===============================
    PRODUCT SCHEMA (for paid plans)
