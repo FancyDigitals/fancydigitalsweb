@@ -99,14 +99,17 @@ export default function PortfolioSingleClient({ project, related }) {
           </Link>
 
           {/* Industry badge */}
-          {project.industry && (
-            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-[#ff914d]/10 px-3 py-1.5">
-              <Sparkles className="h-3 w-3 text-[#ff914d]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#ff914d]">
-                {project.industry}
-              </span>
-            </div>
-          )}
+{project.industry && (
+  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ff914d]/20 bg-gradient-to-r from-[#ff914d]/10 to-[#ff914d]/5 px-4 py-2 shadow-sm backdrop-blur">
+    <span className="relative flex h-2 w-2">
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff914d] opacity-60"></span>
+      <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff914d]"></span>
+    </span>
+    <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#ff914d]">
+      {project.industry}
+    </span>
+  </div>
+)}
 
           {/* Title */}
           <h1 className="text-3xl font-black leading-[1.05] tracking-tight text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl">
@@ -155,19 +158,19 @@ export default function PortfolioSingleClient({ project, related }) {
       </section>
 
       {/* ── HERO IMAGE ── */}
-      {project.hero_image && (
-        <section className="relative -mt-2 px-4 md:px-8">
-          <div className="mx-auto max-w-5xl">
-            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-100 shadow-2xl md:rounded-3xl">
-              <img
-                src={project.hero_image}
-                alt={project.title}
-                className="h-auto w-full object-cover"
-              />
-            </div>
-          </div>
-        </section>
-      )}
+{project.hero_image && (
+  <section className="relative -mt-2 px-4 md:px-8">
+    <div className="mx-auto max-w-4xl">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-100 shadow-2xl md:rounded-3xl">
+        <img
+          src={project.hero_image}
+          alt={project.title}
+          className="aspect-[16/9] w-full object-cover md:aspect-[16/8]"
+        />
+      </div>
+    </div>
+  </section>
+)}
 
       {/* ── PROBLEM / SOLUTION ── */}
       {(project.problem || project.solution) && (
