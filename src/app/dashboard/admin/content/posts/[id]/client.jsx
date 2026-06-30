@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import RichEditor from "@/components/editor/RichEditor";
-import { Save, Trash2, Send } from "lucide-react";
+import { Save, Trash2, Send, CheckCircle2 } from "lucide-react";
 
 export default function PostEditorClient({ id }) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
+  const [autoSaving, setAutoSaving] = useState(false);
 
   const [post, setPost] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -26,9 +28,19 @@ export default function PostEditorClient({ id }) {
     tags: "",
     seo_title: "",
     seo_description: "",
+    cta_text: "",
+    cta_url: "",
     status: "draft",
     featured: false,
   });
+
+  // Track if form has changed since last save
+  const formRef = useRef(form);
+  const isFirstLoad = useRef(true);
+
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
 
   // Fetch post + categories + authors
   useEffect(() => {
@@ -54,11 +66,13 @@ export default function PostEditorClient({ id }) {
         tags: data.tags?.join(", ") || "",
         seo_title: data.seo_title || "",
         seo_description: data.seo_description || "",
+        cta_text: data.cta_text || "",
+        cta_url: data.cta_url || "",
         status: data.status || "draft",
         featured: data.featured || false,
       });
 
-            // Fetch categories
+      // Fetch categories
       const catRes = await fetch("/api/admin/content/categories?type=blog");
       const catData = await catRes.json();
       if (catRes.ok) setCategories(catData.categories || []);
@@ -69,10 +83,50 @@ export default function PostEditorClient({ id }) {
       if (authRes.ok) setAuthors(authData || []);
 
       setLoading(false);
+
+      // Mark first load complete after a delay (so autosave doesn't trigger immediately)
+      setTimeout(() => {
+        isFirstLoad.current = false;
+      }, 2000);
     }
 
     fetchData();
   }, [id]);
+
+  // AUTOSAVE — every 10 seconds, if there are changes
+  useEffect(() => {
+    if (loading) return;
+
+    const interval = setInterval(async () => {
+      if (isFirstLoad.current) return;
+      if (saving) return;
+
+      // Don't autosave if title is empty
+      if (!formRef.current.title.trim()) return;
+
+      setAutoSaving(true);
+      try {
+        const payload = {
+          ...formRef.current,
+          tags: formRef.current.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+        };
+
+        await fetch(`/api/admin/content/posts/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        setLastSaved(new Date());
+      } catch {}
+      setAutoSaving(false);
+    }, 10000); // every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [loading, saving, id]);
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -112,6 +166,8 @@ export default function PostEditorClient({ id }) {
       alert(data.error || "Failed to save");
       return false;
     }
+
+    setLastSaved(new Date());
 
     // Update local state with new status
     if (overrides.status) {
@@ -175,19 +231,41 @@ export default function PostEditorClient({ id }) {
     return data.url;
   }
 
+  function formatLastSaved() {
+    if (!lastSaved) return null;
+    const diff = Math.floor((new Date() - lastSaved) / 1000);
+    if (diff < 60) return "just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+    return lastSaved.toLocaleTimeString();
+  }
+
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-            <div className="flex justify-between items-center flex-wrap gap-3">
+      <div className="flex justify-between items-center flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">Edit Blog Post</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Status:{" "}
-            <span className={`font-semibold ${form.status === "published" ? "text-green-600" : "text-gray-700"}`}>
-              {form.status === "published" ? "Published" : "Draft"}
-            </span>
-          </p>
+          <div className="flex items-center gap-3 mt-1 flex-wrap">
+            <p className="text-sm text-gray-500">
+              Status:{" "}
+              <span className={`font-semibold ${form.status === "published" ? "text-green-600" : "text-gray-700"}`}>
+                {form.status === "published" ? "Published" : "Draft"}
+              </span>
+            </p>
+            {autoSaving && (
+              <span className="text-xs text-blue-600 font-medium flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
+                Auto-saving...
+              </span>
+            )}
+            {!autoSaving && lastSaved && (
+              <span className="text-xs text-gray-500 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                Saved {formatLastSaved()}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
@@ -328,6 +406,41 @@ export default function PostEditorClient({ id }) {
         Featured Post
       </label>
 
+      {/* CTA SECTION — NEW */}
+      <div className="space-y-2 rounded-xl border-2 border-[#075a01]/20 bg-[#075a01]/5 p-4">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          🎯 Call-to-Action Button
+          <span className="text-xs font-normal text-gray-500">(appears at bottom of post)</span>
+        </h2>
+        <p className="text-sm text-gray-600">
+          Optional. Adds a conversion button below the post content. Leave blank to hide.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">CTA Button Text</label>
+            <input
+              type="text"
+              name="cta_text"
+              placeholder="e.g. Try Free, Get Started"
+              value={form.cta_text}
+              onChange={handleChange}
+              className="w-full border border-gray-200 p-3 rounded-md bg-white focus:border-[#075a01] outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">CTA URL</label>
+            <input
+              type="text"
+              name="cta_url"
+              placeholder="https://fancydigitals.com.ng/..."
+              value={form.cta_url}
+              onChange={handleChange}
+              className="w-full border border-gray-200 p-3 rounded-md bg-white focus:border-[#075a01] outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* SEO */}
       <div className="space-y-2">
         <h2 className="text-lg font-semibold">SEO Settings</h2>
@@ -353,7 +466,7 @@ export default function PostEditorClient({ id }) {
       <div>
         <h2 className="text-lg font-semibold mb-2">Content</h2>
         <RichEditor
-          value={form.content}
+          content={form.content}
           onChange={(html) =>
             setForm((prev) => ({ ...prev, content: html }))
           }

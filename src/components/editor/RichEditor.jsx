@@ -7,7 +7,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Bold,
   Italic,
@@ -31,7 +31,11 @@ import {
   Upload,
 } from "lucide-react";
 
-export default function RichEditor({ content = "", onChange, placeholder = "Start writing..." }) {
+
+export default function RichEditor({ content = "", value = "", onChange, placeholder = "Start writing..." }) {
+  // Support BOTH "content" and "value" prop names (backwards compatible)
+  const initialContent = content || value || "";
+
   const [uploading, setUploading] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
@@ -58,7 +62,7 @@ export default function RichEditor({ content = "", onChange, placeholder = "Star
       Placeholder.configure({ placeholder }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
-    content,
+    content: initialContent,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -70,6 +74,13 @@ export default function RichEditor({ content = "", onChange, placeholder = "Star
       onChange?.(editor.getHTML());
     },
   });
+
+    // Update editor content when prop changes (e.g. when post loads from DB)
+  useEffect(() => {
+    if (editor && initialContent && editor.getHTML() !== initialContent) {
+      editor.commands.setContent(initialContent, false);
+    }
+  }, [editor, initialContent]);
 
   // Upload image to Supabase Storage
   const uploadImage = useCallback(
@@ -145,10 +156,10 @@ export default function RichEditor({ content = "", onChange, placeholder = "Star
   const Divider = () => <div className="mx-1 h-6 w-px bg-gray-200" />;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
 
-      {/* TOOLBAR */}
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-gray-100 bg-gray-50/60 px-3 py-2">
+      {/* TOOLBAR — sticky so it stays visible while scrolling */}
+      <div className="sticky top-0 z-20 flex flex-wrap items-center gap-0.5 border-b border-gray-200 bg-white/95 backdrop-blur-md px-3 py-2 shadow-sm">
 
         {/* Headings */}
         <ToolbarBtn

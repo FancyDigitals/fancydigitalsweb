@@ -339,6 +339,29 @@ export default async function PostPage(props) {
               dangerouslySetInnerHTML={{ __html: post.content || "" }}
             />
 
+            {/* CTA BUTTON */}
+            {post.cta_text && post.cta_url && (
+              <div className="my-12 p-8 sm:p-10 bg-gradient-to-br from-[#075a01] to-[#0a8f01] rounded-2xl text-center shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#ff914d]/20 rounded-full -ml-16 -mb-16"></div>
+                <div className="relative">
+                  <p className="text-white/80 text-sm font-bold uppercase tracking-wider mb-2">Ready to take action?</p>
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">
+                    Get started in 30 seconds
+                  </h3>
+                  <a
+                    href={post.cta_url}
+                    target={post.cta_url.startsWith("http") ? "_blank" : "_self"}
+                    rel={post.cta_url.startsWith("http") ? "noopener noreferrer" : ""}
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#075a01] rounded-full text-base font-bold hover:bg-gray-50 hover:scale-[1.02] transition shadow-xl"
+                  >
+                    {post.cta_text}
+                    <span>→</span>
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-10 pb-10 border-b">
