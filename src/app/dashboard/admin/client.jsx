@@ -14,6 +14,7 @@ import {
   Mail,
   Users,
   Filter,
+  Zap,
 } from "lucide-react";
 
 const PLAN_OPTIONS = [
@@ -75,6 +76,13 @@ export default function AdminClient({ adminEmail }) {
             </div>
 
             <div className="flex flex-wrap gap-2">
+                              <a
+                href="/dashboard/admin/indexing"
+                className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-br from-[#075a01] to-[#0a8f01] px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                <Zap className="h-4 w-4" />
+                Google Indexing
+              </a>
               <a
                 href="/dashboard/admin/newsletter"
                 className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#075a01]/40 hover:shadow-md"

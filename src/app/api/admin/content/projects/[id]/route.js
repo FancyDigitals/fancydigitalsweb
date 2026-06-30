@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { notifyGoogleIndexing } from "@/lib/google-indexing";
+
 
 const ADMIN_EMAIL = "fancydigitalsng@gmail.com";
 
@@ -167,6 +169,17 @@ export async function PUT(req, props) {
 
     if (error) return Response.json({ error: error.message }, { status: 500 });
     result = data;
+  }
+
+  // Auto-notify Google if project is published
+  if (result?.status === "published" && result?.slug) {
+    const projectUrl = `https://fancydigitals.com.ng/portfolio/${result.slug}`;
+    notifyGoogleIndexing(projectUrl, "URL_UPDATED")
+      .then((r) => {
+        if (r.success) console.log("✅ Notified Google:", projectUrl);
+        else console.error("❌ Google indexing failed:", r.error);
+      })
+      .catch(() => {});
   }
 
   return Response.json({ project: result });

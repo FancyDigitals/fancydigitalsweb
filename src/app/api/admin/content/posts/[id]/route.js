@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { notifyGoogleIndexing } from "@/lib/google-indexing";
 
 const ADMIN_EMAIL = "fancydigitalsng@gmail.com";
 
@@ -61,6 +62,18 @@ export async function PUT(req, { params }) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  // Auto-notify Google if post is published
+  if (data?.status === "published" && data?.slug) {
+    const postUrl = `https://fancydigitals.com.ng/blog/${data.slug}`;
+    notifyGoogleIndexing(postUrl, "URL_UPDATED")
+      .then((result) => {
+        if (result.success) console.log("✅ Notified Google:", postUrl);
+        else console.error("❌ Google indexing failed:", result.error);
+      })
+      .catch(() => {});
+  }
+
   return NextResponse.json(data);
 }
 
