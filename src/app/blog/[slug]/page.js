@@ -335,7 +335,15 @@ export default async function PostPage(props) {
 
             {/* Content */}
             <div
-              className="prose prose-base sm:prose-lg prose-neutral max-w-none mb-10 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-[#075a01] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-blockquote:border-l-[#075a01] prose-blockquote:bg-gray-50 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-lg"
+              className="prose prose-base sm:prose-lg max-w-none mb-10 
+                prose-p:text-gray-900 prose-p:leading-relaxed
+                prose-headings:text-gray-900 prose-headings:font-bold prose-headings:tracking-tight
+                prose-strong:text-gray-900 prose-strong:font-bold
+                prose-li:text-gray-900 prose-li:leading-relaxed
+                prose-a:text-[#075a01] prose-a:no-underline prose-a:font-semibold hover:prose-a:underline
+                prose-img:rounded-xl
+                prose-blockquote:border-l-4 prose-blockquote:border-[#075a01] prose-blockquote:bg-gray-50 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:text-gray-800 prose-blockquote:not-italic
+                prose-code:text-[#075a01] prose-code:bg-gray-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none"
               dangerouslySetInnerHTML={{ __html: post.content || "" }}
             />
 
