@@ -64,12 +64,25 @@ export default function AdminClient({ adminEmail }) {
             <Shield className="h-4 w-4" />
             <span>Admin Panel</span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
-            User & Plan Management
-          </h1>
-          <p className="mt-2 text-gray-500">
-            Manage user plans and send broadcast emails to all or selected users.
-          </p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 className="text-3xl font-black tracking-tight text-gray-900 md:text-4xl">
+      User & Plan Management
+    </h1>
+    <p className="mt-2 text-gray-500">
+      Manage user plans and send broadcast emails to all or selected users.
+    </p>
+  </div>
+  <a
+    href="/dashboard/admin/content"
+    className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#ff914d]/40 hover:shadow-md"
+  >
+    <svg className="h-4 w-4 text-[#ff914d]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    Content Manager
+  </a>
+</div>
         </div>
 
         {/* SEARCH */}
