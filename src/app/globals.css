@@ -35,6 +35,19 @@
 }
 
 /* =====================================================
+   FORCE LIGHT MODE (prevent system dark mode override)
+===================================================== */
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* =====================================================
    TAILWIND THEME BRIDGE
 ===================================================== */
 
@@ -46,20 +59,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* =====================================================
-   DARK MODE (SYSTEM-AWARE)
-===================================================== */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-
-    --surface-1: #0f0f0f;
-    --surface-2: #141414;
-    --surface-3: #1a1a1a;
-  }
-}
 
 /* =====================================================
    BASE ELEMENT STYLES
