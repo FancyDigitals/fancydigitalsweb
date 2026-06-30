@@ -11,6 +11,8 @@ import {
   Settings,
   FileText,
   Mail,
+  Globe,
+  ScanSearch,
 } from "lucide-react";
 
 export const metadata = {
@@ -124,10 +126,21 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Access — 2 cols on mobile */}
+            {/* Quick Access — 2 cols on mobile, 3 cols on desktop */}
       <div className="rounded-xl sm:rounded-2xl bg-white p-3 sm:p-5 border border-gray-100 shadow-sm mb-4 sm:mb-6">
-        <h2 className="text-sm sm:text-lg font-bold text-gray-900 mb-2.5 sm:mb-3">Quick Access</h2>
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div className="flex items-center justify-between mb-2.5 sm:mb-3">
+          <h2 className="text-sm sm:text-lg font-bold text-gray-900">Quick Access</h2>
+          <Link
+            href="/tools"
+            className="text-[10px] sm:text-xs font-semibold text-[#075a01] hover:underline flex items-center gap-0.5"
+          >
+            All tools <ChevronRight className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+
+          {/* AI Resume */}
           <Link
             href="/dashboard/tools/ai-resume-builder"
             className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-[#075a01] hover:bg-[#075a01]/5 active:scale-[0.98] transition-all"
@@ -141,6 +154,7 @@ export default async function DashboardPage() {
             </div>
           </Link>
 
+          {/* Cover Letter */}
           <Link
             href="/dashboard/tools/ai-cover-letter"
             className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-purple-500 hover:bg-purple-50/50 active:scale-[0.98] transition-all"
@@ -154,6 +168,35 @@ export default async function DashboardPage() {
             </div>
           </Link>
 
+          {/* AI Landing Page */}
+          <Link
+            href="/dashboard/tools/ai-landing-page-generator"
+            className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-blue-500 hover:bg-blue-50/50 active:scale-[0.98] transition-all"
+          >
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-blue-50">
+              <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">Landing Page</p>
+              <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">AI generated</p>
+            </div>
+          </Link>
+
+          {/* AI Visibility */}
+          <Link
+            href="/dashboard/ai-visibility"
+            className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-emerald-500 hover:bg-emerald-50/50 active:scale-[0.98] transition-all"
+          >
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-emerald-50">
+              <ScanSearch className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">AI Readiness</p>
+              <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">Scan your site</p>
+            </div>
+          </Link>
+
+          {/* My Projects */}
           <Link
             href="/dashboard/projects"
             className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-orange-500 hover:bg-orange-50/50 active:scale-[0.98] transition-all"
@@ -167,18 +210,21 @@ export default async function DashboardPage() {
             </div>
           </Link>
 
-          <Link
-            href="/pricing"
-            className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-[#ff914d] hover:bg-orange-50/50 active:scale-[0.98] transition-all"
-          >
-            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-[#ff914d]/10">
-              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff914d]" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">Upgrade</p>
-              <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">Pro features</p>
-            </div>
-          </Link>
+          {/* Upgrade (only show if not Pro) */}
+          {!isPro && (
+            <Link
+              href="/pricing"
+              className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-[#ff914d] hover:bg-orange-50/50 active:scale-[0.98] transition-all"
+            >
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-[#ff914d]/10">
+                <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-[#ff914d]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">Upgrade</p>
+                <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">Pro features</p>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
 

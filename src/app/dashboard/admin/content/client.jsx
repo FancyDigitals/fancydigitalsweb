@@ -91,6 +91,7 @@ function PostsTab() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -104,6 +105,23 @@ function PostsTab() {
       if (res.ok) setPosts(data.posts || []);
     } catch {}
     setLoading(false);
+  }
+
+  async function handleCreate() {
+    setCreating(true);
+    try {
+      const res = await fetch("/api/admin/content/posts", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.post?.id) {
+        window.location.href = `/dashboard/admin/content/posts/${data.post.id}`;
+      } else {
+        alert(data.error || "Failed to create post");
+        setCreating(false);
+      }
+    } catch (err) {
+      alert(err.message);
+      setCreating(false);
+    }
   }
 
   async function handleDelete(id, title) {
@@ -131,13 +149,14 @@ function PostsTab() {
           <Stat label="Drafts" value={drafts} color="gray" />
         </div>
 
-        <Link
-          href="/dashboard/admin/content/posts/new"
-          className="inline-flex items-center gap-2 rounded-xl bg-[#075a01] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0a8f01]"
+        <button
+          onClick={handleCreate}
+          disabled={creating}
+          className="inline-flex items-center gap-2 rounded-xl bg-[#075a01] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0a8f01] disabled:opacity-50"
         >
-          <Plus className="h-4 w-4" />
-          New Post
-        </Link>
+          {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+          {creating ? "Creating..." : "New Post"}
+        </button>
       </div>
 
       {/* Search */}
@@ -156,13 +175,27 @@ function PostsTab() {
       {loading ? (
         <LoadingState />
       ) : filtered.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title={posts.length === 0 ? "No posts yet" : "No posts match your search"}
-          subtitle={posts.length === 0 ? "Create your first blog post to get started." : ""}
-          ctaLabel={posts.length === 0 ? "Create First Post" : null}
-          ctaHref="/dashboard/admin/content/posts/new"
-        />
+        <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#075a01]/10">
+            <FileText className="h-6 w-6 text-[#075a01]" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">
+            {posts.length === 0 ? "No posts yet" : "No posts match your search"}
+          </h3>
+          {posts.length === 0 && (
+            <>
+              <p className="mt-2 text-sm text-gray-500">Create your first blog post to get started.</p>
+              <button
+                onClick={handleCreate}
+                disabled={creating}
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#075a01] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-[#0a8f01] disabled:opacity-50"
+              >
+                {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                {creating ? "Creating..." : "Create First Post"}
+              </button>
+            </>
+          )}
+        </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <ul className="divide-y divide-gray-100">

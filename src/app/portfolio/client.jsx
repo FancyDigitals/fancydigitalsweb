@@ -50,12 +50,6 @@ export default function PortfolioClient({ projects, categories }) {
 
           {/* Headline */}
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#ff914d]/10 px-3 py-1.5">
-              <Sparkles className="h-3 w-3 text-[#ff914d]" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#ff914d]">
-                Selected Work
-              </span>
-            </div>
 
             <h1 className="text-3xl font-black leading-[1.05] tracking-tight text-gray-900 sm:text-4xl md:text-6xl">
               Work that

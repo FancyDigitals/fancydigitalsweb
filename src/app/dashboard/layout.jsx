@@ -15,13 +15,14 @@ import {
   Sparkles,
   Shield,
 } from "lucide-react";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 export default async function DashboardLayout({ children }) {
   const profile = await getUserProfile();
   const isPro = profile?.plan !== "free";
   const displayName = profile?.full_name || profile?.email?.split("@")[0];
 
-    // Fetch unseen leads count for badge
+  // Fetch unseen leads count for badge
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -44,7 +45,8 @@ export default async function DashboardLayout({ children }) {
       unseenLeadsCount = count || 0;
     }
   }
-      const isAdmin = profile?.email?.toLowerCase() === "fancydigitalsng@gmail.com";
+
+  const isAdmin = profile?.email?.toLowerCase() === "fancydigitalsng@gmail.com";
 
   const navItems = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -170,29 +172,15 @@ export default async function DashboardLayout({ children }) {
         </main>
 
         {/* Mobile bottom spacer */}
-        <div className="h-16 lg:hidden" />
+        <div className="h-20 lg:hidden" />
       </div>
 
-      {/* ===== MOBILE BOTTOM NAV ===== */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white/90 backdrop-blur-xl lg:hidden">
-        <div className={`grid ${isAdmin ? "grid-cols-9" : "grid-cols-8"}`}>
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center gap-0.5 py-2.5 text-gray-400 hover:text-[#075a01] transition relative"
-            >
-              <div className="relative">
-                <item.icon className="h-5 w-5" />
-                {item.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 border border-white" />
-                )}
-              </div>
-              <span className="text-[10px] font-semibold">{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </nav>
+      {/* ===== MOBILE BOTTOM NAV (CLIENT COMPONENT) ===== */}
+      <MobileBottomNav
+        isAdmin={isAdmin}
+        isPro={isPro}
+        unseenLeadsCount={unseenLeadsCount}
+      />
     </div>
   );
 }

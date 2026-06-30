@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-console.log("🔥 HIT POSTS ROUTE");
 const ADMIN_EMAIL = "fancydigitalsng@gmail.com";
 
 async function checkAdmin() {
@@ -19,40 +18,20 @@ export async function GET() {
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
-    .from("blog_posts")
-    .select("id, slug, title, excerpt, featured_image, status, featured, views, published_at, created_at, category_id")
+    .from("newsletter_subscribers")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ posts: data || [] });
-}
 
-export async function POST() {
-  const user = await checkAdmin();
-  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const total = data?.length || 0;
+  const active = data?.filter((s) => !s.unsubscribed).length || 0;
+  const unsubscribed = data?.filter((s) => s.unsubscribed).length || 0;
 
-  const supabase = createAdminClient();
-
-  const timestamp = Date.now();
-  const placeholderSlug = `untitled-post-${timestamp}`;
-
-  const { data, error } = await supabase
-    .from("blog_posts")
-    .insert({
-      title: "Untitled Post",
-      slug: placeholderSlug,
-      excerpt: "",
-      content: "",
-      status: "draft",
-      featured: false,
-      reading_time: 1,
-      tags: [],
-    })
-    .select()
-    .single();
-
-  if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ post: data });
+  return Response.json({
+    subscribers: data || [],
+    stats: { total, active, unsubscribed },
+  });
 }
 
 export async function DELETE(req) {
@@ -64,7 +43,7 @@ export async function DELETE(req) {
   if (!id) return Response.json({ error: "Missing id" }, { status: 400 });
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+  const { error } = await supabase.from("newsletter_subscribers").delete().eq("id", id);
 
   if (error) return Response.json({ error: error.message }, { status: 500 });
   return Response.json({ success: true });
