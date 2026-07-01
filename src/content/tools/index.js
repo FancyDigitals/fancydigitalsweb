@@ -1,4 +1,58 @@
 export const tools = [
+
+  {
+  slug: "ai-video-generator",
+  name: "AI Video Generator",
+  category: "AI Tools",
+  desc: "Create scroll-stopping ad or tutorial videos in seconds. Kinetic typography, motion graphics, your own screenshots, and premium templates.",
+  longDesc: "Generate professional social media videos with AI. Write your brief, choose your style, upload screenshots — get a polished ad or tutorial video with kinetic text animations, motion graphics, and smart image placement. Includes Modern and Luxury templates. 9:16, 16:9, and 1:1 formats. Download as WebM.",
+  status: "Live",
+  image: "/tools/ai-video-generator.png",
+  published: true,
+  order: 0,
+  isLive: true,
+  isAI: true,
+  requiresLogin: false,
+  accent: "#075a01",
+  accentLight: "from-[#075a01]/10 to-[#0a8f01]/10",
+  popular: true,
+  href: "/free-ai-video-ad-generator",
+  keywords: [
+    "ai video generator",
+    "free video ad maker",
+    "ai tutorial video",
+    "reels generator ai",
+    "tiktok video maker",
+    "explainer video maker",
+    "product video generator",
+  ],
+  features: [
+    "AI-written script from your brief",
+    "Kinetic text animations",
+    "Motion graphics on every scene",
+    "Modern + Luxury visual templates",
+    "Full-screen visual scenes",
+    "Smart image placement with AI Vision",
+    "Upload logo + screenshots",
+    "9:16, 16:9, 1:1 formats",
+    "Custom brand color",
+    "Instant WebM download",
+  ],
+  whoFor: [
+    "Founders launching products",
+    "Small business owners",
+    "Content creators",
+    "Marketers making social ads",
+    "Educators making tutorials",
+  ],
+  faq: [
+    { q: "Is it really free?", a: "Yes — completely free, no signup required. Full-length videos, all templates, all features." },
+    { q: "What format do I get?", a: "WebM (plays on Twitter, YouTube, Instagram, Facebook, and modern browsers). Convert to MP4 free at cloudconvert.com if needed for WhatsApp." },
+    { q: "How long can my video be?", a: "15 seconds to 2 minutes. Pick from 5 preset lengths in the form." },
+    { q: "Can I upload my own images?", a: "Yes. Upload your logo and screenshots — AI analyzes them with Vision and places them in matching scenes." },
+    { q: "Which templates are available?", a: "Modern (bold, kinetic, high-energy) and Luxury (elegant serif, brand-tinted accents). More coming soon." },
+  ],
+},
   
 
   {

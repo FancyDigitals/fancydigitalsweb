@@ -232,3 +232,95 @@ export async function generateJSON(prompt) {
     throw new Error("AI returned an invalid response format. Please try again.");
   }
 }
+
+/* ============================================================
+   VISION — Analyze an image with Gemini
+============================================================ */
+
+/**
+ * Analyze a base64 image and return a description
+ * @param {string} base64Image - Full data URL (data:image/png;base64,...)
+ * @returns {Promise<string>} - Description of what's in the image
+ */
+export async function analyzeImage(base64Image) {
+  if (!base64Image || typeof base64Image !== "string") {
+    return "";
+  }
+
+  // Extract mimeType and pure base64 from data URL
+  const match = base64Image.match(/^data:(image\/[a-z]+);base64,(.+)$/i);
+  if (!match) {
+    console.warn("[Vision] Invalid image format");
+    return "";
+  }
+
+  const mimeType = match[1];
+  const data = match[2];
+
+  const prompt = `Describe this image in 3-6 words maximum. Focus on WHAT is shown (subject, object, screen, scene).
+
+Examples of good descriptions:
+- "dashboard analytics chart"
+- "signup form"
+- "mobile app home screen"
+- "team meeting laptop"
+- "product landing page"
+
+Return ONLY the description. No punctuation, no explanation.`;
+
+  const contents = [
+    {
+      role: "user",
+      parts: [
+        { text: prompt },
+        {
+          inlineData: {
+            mimeType,
+            data,
+          },
+        },
+      ],
+    },
+  ];
+
+  // Use Gemini directly (vision requires structured contents, not our text engine)
+  const geminiKeys = GEMINI_KEY_2 ? [GEMINI_KEY_1, GEMINI_KEY_2] : [GEMINI_KEY_1];
+  const visionModels = [
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+  ];
+
+  for (const model of visionModels) {
+    for (const key of geminiKeys) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: key });
+        const response = await ai.models.generateContent({
+          model,
+          contents,
+          config: {
+            maxOutputTokens: 100,
+            temperature: 0.3,
+          },
+        });
+
+        let text = null;
+        if (typeof response?.text === "function") text = response.text();
+        else if (typeof response?.text === "string") text = response.text;
+        else text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+
+        if (text) {
+          const cleaned = String(text).trim().toLowerCase().replace(/[."]/g, "");
+          console.log(`[Vision] ✅ Analyzed: "${cleaned}"`);
+          return cleaned;
+        }
+      } catch (err) {
+        console.warn(`[Vision] ❌ ${model} failed: ${err.message?.slice(0, 100)}`);
+        continue;
+      }
+    }
+  }
+
+  console.warn("[Vision] All models failed for this image");
+  return "";
+}

@@ -13,6 +13,7 @@ import {
   Mail,
   Globe,
   ScanSearch,
+  Video,
 } from "lucide-react";
 
 export const metadata = {
@@ -179,6 +180,20 @@ export default async function DashboardPage() {
             <div className="min-w-0 flex-1">
               <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">Landing Page</p>
               <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">AI generated</p>
+            </div>
+          </Link>
+
+                    {/* AI Video Generator */}
+          <Link
+            href="/free-ai-video-ad-generator"
+            className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-red-500 hover:bg-red-50/50 active:scale-[0.98] transition-all"
+          >
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-red-50">
+              <Video className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">Video Ads</p>
+              <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">AI-powered</p>
             </div>
           </Link>
 

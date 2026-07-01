@@ -22,7 +22,8 @@ const NAV = [
     label: "Tools",
     children: [
       { label: "All Tools", href: "/tools", featured: true },
-      { label: "AI Visibility Checker", href: "/free-ai-visibility-checker", badge: "NEW" },
+      { label: "AI Video Generator", href: "/free-ai-video-ad-generator", badge: "NEW" },
+      { label: "AI Visibility Checker", href: "/free-ai-visibility-checker", badge: "AI" },
       { label: "AI Resume Builder", href: "/free-ai-resume-builder", badge: "AI" },
       { label: "AI Cover Letter", href: "/free-ai-cover-letter", badge: "AI" },
       { label: "AI Landing Page Builder", href: "/free-ai-landing-page-generator", badge: "AI" },

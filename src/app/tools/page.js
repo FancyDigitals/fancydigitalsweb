@@ -14,6 +14,7 @@ import {
   Star,
   TrendingUp,
   Globe,
+  Video,
 } from "lucide-react";
 
 const CATEGORY_ICONS = {
@@ -144,6 +145,7 @@ export default function ToolsPage() {
               {tool.slug === "ai-resume-builder" && <FileText className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />}
 {tool.slug === "ai-cover-letter" && <Mail className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />}
 {tool.slug === "ai-landing-page-generator" && <Globe className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />}
+{tool.slug === "ai-video-generator" && <Video className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />}
             </div>
             <span className="inline-flex items-center gap-0.5 rounded-md bg-gradient-to-r from-amber-100 to-yellow-100 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-700">
               <Crown className="h-2.5 w-2.5" />
