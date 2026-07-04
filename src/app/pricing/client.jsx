@@ -8,166 +8,200 @@ import {
   X,
   Sparkles,
   Zap,
-  Crown,
   Star,
   Shield,
   HelpCircle,
   ArrowRight,
   Globe,
   Infinity as InfinityIcon,
+  FileText,
+  Mail,
+  Layout,
+  Video,
+  Search,
+  Briefcase,
 } from "lucide-react";
 
 export default function PricingClient() {
   const [billing, setBilling] = useState("monthly");
-const [region, setRegion] = useState("US");
-const [detectedRegion, setDetectedRegion] = useState(null);
+  const [region, setRegion] = useState("US");
+  const [detectedRegion, setDetectedRegion] = useState(null);
 
-// Auto-detect on mount
-useEffect(() => {
-  fetch("/api/geo")
-    .then((res) => res.json())
-    .then((data) => {
-      const r = getRegionForCountry(data.country);
-      setRegion(r);
-      setDetectedRegion(r);
-    })
-    .catch(() => setRegion("US"));
-}, []);
+  useEffect(() => {
+    fetch("/api/geo")
+      .then((res) => res.json())
+      .then((data) => {
+        const r = getRegionForCountry(data.country);
+        setRegion(r);
+        setDetectedRegion(r);
+      })
+      .catch(() => setRegion("US"));
+  }, []);
 
-const pricing = REGIONAL_PRICING[region];
-const yearlyPerMonth = (pricing.yearly / 12).toFixed(2);
-const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
+  const pricing = REGIONAL_PRICING[region];
+
+  // Pro
+  const proYearlyPerMonth = (pricing.yearly / 12).toFixed(2);
+  const proYearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
+
+  // Agency
+  const agencyYearlyPerMonth = (pricing.agencyYearly / 12).toFixed(2);
+  const agencyYearlySavings = (pricing.agencyMonthly * 12 - pricing.agencyYearly).toFixed(0);
+
+  const tools = [
+    { name: "Resume Builder", icon: FileText, description: "ATS-optimized resumes in 30 seconds" },
+    { name: "Cover Letter Builder", icon: Mail, description: "Personalized cover letters that get replies" },
+    { name: "Landing Page Builder", icon: Layout, description: "Full websites & landing pages, no code" },
+    { name: "AI Ad Video Generator", icon: Video, description: "Scroll-stopping ads for Meta, TikTok, YouTube" },
+    { name: "AI Recommendation Checker", icon: Search, description: "See how AI search engines rank your business" },
+  ];
 
   const plans = [
-  {
-    name: "Free",
-    tagline: "Try it out, no card needed",
-    price: 0,
-    displayPrice: "Free",
-    period: "forever",
-    icon: Sparkles,
-    iconBg: "bg-gray-100",
-    iconColor: "text-gray-600",
-    cta: "Start Free",
-    ctaLink: "/signup",
-    ctaStyle: "bg-gray-900 text-white hover:bg-gray-800",
-    features: [
-      "3 resumes per day",
-      "1 professional template",
-      "AI-powered content",
-      "Download as HTML",
-      "Print & save as PDF",
-      "All AI tools (limited daily)",
-    ],
-    notIncluded: [
-      "Premium templates",
-      "Unlimited generations",
-      "Remove footer branding",
-      "Priority support",
-    ],
-    popular: false,
-  },
-  {
-    name: "Pro",
-    tagline: "For job seekers & professionals",
-    price: billing === "monthly" ? pricing.monthly : parseFloat(yearlyPerMonth),
-    displayPrice: billing === "monthly" 
-      ? formatPrice(pricing.monthly, region) 
-      : formatPrice(parseFloat(yearlyPerMonth), region),
-    period: billing === "monthly" ? "/month" : "/month, billed yearly",
-    yearlyTotal: billing === "yearly" ? `${formatPrice(pricing.yearly, region)}/year` : null,
-    icon: Zap,
-    iconBg: "bg-gradient-to-br from-[#075a01] to-[#0a8f01]",
-    iconColor: "text-white",
-    cta: "Get Pro",
-    ctaLink: "/api/checkout?plan=pro_" + billing,
-    ctaStyle: "bg-gradient-to-r from-[#075a01] to-[#0a8f01] text-white hover:opacity-90",
-    features: [
-      "Unlimited resumes & generations",
-      "6+ premium templates",
-      "No footer branding",
-      "ATS score checker",
-      "Save & re-edit any resume",
-      "All current & future AI tools",
-      "Cover letter generator",
-      "Priority email support",
-      "Export to multiple formats",
-      "Cancel anytime",
-    ],
-    notIncluded: [],
-    popular: true,
-    badge: billing === "yearly" ? `Save ${formatPrice(yearlySavings, region)}` : null,
-  },
-  {
-    name: "Lifetime",
-    tagline: "Pay once, use forever",
-    price: pricing.lifetime,
-    displayPrice: formatPrice(pricing.lifetime, region),
-    period: "one-time",
-    icon: Crown,
-    iconBg: "bg-gradient-to-br from-amber-400 to-orange-500",
-    iconColor: "text-white",
-    cta: "Buy Lifetime",
-    ctaLink: "/api/checkout?plan=lifetime",
-    ctaStyle: "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90",
-    features: [
-      "Everything in Pro",
-      "One-time payment, no subscription",
-      "Free updates forever",
-      "Early access to new tools",
-      "Lifetime priority support",
-      "Best value long-term",
-    ],
-    notIncluded: [],
-    popular: false,
-    badge: "Best Value",
-  },
-];
+    {
+      name: "Free",
+      tagline: "Try every tool, no card needed",
+      price: 0,
+      displayPrice: "Free",
+      period: "forever",
+      icon: Sparkles,
+      iconBg: "bg-gray-100",
+      iconColor: "text-gray-600",
+      cta: "Start Free",
+      ctaLink: "/signup",
+      ctaStyle: "bg-gray-900 text-white hover:bg-gray-800",
+      features: [
+        "Access to all 5 AI tools",
+        "3 resumes / cover letters per day",
+        "2 landing pages per day",
+        "1 ad video per day",
+        "2 AI checks per day",
+        "Basic templates",
+      ],
+      notIncluded: [
+        "Unlimited generations",
+        "Premium templates",
+        "Custom domain",
+        "Remove branding",
+      ],
+      popular: false,
+    },
+    {
+      name: "Pro",
+      tagline: "Unlimited for solo users",
+      price: billing === "monthly" ? pricing.monthly : parseFloat(proYearlyPerMonth),
+      displayPrice: billing === "monthly"
+        ? formatPrice(pricing.monthly, region)
+        : formatPrice(parseFloat(proYearlyPerMonth), region),
+      period: billing === "monthly" ? "/month" : "/month, billed yearly",
+      yearlyTotal: billing === "yearly" ? `${formatPrice(pricing.yearly, region)}/year` : null,
+      icon: Zap,
+      iconBg: "bg-gradient-to-br from-[#075a01] to-[#0a8f01]",
+      iconColor: "text-white",
+      cta: "Get Pro",
+      ctaLink: "/checkout?plan=pro_" + billing,
+      ctaStyle: "bg-gradient-to-r from-[#075a01] to-[#0a8f01] text-white hover:opacity-90",
+      features: [
+        "Unlimited use of all 5 AI tools",
+        "Premium templates & designs",
+        "1 custom domain",
+        "Remove Fancy Digitals branding",
+        "Priority AI processing",
+        "Save & re-edit all creations",
+        "Export in multiple formats",
+        "Priority email support",
+        "Access to all future tools",
+        "Cancel anytime",
+      ],
+      notIncluded: [],
+      popular: true,
+      badge: billing === "yearly" ? `Save ${formatPrice(proYearlySavings, region)}` : null,
+    },
+    {
+      name: "Agency",
+      tagline: "Manage clients & scale up",
+      price: billing === "monthly" ? pricing.agencyMonthly : parseFloat(agencyYearlyPerMonth),
+      displayPrice: billing === "monthly"
+        ? formatPrice(pricing.agencyMonthly, region)
+        : formatPrice(parseFloat(agencyYearlyPerMonth), region),
+      period: billing === "monthly" ? "/month" : "/month, billed yearly",
+      yearlyTotal: billing === "yearly" ? `${formatPrice(pricing.agencyYearly, region)}/year` : null,
+      icon: Briefcase,
+      iconBg: "bg-gradient-to-br from-amber-500 to-orange-500",
+      iconColor: "text-white",
+      cta: "Get Agency",
+      ctaLink: "/checkout?plan=agency_" + billing,
+      ctaStyle: "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90",
+      features: [
+        "Everything in Pro",
+        "Manage up to 10 client accounts",
+        "3 custom domains",
+        "White-label branding",
+        "Client edit request system",
+        "Bulk export tools",
+        "WhatsApp support",
+        "Extend clients & domains anytime",
+      ],
+      notIncluded: [],
+      popular: false,
+      badge: billing === "yearly" ? `Save ${formatPrice(agencyYearlySavings, region)}` : "Best for teams",
+    },
+  ];
 
   const comparison = [
-    { feature: "AI generations per day", free: "3", pro: "Unlimited", lifetime: "Unlimited" },
-    { feature: "Resume templates", free: "1 basic", pro: "6+ premium", lifetime: "6+ premium" },
-    { feature: "Cover letter generator", free: false, pro: true, lifetime: true },
-    { feature: "ATS score checker", free: false, pro: true, lifetime: true },
-    { feature: "Save & re-edit resumes", free: false, pro: true, lifetime: true },
-    { feature: "Remove footer branding", free: false, pro: true, lifetime: true },
-    { feature: "Priority support", free: false, pro: true, lifetime: true },
-    { feature: "Future AI tools access", free: "Limited", pro: true, lifetime: true },
-    { feature: "One-time payment", free: false, pro: false, lifetime: true },
+    { feature: "Resume Builder", free: "3/day", pro: "Unlimited", agency: "Unlimited" },
+    { feature: "Cover Letter Builder", free: "3/day", pro: "Unlimited", agency: "Unlimited" },
+    { feature: "Landing Page Builder", free: "2/day", pro: "Unlimited", agency: "Unlimited" },
+    { feature: "AI Ad Video Generator", free: "1/day", pro: "Unlimited", agency: "Unlimited" },
+    { feature: "AI Recommendation Checker", free: "2/day", pro: "Unlimited", agency: "Unlimited" },
+    { feature: "Client accounts", free: "0", pro: "0", agency: "10 (extendable)" },
+    { feature: "Custom domains", free: "0", pro: "1", agency: "3 (extendable)" },
+    { feature: "White-label branding", free: false, pro: false, agency: true },
+    { feature: "Premium templates", free: false, pro: true, agency: true },
+    { feature: "Save & re-edit", free: false, pro: true, agency: true },
+    { feature: "Priority support", free: false, pro: true, agency: "WhatsApp" },
+    { feature: "Future AI tools access", free: "Limited", pro: true, agency: true },
   ];
 
   const faqs = [
     {
+      q: "What tools do I get with my plan?",
+      a: "All 5 tools on every plan — Resume Builder, Cover Letter Builder, Landing Page Builder, AI Ad Video Generator, and AI Recommendation Checker. Free has daily limits. Pro and Agency are unlimited.",
+    },
+    {
+      q: "What's the difference between Pro and Agency?",
+      a: "Pro is for solo users — you manage your own account. Agency is for freelancers and teams who build for clients. Agency gives you 10 client accounts, 3 custom domains, white-label branding, and WhatsApp support.",
+    },
+    {
+      q: "Can I add more clients or domains on Agency?",
+      a: "Yes. You can extend anytime from your dashboard. Add 5 extra clients or 1 extra domain whenever you need. No need to upgrade plans.",
+    },
+    {
       q: "Can I cancel my subscription anytime?",
-      a: "Yes! You can cancel your Pro subscription anytime with a single click. You'll keep Pro access until the end of your billing period.",
+      a: "Yes. Cancel with one click. You'll keep access until the end of your billing period.",
     },
     {
       q: "What payment methods do you accept?",
-      a: "We accept all major credit/debit cards, PayPal, Apple Pay, and Google Pay through our secure payment processor Lemon Squeezy. Local Nigerian payments coming soon via Paystack.",
+      a: "Nigerian users: direct bank transfer with a reference code. International users: card and PayPal coming soon. All plans have a 7-day money-back guarantee.",
     },
     {
       q: "Is my data secure?",
-      a: "Absolutely. Your resumes and personal information are encrypted and stored securely on Supabase (enterprise-grade infrastructure). We never share your data with third parties.",
+      a: "Yes. Your data is encrypted and stored on enterprise-grade infrastructure. We never share or sell your data.",
     },
     {
       q: "What happens if I downgrade?",
-      a: "You'll keep Pro access until your billing period ends, then automatically switch to the Free plan. Your saved resumes remain accessible.",
+      a: "You keep your current plan access until your billing period ends, then switch down. Everything you've created stays yours.",
     },
     {
       q: "Do you offer refunds?",
-      a: "Yes! We offer a 7-day money-back guarantee on all Pro plans. If you're not satisfied, just email us and we'll refund you, no questions asked.",
-    },
-    {
-      q: "What's the difference between Pro and Lifetime?",
-      a: "Pro is a recurring subscription (monthly or yearly). Lifetime is a one-time payment that gives you Pro access forever, including all future tools and updates. Lifetime pays off after ~10 months of Pro.",
+      a: "Yes. 7-day money-back guarantee on all paid plans. Not happy? Email us for a full refund, no questions.",
     },
     {
       q: "Can I use this for clients (commercial use)?",
-      a: "Yes! Both Pro and Lifetime plans include commercial use rights. Build resumes for clients, charge for the service — it's all good.",
+      a: "Yes. Pro and Agency plans both include commercial rights. Agency adds white-label so your clients don't see Fancy Digitals branding.",
     },
     {
       q: "Do you have a student discount?",
-      a: "Yes! Email us with your student ID at hello@fancydigitals.com.ng for 50% off any plan.",
+      a: "Yes. Email hello@fancydigitals.com.ng with your student ID for 50% off any plan.",
     },
   ];
 
@@ -176,17 +210,28 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
       {/* HERO */}
       <section className="px-4 pt-16 pb-12 sm:pt-24 sm:pb-16 lg:pt-32">
         <div className="mx-auto max-w-4xl text-center">
-
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-            Build smarter. <span className="text-[#075a01]">Pay less.</span>
+            Five AI tools. <span className="text-[#075a01]">One simple plan.</span>
           </h1>
           <p className="mt-4 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Start free. Upgrade when you need more. No hidden fees, no contracts. Cancel anytime.
+            Resumes, cover letters, landing pages, ad videos, and AI visibility checks — all in one place. Start free, upgrade when you're ready.
           </p>
+
+          {/* Tools row */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 max-w-3xl mx-auto">
+            {tools.map((tool) => (
+              <div
+                key={tool.name}
+                className="inline-flex items-center gap-2 rounded-full bg-white border border-gray-200 px-3 py-1.5 shadow-sm"
+              >
+                <tool.icon className="h-3.5 w-3.5 text-[#075a01]" />
+                <span className="text-xs font-semibold text-gray-700">{tool.name}</span>
+              </div>
+            ))}
+          </div>
 
           {/* Currency + Billing toggle */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            {/* Billing toggle */}
             <div className="inline-flex items-center rounded-full bg-gray-100 p-1">
               <button
                 onClick={() => setBilling("monthly")}
@@ -204,34 +249,33 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
               >
                 Yearly
                 <span className="rounded-full bg-[#075a01] text-white text-[10px] font-bold px-1.5 py-0.5">
-                  -33%
+                  -27%
                 </span>
               </button>
             </div>
 
-            {/* Currency toggle */}
             <div className="relative inline-block">
-  <select
-    value={region}
-    onChange={(e) => setRegion(e.target.value)}
-    className="appearance-none rounded-full bg-gray-100 px-4 py-2 pr-9 text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#075a01]/30"
-  >
-    {Object.entries(REGIONAL_PRICING).map(([key, val]) => (
-      <option key={key} value={key}>
-        {val.flag} {val.country} ({val.code})
-      </option>
-    ))}
-  </select>
-  <svg className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-  </svg>
-</div>
+              <select
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                className="appearance-none rounded-full bg-gray-100 px-4 py-2 pr-9 text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#075a01]/30"
+              >
+                {Object.entries(REGIONAL_PRICING).map(([key, val]) => (
+                  <option key={key} value={key}>
+                    {val.flag} {val.country} ({val.code})
+                  </option>
+                ))}
+              </select>
+              <svg className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
 
-{detectedRegion === region && (
-  <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 whitespace-nowrap">
-    Auto-detected from your location
-  </p>
-)}
+            {detectedRegion === region && (
+              <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 whitespace-nowrap">
+                Auto-detected from your location
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -261,7 +305,7 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                 {plan.badge && !plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-3 py-1 text-xs font-bold text-white shadow-lg">
-                      <Crown className="h-3 w-3" />
+                      <Briefcase className="h-3 w-3" />
                       {plan.badge}
                     </span>
                   </div>
@@ -288,20 +332,20 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-bold text-gray-900">
-  {plan.displayPrice}
-</span>
+                      {plan.displayPrice}
+                    </span>
                     {plan.price !== 0 && (
-  <span className="text-sm text-gray-500">{plan.period}</span>
-)}
+                      <span className="text-sm text-gray-500">{plan.period}</span>
+                    )}
                   </div>
                   {plan.yearlyTotal && (
                     <p className="mt-1 text-xs text-gray-500">{plan.yearlyTotal}</p>
                   )}
-                  {plan.name === "Lifetime" && (
-  <p className="mt-1 text-xs text-amber-600 font-semibold">
-    Pays off after 10 months
-  </p>
-)}
+                  {plan.name === "Agency" && (
+                    <p className="mt-1 text-xs text-amber-600 font-semibold">
+                      One client project pays for the whole month
+                    </p>
+                  )}
                 </div>
 
                 <Link
@@ -330,6 +374,30 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
             ))}
           </div>
 
+          {/* Add-on strip */}
+          <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:justify-between">
+              <div>
+                <p className="text-sm font-bold text-gray-900">
+                  Need more? Extend your Agency plan anytime.
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Add extra clients or domains from your dashboard. No plan upgrade needed.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="rounded-lg bg-white px-3 py-2 border border-amber-200">
+                  <p className="text-[10px] font-semibold uppercase text-amber-700">+5 clients</p>
+                  <p className="text-sm font-bold text-gray-900">{formatPrice(pricing.addonClient, region)}/mo</p>
+                </div>
+                <div className="rounded-lg bg-white px-3 py-2 border border-amber-200">
+                  <p className="text-[10px] font-semibold uppercase text-amber-700">+1 domain</p>
+                  <p className="text-sm font-bold text-gray-900">{formatPrice(pricing.addonDomain, region)}/mo</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Trust badges */}
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-500">
             <div className="flex items-center gap-2">
@@ -348,6 +416,36 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
         </div>
       </section>
 
+      {/* WHAT YOU GET */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Everything you need to grow
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Five powerful AI tools in one platform
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tools.map((tool) => (
+              <div
+                key={tool.name}
+                className="rounded-2xl bg-white border border-gray-200 p-5 hover:border-[#075a01]/40 hover:shadow-md transition"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#075a01] to-[#0a8f01]">
+                    <tool.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900">{tool.name}</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">{tool.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* COMPARISON TABLE */}
       <section className="px-4 py-16 bg-gray-50">
         <div className="mx-auto max-w-5xl">
@@ -356,11 +454,11 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
               Compare all features
             </h2>
             <p className="mt-2 text-gray-600">
-              Everything you need to know in one table
+              Everything in one table
             </p>
           </div>
 
-          {/* Desktop table */}
+          {/* Desktop */}
           <div className="hidden md:block rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -370,7 +468,7 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                   <th className="text-center px-6 py-4 text-sm font-bold text-[#075a01]">
                     Pro <Star className="inline h-3 w-3 fill-current" />
                   </th>
-                  <th className="text-center px-6 py-4 text-sm font-bold text-amber-600">Lifetime</th>
+                  <th className="text-center px-6 py-4 text-sm font-bold text-amber-600">Agency</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -378,37 +476,19 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.feature}</td>
                     <td className="px-6 py-4 text-center text-sm">
-                      {typeof row.free === "boolean" ? (
-                        row.free ? (
-                          <Check className="h-5 w-5 text-[#075a01] mx-auto" />
-                        ) : (
-                          <X className="h-5 w-5 text-gray-300 mx-auto" />
-                        )
-                      ) : (
-                        <span className="text-gray-600">{row.free}</span>
-                      )}
+                      {typeof row.free === "boolean"
+                        ? (row.free ? <Check className="h-5 w-5 text-[#075a01] mx-auto" /> : <X className="h-5 w-5 text-gray-300 mx-auto" />)
+                        : <span className="text-gray-600">{row.free}</span>}
                     </td>
                     <td className="px-6 py-4 text-center text-sm">
-                      {typeof row.pro === "boolean" ? (
-                        row.pro ? (
-                          <Check className="h-5 w-5 text-[#075a01] mx-auto" />
-                        ) : (
-                          <X className="h-5 w-5 text-gray-300 mx-auto" />
-                        )
-                      ) : (
-                        <span className="text-gray-900 font-semibold">{row.pro}</span>
-                      )}
+                      {typeof row.pro === "boolean"
+                        ? (row.pro ? <Check className="h-5 w-5 text-[#075a01] mx-auto" /> : <X className="h-5 w-5 text-gray-300 mx-auto" />)
+                        : <span className="text-gray-900 font-semibold">{row.pro}</span>}
                     </td>
                     <td className="px-6 py-4 text-center text-sm">
-                      {typeof row.lifetime === "boolean" ? (
-                        row.lifetime ? (
-                          <Check className="h-5 w-5 text-amber-600 mx-auto" />
-                        ) : (
-                          <X className="h-5 w-5 text-gray-300 mx-auto" />
-                        )
-                      ) : (
-                        <span className="text-gray-900 font-semibold">{row.lifetime}</span>
-                      )}
+                      {typeof row.agency === "boolean"
+                        ? (row.agency ? <Check className="h-5 w-5 text-amber-600 mx-auto" /> : <X className="h-5 w-5 text-gray-300 mx-auto" />)
+                        : <span className="text-gray-900 font-semibold">{row.agency}</span>}
                     </td>
                   </tr>
                 ))}
@@ -416,7 +496,7 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
             </table>
           </div>
 
-          {/* Mobile cards */}
+          {/* Mobile */}
           <div className="md:hidden space-y-3">
             {comparison.map((row, i) => (
               <div key={i} className="rounded-xl bg-white border border-gray-200 p-4">
@@ -424,27 +504,21 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
                     <p className="text-[10px] font-bold uppercase text-gray-500 mb-1">Free</p>
-                    {typeof row.free === "boolean" ? (
-                      row.free ? <Check className="h-4 w-4 text-[#075a01] mx-auto" /> : <X className="h-4 w-4 text-gray-300 mx-auto" />
-                    ) : (
-                      <span className="text-xs text-gray-600">{row.free}</span>
-                    )}
+                    {typeof row.free === "boolean"
+                      ? (row.free ? <Check className="h-4 w-4 text-[#075a01] mx-auto" /> : <X className="h-4 w-4 text-gray-300 mx-auto" />)
+                      : <span className="text-xs text-gray-600">{row.free}</span>}
                   </div>
                   <div>
                     <p className="text-[10px] font-bold uppercase text-[#075a01] mb-1">Pro</p>
-                    {typeof row.pro === "boolean" ? (
-                      row.pro ? <Check className="h-4 w-4 text-[#075a01] mx-auto" /> : <X className="h-4 w-4 text-gray-300 mx-auto" />
-                    ) : (
-                      <span className="text-xs text-gray-900 font-semibold">{row.pro}</span>
-                    )}
+                    {typeof row.pro === "boolean"
+                      ? (row.pro ? <Check className="h-4 w-4 text-[#075a01] mx-auto" /> : <X className="h-4 w-4 text-gray-300 mx-auto" />)
+                      : <span className="text-xs text-gray-900 font-semibold">{row.pro}</span>}
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold uppercase text-amber-600 mb-1">Lifetime</p>
-                    {typeof row.lifetime === "boolean" ? (
-                      row.lifetime ? <Check className="h-4 w-4 text-amber-600 mx-auto" /> : <X className="h-4 w-4 text-gray-300 mx-auto" />
-                    ) : (
-                      <span className="text-xs text-gray-900 font-semibold">{row.lifetime}</span>
-                    )}
+                    <p className="text-[10px] font-bold uppercase text-amber-600 mb-1">Agency</p>
+                    {typeof row.agency === "boolean"
+                      ? (row.agency ? <Check className="h-4 w-4 text-amber-600 mx-auto" /> : <X className="h-4 w-4 text-gray-300 mx-auto" />)
+                      : <span className="text-xs text-gray-900 font-semibold">{row.agency}</span>}
                   </div>
                 </div>
               </div>
@@ -453,32 +527,78 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
         </div>
       </section>
 
-      {/* SOCIAL PROOF / STATS */}
+            {/* VALUE PROOF */}
       <section className="px-4 py-16">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Pro pays for itself in one use
+            </h2>
+            <p className="mt-2 text-gray-600">
+              What freelancers charge vs what you pay with Pro
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <div className="space-y-3">
+              {[
+                { service: "One professional resume", lowNGN: 5000, highNGN: 15000 },
+                { service: "One landing page / website", lowNGN: 50000, highNGN: 200000 },
+                { service: "One ad video", lowNGN: 20000, highNGN: 100000 },
+                { service: "One cover letter", lowNGN: 3000, highNGN: 8000 },
+                { service: "AI visibility audit", lowNGN: 15000, highNGN: 50000 },
+              ].map((row, i) => {
+                // Convert NGN prices to selected currency using ratio
+                const ratio = pricing.monthly / REGIONAL_PRICING.NG.monthly;
+                const low = row.lowNGN * ratio;
+                const high = row.highNGN * ratio;
+                return (
+                  <div key={i} className="flex items-center justify-between gap-4 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                    <span className="text-sm sm:text-base text-gray-700">{row.service}</span>
+                    <span className="text-sm sm:text-base font-bold text-gray-900">
+                      {formatPrice(Math.round(low), region)} – {formatPrice(Math.round(high), region)}
+                    </span>
+                  </div>
+                );
+              })}
+              <div className="pt-4 mt-4 border-t-2 border-[#075a01]">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-base sm:text-lg font-bold text-[#075a01]">All 5 tools unlimited with Pro</span>
+                  <span className="text-lg sm:text-xl font-bold text-[#075a01]">
+                    {formatPrice(pricing.monthly, region)}/mo
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="px-4 py-16 bg-gray-50">
         <div className="mx-auto max-w-5xl">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">10K+</p>
-              <p className="mt-1 text-sm text-gray-600">Resumes generated</p>
-            </div>
-            <div>
-              <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">98%</p>
-              <p className="mt-1 text-sm text-gray-600">ATS pass rate</p>
+              <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">5</p>
+              <p className="mt-1 text-sm text-gray-600">AI-powered tools</p>
             </div>
             <div>
               <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">30s</p>
               <p className="mt-1 text-sm text-gray-600">Average generation</p>
             </div>
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">4.9★</p>
-              <p className="mt-1 text-sm text-gray-600">User rating</p>
+              <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">98%</p>
+              <p className="mt-1 text-sm text-gray-600">ATS pass rate</p>
+            </div>
+            <div>
+              <p className="text-3xl sm:text-4xl font-bold text-[#075a01]">24/7</p>
+              <p className="mt-1 text-sm text-gray-600">AI access</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="px-4 py-16 bg-gray-50">
+      <section className="px-4 py-16">
         <div className="mx-auto max-w-3xl">
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-[#075a01]/10 px-3 py-1 text-xs font-bold text-[#075a01] mb-3">
@@ -534,10 +654,10 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                 <InfinityIcon className="h-6 w-6 text-white" />
               </div>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
-                Ready to build something great?
+                Ready to grow your business?
               </h2>
               <p className="mt-3 text-base text-white/80 max-w-xl mx-auto">
-                Join thousands of professionals using Fancy Digitals to land their dream jobs.
+                Join thousands of professionals and businesses using Fancy Digitals to grow faster with AI.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
@@ -547,10 +667,10 @@ const yearlySavings = (pricing.monthly * 12 - pricing.yearly).toFixed(0);
                   Start Free Now
                 </Link>
                 <Link
-                  href="/dashboard/tools/ai-resume-builder"
+                  href="/tools"
                   className="rounded-xl border border-white/30 bg-white/10 backdrop-blur-sm px-6 py-3 text-sm font-bold text-white hover:bg-white/20 active:scale-95 transition-all"
                 >
-                  Try Resume Builder
+                  Explore Tools
                 </Link>
               </div>
             </div>

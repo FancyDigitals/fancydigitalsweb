@@ -15,6 +15,8 @@ import {
   Users,
   Filter,
   Zap,
+  Target,
+  Hash,
 } from "lucide-react";
 
 const PLAN_OPTIONS = [
@@ -115,6 +117,20 @@ export default function AdminClient({ adminEmail }) {
                 </svg>
                 Content Manager
               </a>
+              <a
+  href="/dashboard/admin/orders"
+  className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#075a01]/40 hover:shadow-md"
+>
+  <Hash className="h-4 w-4 text-[#075a01]" />
+  Orders
+</a>
+              <a
+  href="/dashboard/admin/meta-ads-studio"
+  className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#075a01]/40 hover:shadow-md"
+>
+  <Target className="h-4 w-4 text-[#075a01]" />
+  Meta Ads Studio
+</a>
             </div>
           </div>
         </div>

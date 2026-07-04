@@ -4,18 +4,24 @@
 export const PLANS = {
   FREE: "FREE",
   PRO_MONTHLY: "PRO_MONTHLY",
-  LIFETIME: "LIFETIME",
+  AGENCY_MONTHLY: "AGENCY_MONTHLY",
 };
 
 export function isPro(plan) {
   if (!plan) return false;
   const p = String(plan).toUpperCase();
-  return p === "PRO_MONTHLY" || p === "LIFETIME" || p === "PRO";
+  return (
+    p === "PRO_MONTHLY" ||
+    p === "PRO" ||
+    p === "AGENCY_MONTHLY" ||
+    p === "AGENCY"
+  );
 }
 
-export function isLifetime(plan) {
+export function isAgency(plan) {
   if (!plan) return false;
-  return String(plan).toUpperCase() === "LIFETIME";
+  const p = String(plan).toUpperCase();
+  return p === "AGENCY_MONTHLY" || p === "AGENCY";
 }
 
 // ============================================
@@ -29,31 +35,40 @@ export const PLAN_LIMITS = {
     resumePerDay: 3,
     coverLetterPerDay: 3,
     landingPagePerDay: 2,
+    videoAdPerDay: 1,
+    aiCheckerPerDay: 2,
     extraLanguages: false,
     brandColors: false,
     extendedLeadForm: false,
+    whiteLabel: false,
   },
   PRO_MONTHLY: {
     publishedPages: Infinity,
-    clientSites: 3,
+    clientSites: 0,
     customDomains: 1,
     resumePerDay: Infinity,
     coverLetterPerDay: Infinity,
     landingPagePerDay: Infinity,
+    videoAdPerDay: Infinity,
+    aiCheckerPerDay: Infinity,
     extraLanguages: true,
     brandColors: true,
     extendedLeadForm: true,
+    whiteLabel: false,
   },
-  LIFETIME: {
+  AGENCY_MONTHLY: {
     publishedPages: Infinity,
-    clientSites: 3,
-    customDomains: 1,
+    clientSites: 10,
+    customDomains: 3,
     resumePerDay: Infinity,
     coverLetterPerDay: Infinity,
     landingPagePerDay: Infinity,
+    videoAdPerDay: Infinity,
+    aiCheckerPerDay: Infinity,
     extraLanguages: true,
     brandColors: true,
     extendedLeadForm: true,
+    whiteLabel: true,
   },
 };
 
@@ -66,21 +81,84 @@ export function getLimits(plan) {
 // PPP-BASED REGIONAL PRICING
 // ============================================
 export const REGIONAL_PRICING = {
-  US: { code: "USD", symbol: "$", monthly: 4.99, yearly: 39, lifetime: 49, flag: "🇺🇸", country: "United States" },
-  GB: { code: "GBP", symbol: "£", monthly: 3.99, yearly: 31, lifetime: 39, flag: "🇬🇧", country: "United Kingdom" },
-  EU: { code: "EUR", symbol: "€", monthly: 4.49, yearly: 35, lifetime: 45, flag: "🇪🇺", country: "Europe" },
-  CA: { code: "CAD", symbol: "C$", monthly: 6.49, yearly: 51, lifetime: 65, flag: "🇨🇦", country: "Canada" },
-  AU: { code: "AUD", symbol: "A$", monthly: 7.49, yearly: 59, lifetime: 75, flag: "🇦🇺", country: "Australia" },
-  NG: { code: "NGN", symbol: "₦", monthly: 2500, yearly: 20000, lifetime: 25000, flag: "🇳🇬", country: "Nigeria" },
-  IN: { code: "INR", symbol: "₹", monthly: 199, yearly: 1499, lifetime: 1999, flag: "🇮🇳", country: "India" },
-  ZA: { code: "ZAR", symbol: "R", monthly: 49, yearly: 399, lifetime: 499, flag: "🇿🇦", country: "South Africa" },
-  KE: { code: "KES", symbol: "KSh", monthly: 399, yearly: 2999, lifetime: 3999, flag: "🇰🇪", country: "Kenya" },
-  BR: { code: "BRL", symbol: "R$", monthly: 15, yearly: 119, lifetime: 149, flag: "🇧🇷", country: "Brazil" },
-  PH: { code: "PHP", symbol: "₱", monthly: 149, yearly: 1199, lifetime: 1499, flag: "🇵🇭", country: "Philippines" },
-  MX: { code: "MXN", symbol: "$", monthly: 89, yearly: 699, lifetime: 899, flag: "🇲🇽", country: "Mexico" },
+  US: {
+    code: "USD", symbol: "$", flag: "🇺🇸", country: "United States",
+    monthly: 9, yearly: 79,
+    agencyMonthly: 29, agencyYearly: 279,
+    addonClient: 6, addonDomain: 4,
+  },
+  GB: {
+    code: "GBP", symbol: "£", flag: "🇬🇧", country: "United Kingdom",
+    monthly: 7, yearly: 65,
+    agencyMonthly: 23, agencyYearly: 219,
+    addonClient: 5, addonDomain: 3,
+  },
+  EU: {
+    code: "EU", symbol: "€", flag: "🇪🇺", country: "Europe",
+    monthly: 8, yearly: 75,
+    agencyMonthly: 26, agencyYearly: 249,
+    addonClient: 5, addonDomain: 4,
+  },
+  CA: {
+    code: "CAD", symbol: "C$", flag: "🇨🇦", country: "Canada",
+    monthly: 12, yearly: 109,
+    agencyMonthly: 39, agencyYearly: 379,
+    addonClient: 8, addonDomain: 5,
+  },
+  AU: {
+    code: "AUD", symbol: "A$", flag: "🇦🇺", country: "Australia",
+    monthly: 13, yearly: 119,
+    agencyMonthly: 42, agencyYearly: 399,
+    addonClient: 9, addonDomain: 6,
+  },
+  NG: {
+    code: "NGN", symbol: "₦", flag: "🇳🇬", country: "Nigeria",
+    monthly: 4500, yearly: 39000,
+    agencyMonthly: 15000, agencyYearly: 140000,
+    addonClient: 3000, addonDomain: 2000,
+  },
+  IN: {
+    code: "INR", symbol: "₹", flag: "🇮🇳", country: "India",
+    monthly: 349, yearly: 2999,
+    agencyMonthly: 1199, agencyYearly: 10999,
+    addonClient: 249, addonDomain: 149,
+  },
+  ZA: {
+    code: "ZAR", symbol: "R", flag: "🇿🇦", country: "South Africa",
+    monthly: 89, yearly: 799,
+    agencyMonthly: 299, agencyYearly: 2799,
+    addonClient: 59, addonDomain: 39,
+  },
+  KE: {
+    code: "KES", symbol: "KSh", flag: "🇰🇪", country: "Kenya",
+    monthly: 699, yearly: 5999,
+    agencyMonthly: 2299, agencyYearly: 21999,
+    addonClient: 499, addonDomain: 299,
+  },
+  BR: {
+    code: "BRL", symbol: "R$", flag: "🇧🇷", country: "Brazil",
+    monthly: 27, yearly: 239,
+    agencyMonthly: 89, agencyYearly: 849,
+    addonClient: 19, addonDomain: 12,
+  },
+  PH: {
+    code: "PHP", symbol: "₱", flag: "🇵🇭", country: "Philippines",
+    monthly: 249, yearly: 2199,
+    agencyMonthly: 799, agencyYearly: 7599,
+    addonClient: 169, addonDomain: 109,
+  },
+  MX: {
+    code: "MXN", symbol: "$", flag: "🇲🇽", country: "Mexico",
+    monthly: 149, yearly: 1299,
+    agencyMonthly: 489, agencyYearly: 4599,
+    addonClient: 99, addonDomain: 69,
+  },
 };
 
-const EU_COUNTRIES = ["DE", "FR", "ES", "IT", "NL", "BE", "AT", "PT", "IE", "FI", "GR", "PL", "CZ", "HU", "RO", "SE", "DK", "SK", "BG", "HR", "LU", "SI", "LV", "EE", "CY", "MT", "LT"];
+const EU_COUNTRIES = [
+  "DE","FR","ES","IT","NL","BE","AT","PT","IE","FI","GR","PL",
+  "CZ","HU","RO","SE","DK","SK","BG","HR","LU","SI","LV","EE","CY","MT","LT",
+];
 
 export function getRegionForCountry(countryCode) {
   if (!countryCode) return "US";
@@ -92,8 +170,8 @@ export function getRegionForCountry(countryCode) {
 
 export function formatPrice(amount, currency) {
   const { symbol, code } = REGIONAL_PRICING[currency] || REGIONAL_PRICING.US;
-  if (["USD", "GBP", "EUR", "CAD", "AUD"].includes(code)) {
-    return `${symbol}${amount.toFixed(2)}`;
+  if (["USD", "GBP", "EU", "CAD", "AUD"].includes(code)) {
+    return `${symbol}${Number(amount).toFixed(2)}`;
   }
-  return `${symbol}${amount.toLocaleString()}`;
+  return `${symbol}${Number(amount).toLocaleString()}`;
 }
