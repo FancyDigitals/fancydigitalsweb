@@ -62,7 +62,7 @@ export default function Hero({
 
 {/* Subheadline */}
 <p className="mx-auto mb-6 max-w-[280px] text-center text-[11px] leading-relaxed text-white/50 sm:mb-8 sm:max-w-md sm:text-sm md:mb-10 md:max-w-xl md:text-base lg:text-lg">
-  Premium websites, brands, and digital tools —
+  Premium websites, brands, and digital tools
   built for founders and businesses who demand clarity and performance.
 </p>
 
