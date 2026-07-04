@@ -1,19 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Download, Loader2 } from "lucide-react";
+import { Play, Pause, Download, Loader2, FileVideo } from "lucide-react";
 import { CanvasEngine } from "@/lib/video/canvas-engine";
 import { getRenderer } from "@/lib/video/templates";
 
-/**
- * Canvas-based video player with playback + WebM download
- *
- * Props:
- * - scenes: array of scene objects
- * - brandColor, contentStyle, backgroundStyle, logoUrl
- * - aspectRatio: "9:16" | "16:9" | "1:1"
- * - onDownloadStart, onDownloadProgress, onDownloadComplete callbacks
- */
 export default function CanvasVideoPlayer({
   scenes = [],
   brandColor = "#075a01",
@@ -26,6 +17,7 @@ export default function CanvasVideoPlayer({
 }) {
   const canvasRef = useRef(null);
   const engineRef = useRef(null);
+  const ffmpegRef = useRef(null);
 
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -36,7 +28,10 @@ export default function CanvasVideoPlayer({
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [downloadError, setDownloadError] = useState("");
 
-  // Aspect ratio dimensions
+  const [converting, setConverting] = useState(false);
+  const [convertProgress, setConvertProgress] = useState(0);
+  const [ffmpegLoading, setFfmpegLoading] = useState(false);
+
   const dimensions = {
     "9:16": { width: 1080, height: 1920 },
     "16:9": { width: 1920, height: 1080 },
@@ -44,11 +39,9 @@ export default function CanvasVideoPlayer({
   };
   const { width, height } = dimensions[aspectRatio] || dimensions["9:16"];
 
-  // Init engine
   useEffect(() => {
     if (!canvasRef.current || scenes.length === 0) return;
 
-    console.log("Canvas Player template:", template, "renderer:", getRenderer(template)?.name);
     const engine = new CanvasEngine(canvasRef.current, {
       width,
       height,
@@ -69,7 +62,6 @@ export default function CanvasVideoPlayer({
     engineRef.current = engine;
     setTotalDuration(engine.totalDuration);
 
-    // Preload images then autoplay
     engine.preload().then(() => {
       setReady(true);
       if (autoPlay) {
@@ -95,76 +87,86 @@ export default function CanvasVideoPlayer({
     }
   }
 
-  async function handleDownload() {
-    if (!canvasRef.current || !engineRef.current) return;
+  // ═══════════════════════════════════════════════════════════════
+  // Record WebM from canvas
+  // ═══════════════════════════════════════════════════════════════
+  async function recordWebM() {
+    if (!canvasRef.current || !engineRef.current) return null;
 
+    const canvas = canvasRef.current;
+    const stream = canvas.captureStream(30);
+
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+      ? "video/webm;codecs=vp9"
+      : "video/webm";
+
+    const recorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 6_000_000,
+    });
+
+    const chunks = [];
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    const durationMs = engineRef.current.totalDuration * 1000;
+
+    engineRef.current.pause();
+    engineRef.current.reset();
+    engineRef.current.play();
+    setPlaying(true);
+
+    await new Promise((r) => setTimeout(r, 200));
+
+    recorder.start();
+
+    const startTime = Date.now();
+    const progressTimer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+      setDownloadProgress(pct);
+    }, 150);
+
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          recorder.stop();
+          recorder.onstop = () => {
+            clearInterval(progressTimer);
+            const blob = new Blob(chunks, { type: "video/webm" });
+            resolve(blob);
+          };
+          recorder.onerror = reject;
+        } catch (e) {
+          reject(e);
+        }
+      }, durationMs + 300);
+    });
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Download WebM only (fast path)
+  // ═══════════════════════════════════════════════════════════════
+  async function handleDownloadWebM() {
     setDownloadError("");
     setDownloading(true);
     setDownloadProgress(0);
 
     try {
-      const canvas = canvasRef.current;
-      const stream = canvas.captureStream(30);
-
-      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-        ? "video/webm;codecs=vp9"
-        : "video/webm";
-
-      const recorder = new MediaRecorder(stream, {
-        mimeType,
-        videoBitsPerSecond: 6_000_000,
-      });
-
-      const chunks = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
-
-      const durationMs = engineRef.current.totalDuration * 1000;
-
-      // Reset video to start
-      engineRef.current.pause();
-      engineRef.current.reset();
-      engineRef.current.play();
-      setPlaying(true);
-
-      // Small delay so first frame renders
-      await new Promise((r) => setTimeout(r, 200));
-
-      recorder.start();
-
-      // Progress tracker
-      const startTime = Date.now();
-      const progressTimer = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
-        setDownloadProgress(pct);
-      }, 150);
-
-      // Stop after duration
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          try {
-            recorder.stop();
-            recorder.onstop = () => {
-              clearInterval(progressTimer);
-              const blob = new Blob(chunks, { type: "video/webm" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `fancy-video-${Date.now()}.webm`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              setTimeout(() => URL.revokeObjectURL(url), 1000);
-              resolve();
-            };
-            recorder.onerror = reject;
-          } catch (e) {
-            reject(e);
-          }
-        }, durationMs + 300);
-      });
+      const blob = await recordWebM();
+      downloadBlob(blob, `fancy-video-${Date.now()}.webm`);
     } catch (err) {
       console.error("Download error:", err);
       setDownloadError(err.message || "Download failed. Try again.");
@@ -174,9 +176,102 @@ export default function CanvasVideoPlayer({
     }
   }
 
-  // Display sizing (preview at max 720p)
+  // ═══════════════════════════════════════════════════════════════
+  // Download MP4 (records WebM, then converts with ffmpeg)
+  // ═══════════════════════════════════════════════════════════════
+  async function handleDownloadMP4() {
+    setDownloadError("");
+    setDownloading(true);
+    setDownloadProgress(0);
+
+    try {
+      // Step 1: Record WebM
+      const webmBlob = await recordWebM();
+      setDownloading(false);
+      setDownloadProgress(0);
+
+      // Step 2: Load FFmpeg if not loaded yet
+      setFfmpegLoading(true);
+      const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+      const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
+
+      if (!ffmpegRef.current) {
+        const ffmpeg = new FFmpeg();
+
+        ffmpeg.on("progress", ({ progress }) => {
+          const pct = Math.min(100, Math.round(progress * 100));
+          setConvertProgress(pct);
+        });
+
+        const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+        await ffmpeg.load({
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+        });
+
+        ffmpegRef.current = ffmpeg;
+      }
+      setFfmpegLoading(false);
+
+      // Step 3: Convert WebM → MP4
+      setConverting(true);
+      setConvertProgress(0);
+
+      const ffmpeg = ffmpegRef.current;
+      const inputName = "input.webm";
+      const outputName = "output.mp4";
+
+      await ffmpeg.writeFile(inputName, await fetchFile(webmBlob));
+
+      // Convert with H.264 codec — WhatsApp/mobile optimized
+      const expectedDuration = Math.round(engineRef.current.totalDuration);
+
+await ffmpeg.exec([
+  "-fflags", "+genpts",
+  "-r", "30",
+  "-i", inputName,
+  "-c:v", "libx264",
+  "-preset", "veryfast",
+  "-crf", "20",
+  "-profile:v", "high",
+  "-level", "4.0",
+  "-pix_fmt", "yuv420p",
+  "-r", "30",
+  "-vsync", "cfr",
+  "-t", String(expectedDuration),
+  "-movflags", "+faststart",
+  "-an",
+  outputName,
+]);
+
+      const mp4Data = await ffmpeg.readFile(outputName);
+      const mp4Blob = new Blob([mp4Data.buffer], { type: "video/mp4" });
+
+      downloadBlob(mp4Blob, `fancy-video-${Date.now()}.mp4`);
+
+      // Cleanup
+      await ffmpeg.deleteFile(inputName);
+      await ffmpeg.deleteFile(outputName);
+    } catch (err) {
+      console.error("MP4 conversion error:", err);
+      setDownloadError(
+        err.message?.includes("SharedArrayBuffer")
+          ? "MP4 conversion needs a page refresh. Please reload and try again."
+          : err.message || "MP4 conversion failed. Try WebM instead."
+      );
+    } finally {
+      setDownloading(false);
+      setDownloadProgress(0);
+      setConverting(false);
+      setConvertProgress(0);
+      setFfmpegLoading(false);
+    }
+  }
+
   const maxDisplayWidth =
     aspectRatio === "9:16" ? 360 : aspectRatio === "1:1" ? 480 : 720;
+
+  const isBusy = downloading || converting || ffmpegLoading;
 
   return (
     <div className="w-full">
@@ -210,72 +305,95 @@ export default function CanvasVideoPlayer({
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="mt-4 flex gap-3 max-w-lg mx-auto">
+      {/* Play/Pause */}
+      <div className="mt-4 max-w-lg mx-auto">
         <button
           onClick={togglePlay}
-          disabled={!ready || downloading}
-          className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
+          disabled={!ready || isBusy}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
         >
-          {playing ? (
+          {playing ? <><Pause className="h-4 w-4" /> Pause</> : <><Play className="h-4 w-4" /> Play</>}
+        </button>
+      </div>
+
+      {/* Download buttons */}
+      <div className="mt-3 grid grid-cols-2 gap-3 max-w-lg mx-auto">
+        <button
+          onClick={handleDownloadWebM}
+          disabled={!ready || isBusy}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#075a01] bg-white px-4 py-3 text-sm font-bold text-[#075a01] hover:bg-green-50 transition disabled:opacity-50"
+        >
+          {downloading && !converting && !ffmpegLoading ? (
             <>
-              <Pause className="h-4 w-4" /> Pause
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {downloadProgress}%
             </>
           ) : (
             <>
-              <Play className="h-4 w-4" /> Play
+              <Download className="h-4 w-4" />
+              WebM
             </>
           )}
         </button>
 
         <button
-          onClick={handleDownload}
-          disabled={!ready || downloading}
-          className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-4 py-3 text-sm font-bold text-white shadow-lg hover:opacity-90 transition disabled:opacity-50"
+          onClick={handleDownloadMP4}
+          disabled={!ready || isBusy}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-4 py-3 text-sm font-bold text-white shadow-lg hover:opacity-90 transition disabled:opacity-50"
         >
-          {downloading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Rendering {downloadProgress}%
-            </>
+          {ffmpegLoading ? (
+            <><Loader2 className="h-4 w-4 animate-spin" />Loading...</>
+          ) : converting ? (
+            <><Loader2 className="h-4 w-4 animate-spin" />Converting {convertProgress}%</>
+          ) : downloading && !converting ? (
+            <><Loader2 className="h-4 w-4 animate-spin" />Recording {downloadProgress}%</>
           ) : (
             <>
-              <Download className="h-4 w-4" />
-              Download WebM
+              <FileVideo className="h-4 w-4" />
+              MP4 (recommended)
             </>
           )}
         </button>
       </div>
 
+      {/* Status messages */}
       {downloadError && (
         <div className="mt-3 max-w-lg mx-auto rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {downloadError}
         </div>
       )}
 
-      {downloading && (
+      {downloading && !converting && (
         <p className="mt-3 text-xs text-amber-600 text-center max-w-lg mx-auto">
           ⚠️ Keep this tab open. Recording in real-time.
         </p>
       )}
 
-      {/* MP4 Conversion Notice */}
-      <div className="mt-4 max-w-lg mx-auto rounded-xl bg-blue-50 border border-blue-200 p-4">
-        <p className="text-xs text-blue-900 font-bold mb-1">
-          Need MP4 format for WhatsApp?
+      {converting && (
+        <p className="mt-3 text-xs text-blue-600 text-center max-w-lg mx-auto">
+          Converting to MP4 in your browser. This runs offline — no server needed.
         </p>
-        <p className="text-xs text-blue-700">
-          Convert your WebM to MP4 free at{" "}
-          <a
-            href="https://cloudconvert.com/webm-to-mp4"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline font-bold hover:text-blue-900"
-          >
-            cloudconvert.com
-          </a>{" "}
-          in 10 seconds. WebM works on Twitter, YouTube, Instagram, and Facebook directly.
+      )}
+
+      {ffmpegLoading && (
+        <p className="mt-3 text-xs text-blue-600 text-center max-w-lg mx-auto">
+          Loading video converter (30MB, one-time). Please wait...
         </p>
+      )}
+
+      {/* Format guide */}
+      <div className="mt-4 max-w-lg mx-auto rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <p className="text-xs text-gray-800 font-bold mb-2">
+          Which format should I use?
+        </p>
+        <div className="space-y-1.5 text-xs text-gray-600">
+          <p>
+            <strong className="text-[#075a01]">MP4</strong> — Works everywhere (Meta Ads, WhatsApp, TikTok, YouTube, Instagram). Recommended.
+          </p>
+          <p>
+            <strong>WebM</strong> — Smaller file, faster download. Works on Facebook, Twitter, YouTube. Not on WhatsApp/Instagram.
+          </p>
+        </div>
       </div>
     </div>
   );

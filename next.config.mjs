@@ -25,8 +25,27 @@ const nextConfig = {
       },
       {
         source: "/tools/ai-cover-letter",
-        destination: "/free-ai-cover-letter", 
+        destination: "/free-ai-cover-letter",
         permanent: true,
+      },
+    ];
+  },
+
+  // Headers for FFmpeg.wasm on the video generator page only
+  async headers() {
+    return [
+      {
+        source: "/free-ai-video-ad-generator/:path*",
+        headers: [
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+          {
+            key: "Cross-Origin-Embedder-Policy",
+            value: "require-corp",
+          },
+        ],
       },
     ];
   },

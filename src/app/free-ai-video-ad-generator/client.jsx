@@ -50,11 +50,11 @@ const ASPECT_RATIOS = [
 ];
 
 const SCENE_LENGTHS = [
-  { id: 15, label: "Short", desc: "3–4 scenes · 15s" },
-  { id: 30, label: "Medium", desc: "5–7 scenes · 30s", recommended: true },
-  { id: 60, label: "Long", desc: "8–10 scenes · 60s" },
-  { id: 90, label: "Extended", desc: "12–15 scenes · 90s" },
-  { id: 120, label: "Full", desc: "16–20 scenes · 2 min" },
+  { id: 15, label: "Short", desc: "3–5 scenes · ~15s" },
+  { id: 30, label: "Medium", desc: "6–8 scenes · ~30s", recommended: true },
+  { id: 60, label: "Long", desc: "10–14 scenes · ~60s" },
+  { id: 90, label: "Extended", desc: "15–18 scenes · ~90s" },
+  { id: 120, label: "Full", desc: "18–22 scenes · ~2 min" },
 ];
 
 const FPS = 30;
