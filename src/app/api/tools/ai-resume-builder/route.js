@@ -51,10 +51,11 @@ Education ${i + 1}:
 
 ⚠️ ABSOLUTE RULES:
 1. ONLY use info provided below. NEVER invent companies, jobs, schools, dates, or achievements.
-2. If user provided 2 experiences, output EXACTLY 2. Not more, not less.
-3. If user provided 1 education, output EXACTLY 1. Not more.
+2. You MUST output ONE experience entry for EVERY experience the user provided. Count them. If user gave 3, output 3. If user gave 5, output 5. NEVER skip any experience, even if it seems less relevant.
+3. You MUST output ONE education entry for EVERY education the user provided. Count them. NEVER skip any education entry.
 4. Keep all dates, company names, role titles, schools EXACTLY as user wrote them.
 5. If a field is empty or "N/A", leave it empty in output. Don't make stuff up.
+6. The "experience" array length in your JSON output MUST equal the number of Work Experience entries provided. Same for "education" array.
 
 🚫 BANNED WORDS/PHRASES (these scream "AI wrote this"):
 - "Spearheaded"
@@ -171,6 +172,39 @@ Return JSON only:
 A real hiring manager will read this in 6 seconds. Make every word earn its place. Sound human, be specific, no buzzwords.`;
 
     const resumeData = await generateJSON(prompt);
+
+// Safety: if AI dropped experiences/educations, fall back to user's raw data for missing ones
+const providedExpCount = (experiences || []).filter((e) => e.role || e.company).length;
+const providedEduCount = (educations || []).filter((e) => e.degree || e.school).length;
+
+if (!resumeData.experience || resumeData.experience.length < providedExpCount) {
+  console.warn(`[Resume] AI returned ${resumeData.experience?.length || 0}/${providedExpCount} experiences. Restoring missing ones.`);
+  const aiExp = resumeData.experience || [];
+  const userExp = (experiences || []).filter((e) => e.role || e.company);
+  resumeData.experience = userExp.map((u, i) => {
+    if (aiExp[i]) return aiExp[i];
+    // Fallback: use user's raw data
+    return {
+      role: u.role || "",
+      company: u.company || "",
+      duration: u.duration || "",
+      location: u.location || "",
+      bullets: (u.description || "").split("\n").filter((l) => l.trim()).slice(0, 4),
+    };
+  });
+}
+
+if (!resumeData.education || resumeData.education.length < providedEduCount) {
+  console.warn(`[Resume] AI returned ${resumeData.education?.length || 0}/${providedEduCount} educations. Restoring missing ones.`);
+  const aiEdu = resumeData.education || [];
+  const userEdu = (educations || []).filter((e) => e.degree || e.school);
+  resumeData.education = userEdu.map((u, i) => aiEdu[i] || {
+    degree: u.degree || "",
+    school: u.school || "",
+    year: u.year || "",
+    details: u.details || "",
+  });
+}
 
     const supabase = await createClient();
     await supabase.from("projects").insert({
