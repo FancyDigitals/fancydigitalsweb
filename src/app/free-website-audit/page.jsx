@@ -985,27 +985,175 @@ useEffect(() => {
       )}
 
       {/* HOW IT WORKS */}
-      {!result && !loading && (
-        <section className="relative px-4 pb-16 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-4xl">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {[
-                { icon: Globe, title: "Enter your URL", desc: "Paste any website URL. We fetch the live page and run Google PageSpeed in real time." },
-                { icon: Camera, title: "Upload app screenshots", desc: "Take screenshots of your dashboard, key features, pricing, and sign up screens for deep UX analysis." },
-                { icon: Download, title: "Get your full report", desc: "Score, grade, priority fixes, UX insights, competitor comparison, innovative ideas, and PDF download." },
-              ].map((s) => (
-                <div key={s.title} className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm text-center">
-                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#075a01]/10">
-                    <s.icon className="h-5 w-5 text-[#075a01]" />
-                  </div>
-                  <p className="font-bold text-gray-900 text-sm mb-1">{s.title}</p>
-                  <p className="text-xs text-gray-500 leading-relaxed">{s.desc}</p>
-                </div>
-              ))}
+{!result && !loading && (
+  <>
+    <section className="relative px-4 pb-16 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-4xl">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { icon: Globe, title: "Enter your URL", desc: "Paste any website URL. We fetch the live page and run Google PageSpeed in real time." },
+            { icon: Camera, title: "Upload app screenshots", desc: "Take screenshots of your dashboard, key features, pricing, and sign up screens for deep UX analysis." },
+            { icon: Download, title: "Get your full report", desc: "Score, grade, priority fixes, UX insights, competitor comparison, innovative ideas, and PDF download." },
+          ].map((s) => (
+            <div key={s.title} className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm text-center">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#075a01]/10">
+                <s.icon className="h-5 w-5 text-[#075a01]" />
+              </div>
+              <p className="font-bold text-gray-900 text-sm mb-1">{s.title}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{s.desc}</p>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* WHAT WE AUDIT */}
+    <section className="relative px-4 pb-16 sm:px-6 lg:px-10 bg-gray-50">
+      <div className="mx-auto max-w-5xl py-14">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            What our website audit checks
+          </h2>
+          <p className="mt-2 text-sm text-gray-500 max-w-xl mx-auto">
+            11 categories. Real data from your live website. No guessing.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: Search, title: "SEO & Discoverability", desc: "Page title, meta description, headings, schema markup, canonical tags — everything Google uses to rank your site." },
+            { icon: Zap, title: "Speed & Loading", desc: "Real Google PageSpeed scores, LCP, FCP, blocking time — and exactly what to fix to make your site faster." },
+            { icon: Smartphone, title: "Phone & Tablet Experience", desc: "Does your site work on mobile? We check viewport settings, mobile scores, and touch-friendliness." },
+            { icon: MessageSquare, title: "Words & Messaging", desc: "Are your headlines clear? Does your copy explain what you do and why someone should care?" },
+            { icon: Shield, title: "Trust & Credibility", desc: "Testimonials, team pages, SSL, contact info, FAQ — everything that makes a stranger trust your business." },
+            { icon: TrendingUp, title: "Getting People to Act", desc: "CTAs, buttons, forms, and the flow that guides visitors from landing to contacting or buying." },
+            { icon: Star, title: "Brand & First Impression", desc: "Does your site look professional? OG images, visual consistency, and whether it feels like a real business." },
+            { icon: Users, title: "Reviews & Social Proof", desc: "We check for testimonials, ratings, case studies, and client logos — proof that real people trust you." },
+            { icon: Eye, title: "AI & Modern Search", desc: "Schema markup, content depth, entity clarity — everything that makes ChatGPT, Gemini, and Perplexity recommend your business." },
+            { icon: MessageSquare, title: "WhatsApp & Social", desc: "Are you using WhatsApp, Instagram, or other platforms to connect with customers? We audit your social presence." },
+            { icon: BarChart2, title: "Competitor Gap Analysis", desc: "We fetch and analyze your competitor sites to show exactly what they do better — and how to beat them." },
+          ].map((item) => (
+            <div key={item.title} className="rounded-xl bg-white border border-gray-100 p-5 shadow-sm">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#075a01]/10">
+                <item.icon className="h-5 w-5 text-[#075a01]" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">{item.title}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* WHO IT'S FOR */}
+    <section className="relative px-4 pb-16 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-5xl">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            Who uses the free website audit tool
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { title: "Business owners", desc: "Find out why your website isn't bringing in customers — and get a clear plan to fix it." },
+            { title: "Startup founders", desc: "Validate your site before launch. Get an honest score and fix the biggest problems first." },
+            { title: "Marketing managers", desc: "Audit any site in seconds. Get data for your next strategy meeting or client presentation." },
+            { title: "SEO professionals", desc: "Run a full technical and content audit with real PageSpeed data, schema checks, and competitor analysis." },
+            { title: "Agencies", desc: "Audit client websites, generate shareable reports, and show the value of your work with before/after scores." },
+            { title: "App developers", desc: "Upload screenshots of your app for deep UX analysis — specific feedback on every screen from AI." },
+          ].map((u) => (
+            <div key={u.title} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+              <CheckCircle2 className="h-5 w-5 text-[#075a01] shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-gray-900 text-sm">{u.title}</p>
+                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{u.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* FAQ */}
+    <section className="relative px-4 pb-16 sm:px-6 lg:px-10 bg-gray-50">
+      <div className="mx-auto max-w-3xl py-14">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            Frequently asked questions
+          </h2>
+        </div>
+        <div className="space-y-4">
+          {[
+            {
+              q: "Is this website audit tool really free?",
+              a: "Yes. 1 free audit per day with no sign-up required. Create a free account for more audits. Pro users get unlimited audits, shareable reports, and audit history.",
+            },
+            {
+              q: "How is this different from Google PageSpeed Insights?",
+              a: "Google PageSpeed only measures technical performance. Our tool audits 11 categories including content, trust, conversion, brand, social proof, competitor gaps, and innovative growth ideas — then explains everything in plain English with specific fixes.",
+            },
+            {
+              q: "How accurate is the audit?",
+              a: "Very accurate. We fetch your live website, extract real data — actual page titles, headings, trust signals, CTAs, images — and run Google PageSpeed in real time. The AI analysis is based on this real data, not guesses.",
+            },
+            {
+              q: "Can I audit competitor websites?",
+              a: "Yes. Add up to 3 competitor URLs and we fetch and analyze all of them. The report shows exactly what competitors do better and how to close the gap.",
+            },
+            {
+              q: "What is the screenshot UX analysis?",
+              a: "Upload screenshots of your app or website interior — dashboard, key features, pricing page, onboarding. Our AI analyzes every screen in detail and gives specific feedback on layout, buttons, messaging, missing features, and innovative ideas.",
+            },
+            {
+              q: "Can I share my audit report?",
+              a: "Yes. Every audit generates a shareable link you can send to your team, clients, or developer. No login required to view a shared report.",
+            },
+            {
+              q: "How long does the audit take?",
+              a: "Usually 30–60 seconds for a standard audit. With screenshots and competitor analysis, up to 90 seconds. We run everything in parallel to keep it as fast as possible.",
+            },
+            {
+              q: "Can I download my audit as a PDF?",
+              a: "Yes. Click the PDF Report button after your audit completes. The PDF includes all scores, priority fixes, competitor comparison, innovative ideas, and UX analysis.",
+            },
+          ].map((faq) => (
+            <div key={faq.q} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="font-bold text-gray-900 text-sm mb-1.5">{faq.q}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* BOTTOM CTA */}
+    <section className="relative px-4 pb-16 sm:px-6 sm:pb-20 lg:px-10">
+      <div className="mx-auto max-w-3xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#075a01] to-[#0a8f01] p-8 text-center shadow-2xl sm:p-12">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[#ff914d]/20 blur-3xl" />
+          <div className="relative">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 mb-4">
+              <Search className="h-6 w-6 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">
+              Ready to audit your website?
+            </h2>
+            <p className="mt-3 text-sm text-white/80 sm:text-base max-w-md mx-auto">
+              Free. No sign-up required. Get your full score, priority fixes, and growth ideas in under 60 seconds.
+            </p>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-[#075a01] shadow-lg hover:bg-gray-100 active:scale-95 transition-all"
+            >
+              Audit My Website Free
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
-        </section>
-      )}
+        </div>
+      </div>
+    </section>
+  </>
+)}
     </main>
   );
 }
