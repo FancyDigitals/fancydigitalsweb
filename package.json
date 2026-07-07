@@ -29,6 +29,7 @@
     "@tiptap/react": "^3.27.1",
     "@tiptap/starter-kit": "^3.27.1",
     "bcryptjs": "^3.0.3",
+    "epubjs": "^0.3.93",
     "google-auth-library": "^10.9.0",
     "groq-sdk": "^1.3.0",
     "html2canvas": "^1.4.1",
@@ -36,13 +37,16 @@
     "jsqr": "^1.4.0",
     "lowlight": "^3.3.0",
     "lucide-react": "^1.18.0",
+    "mammoth": "^1.12.0",
     "next": "16.1.1",
+    "pdfjs-dist": "^6.1.200",
     "prisma": "^6.19.1",
     "qrcode": "^1.5.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "^4.0.484",
-    "resend": "^6.16.0"
+    "resend": "^6.16.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

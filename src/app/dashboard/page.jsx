@@ -183,6 +183,20 @@ export default async function DashboardPage() {
             </div>
           </Link>
 
+          {/* Document Viewer */}
+<Link
+  href="/dashboard/tools/document-viewer"
+  className="flex items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl border border-gray-100 p-2.5 sm:p-4 hover:border-[#075a01] hover:bg-[#075a01]/5 active:scale-[0.98] transition-all"
+>
+  <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-[#075a01]/10">
+    <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-[#075a01]" />
+  </div>
+  <div className="min-w-0 flex-1">
+    <p className="font-bold text-gray-900 text-[11px] sm:text-sm leading-tight">Doc Viewer</p>
+    <p className="text-[9px] sm:text-xs text-gray-500 line-clamp-1">PDF, Word, Excel+</p>
+  </div>
+</Link>
+
                     {/* AI Video Generator */}
           <Link
             href="/free-ai-video-ad-generator"

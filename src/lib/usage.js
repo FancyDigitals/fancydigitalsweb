@@ -6,6 +6,7 @@ const TOOL_LIMIT_KEY = {
   "ai-resume-builder": "resumePerDay",
   "ai-cover-letter": "coverLetterPerDay",
   "ai-landing-page-generator": "landingPagePerDay",
+  "document-viewer": "documentViewerPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;

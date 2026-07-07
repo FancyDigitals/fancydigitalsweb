@@ -60,6 +60,7 @@ export default function ToolsPage() {
 
   const aiTools = published.filter((t) => t.isAI && t.isLive);
   const freeTools = published.filter((t) => !t.isAI);
+console.log("freeTools:", freeTools.map(t => t.slug));
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50">
