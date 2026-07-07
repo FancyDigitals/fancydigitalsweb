@@ -7,6 +7,7 @@ const TOOL_LIMIT_KEY = {
   "ai-cover-letter": "coverLetterPerDay",
   "ai-landing-page-generator": "landingPagePerDay",
   "document-viewer": "documentViewerPerDay",
+  "website-audit": "websiteAuditPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;

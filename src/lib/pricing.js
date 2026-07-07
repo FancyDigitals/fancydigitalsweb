@@ -38,6 +38,7 @@ export const PLAN_LIMITS = {
     videoAdPerDay: 1,
     aiCheckerPerDay: 2,
     documentViewerPerDay: 10,
+    websiteAuditPerDay: 1,
     extraLanguages: false,
     brandColors: false,
     extendedLeadForm: false,
@@ -53,6 +54,7 @@ export const PLAN_LIMITS = {
     videoAdPerDay: Infinity,
     aiCheckerPerDay: Infinity,
     documentViewerPerDay: Infinity,
+    websiteAuditPerDay: Infinity,
     extraLanguages: true,
     brandColors: true,
     extendedLeadForm: true,
@@ -68,6 +70,7 @@ export const PLAN_LIMITS = {
     videoAdPerDay: Infinity,
     aiCheckerPerDay: Infinity,
     documentViewerPerDay: Infinity,
+    websiteAuditPerDay: Infinity,
     extraLanguages: true,
     brandColors: true,
     extendedLeadForm: true,
@@ -77,6 +80,10 @@ export const PLAN_LIMITS = {
 
 export function getLimits(plan) {
   const p = String(plan || "FREE").toUpperCase();
+  if (p === "PRO_YEARLY") return PLAN_LIMITS.PRO_MONTHLY;
+  if (p === "AGENCY_YEARLY") return PLAN_LIMITS.AGENCY_MONTHLY;
+  if (p === "PRO") return PLAN_LIMITS.PRO_MONTHLY;
+  if (p === "AGENCY") return PLAN_LIMITS.AGENCY_MONTHLY;
   return PLAN_LIMITS[p] || PLAN_LIMITS.FREE;
 }
 

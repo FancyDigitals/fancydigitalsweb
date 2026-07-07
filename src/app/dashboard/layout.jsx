@@ -52,6 +52,7 @@ export default async function DashboardLayout({ children }) {
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Tools", href: "/tools", icon: Wrench },
     { label: "AI Readiness", href: "/dashboard/ai-visibility", icon: Sparkles },
+    { label: "Website Audit", href: "/free-website-audit", icon: Globe },
     { label: "Projects", href: "/dashboard/projects", icon: FolderOpen },
     { label: "Landing Pages", href: "/dashboard/landing-pages", icon: Globe, badge: unseenLeadsCount },
     { label: "Clients", href: "/dashboard/clients", icon: Users },

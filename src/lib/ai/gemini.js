@@ -49,7 +49,7 @@ async function tryGemini({ apiKey, model, prompt, jsonMode }) {
   console.log(`[AI] Trying Gemini model=${model} key=${keyLabel}`);
 
   const config = {
-    maxOutputTokens: 8192,
+    maxOutputTokens: 16000,
     temperature: 0.2,
   };
   if (jsonMode) {
