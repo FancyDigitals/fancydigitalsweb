@@ -33,7 +33,8 @@ export default function DashboardDetector({
     pathname.startsWith("/signin") ||
     pathname.startsWith("/signup") ||
     pathname.startsWith("/p/") ||
-    pathname.startsWith("/client");
+    pathname.startsWith("/client") ||
+    pathname.startsWith("/academy");
 
   if (hideChrome) {
     return <>{children}</>;

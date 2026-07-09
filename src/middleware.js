@@ -6,7 +6,7 @@ const ROOT_DOMAIN = "fancydigitals.com.ng";
 
 const RESERVED_SUBDOMAINS = [
   "www", "blog", "portal", "api", "admin", "app",
-  "mail", "ftp", "cpanel", "webmail",
+  "mail", "ftp", "cpanel", "webmail", "learn",
 ];
 
 const admin = createAdminClient(
@@ -28,6 +28,13 @@ export async function middleware(request) {
   // CASE 1: Subdomain of fancydigitals.com.ng
   if (hostname.endsWith(`.${ROOT_DOMAIN}`)) {
     const subdomain = hostname.replace(`.${ROOT_DOMAIN}`, "");
+
+    // Academy subdomain
+    if (subdomain === "learn" && !isInternal) {
+      url.pathname = `/academy${path === "/" ? "" : path}`;
+      return NextResponse.rewrite(url);
+    }
+
     if (subdomain && !RESERVED_SUBDOMAINS.includes(subdomain) && !isInternal) {
       url.pathname = `/p/${subdomain}${path === "/" ? "" : path}`;
       return NextResponse.rewrite(url);
