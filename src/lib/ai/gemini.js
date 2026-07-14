@@ -1,14 +1,26 @@
 import { GoogleGenAI } from "@google/genai";
 import Groq from "groq-sdk";
+import OpenAI from "openai";
 
 // ─── API KEYS ────────────────────────────────────────────────────────────────
-const GEMINI_KEY_1 = process.env.GEMINI_API_KEY;
-const GEMINI_KEY_2 = process.env.GEMINI_API_KEY_2;
-const GROQ_KEY = process.env.GROQ_API_KEY;
+// Support multiple key naming conventions and rotate through all available
+const RAW_GEMINI_KEYS = [
+  process.env.GEMINI_API_KEY,
+  process.env.GEMINI_API_KEY_2,
+  process.env.GEMINI_API_KEY_3,
+].filter(Boolean);
 
-if (!GEMINI_KEY_1) {
-  throw new Error("Missing GEMINI_API_KEY in environment variables");
+if (RAW_GEMINI_KEYS.length === 0) {
+  throw new Error(
+    "No Gemini API keys found. Set at least one of: GEMINI_API_KEY, GEMINI_API_KEY_2, GEMINI_API_KEY_3"
+  );
 }
+
+const GEMINI_KEY_1 = RAW_GEMINI_KEYS[0];
+const GEMINI_KEY_2 = RAW_GEMINI_KEYS[1] || null;
+const GEMINI_KEY_3 = RAW_GEMINI_KEYS[2] || null;
+const GROQ_KEY = process.env.GROQ_API_KEY;
+const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
 
 // ─── PROVIDER CONFIGS ────────────────────────────────────────────────────────
 
@@ -26,6 +38,13 @@ const GROQ_MODELS = [
   "llama-3.1-8b-instant",
   "gemma2-9b-it",
   "mixtral-8x7b-32768",
+];
+
+const OPENROUTER_MODELS = [
+  "anthropic/claude-sonnet-4.5",
+  "anthropic/claude-sonnet-4",
+  "google/gemini-2.5-flash",
+  "openai/gpt-4.1-mini",
 ];
 
 function sleep(ms) {
@@ -49,7 +68,7 @@ async function tryGemini({ apiKey, model, prompt, jsonMode }) {
   console.log(`[AI] Trying Gemini model=${model} key=${keyLabel}`);
 
   const config = {
-    maxOutputTokens: 16000,
+    maxOutputTokens: 65535,
     temperature: 0.2,
   };
   if (jsonMode) {
@@ -126,10 +145,60 @@ async function tryGroq({ model, prompt, jsonMode }) {
   return text;
 }
 
+async function tryOpenRouter({ model, prompt, jsonMode }) {
+  if (!OPENROUTER_KEY) throw new Error("No OpenRouter API key");
+
+  const client = new OpenAI({
+    apiKey: OPENROUTER_KEY,
+    baseURL: "https://openrouter.ai/api/v1",
+    defaultHeaders: {
+      "HTTP-Referer": "https://fancydigitals.com.ng",
+      "X-Title": "Fancy Digitals",
+    },
+  });
+
+  let userMessage = "";
+
+  if (typeof prompt === "string") {
+    userMessage = prompt;
+  } else if (Array.isArray(prompt)) {
+    userMessage = prompt
+      .map((p) => {
+        if (typeof p === "string") return p;
+        if (p?.parts) return p.parts.map((x) => x.text || "").join("\n");
+        if (p?.text) return p.text;
+        return JSON.stringify(p);
+      })
+      .join("\n\n");
+  } else {
+    userMessage = JSON.stringify(prompt);
+  }
+
+  const response = await client.chat.completions.create({
+    model,
+    messages: [
+      {
+        role: "system",
+        content: jsonMode
+          ? "Return ONLY valid JSON."
+          : "You are a helpful assistant.",
+      },
+      {
+        role: "user",
+        content: userMessage,
+      },
+    ],
+    temperature: 0.2,
+    max_tokens: 12000,
+  });
+
+  return response.choices[0].message.content;
+}
+
 // ─── MAIN ENGINE ─────────────────────────────────────────────────────────────
 
 export async function generateWithGemini(prompt, { jsonMode = true } = {}) {
-  const geminiKeys = GEMINI_KEY_2 ? [GEMINI_KEY_1, GEMINI_KEY_2] : [GEMINI_KEY_1];
+  const geminiKeys = [GEMINI_KEY_1, GEMINI_KEY_2, GEMINI_KEY_3].filter(Boolean);
 
   let lastError = null;
   let quotaHits = 0;
@@ -142,7 +211,16 @@ export async function generateWithGemini(prompt, { jsonMode = true } = {}) {
       try {
         const result = await tryGemini({ apiKey: key, model, prompt, jsonMode });
         console.log(`[AI] ✅ Gemini success model=${model}`);
-        return result;
+        if (jsonMode) {
+  try {
+    JSON.parse(result);
+  } catch {
+    console.warn("[AI] Invalid JSON from Gemini. Trying next model...");
+    continue;
+  }
+}
+
+return result;
       } catch (error) {
         lastError = error;
         const errType = classifyError(error);
@@ -170,7 +248,42 @@ export async function generateWithGemini(prompt, { jsonMode = true } = {}) {
 
   console.warn(`[AI] ⚠️ All Gemini attempts failed (${totalAttempts} tries, ${quotaHits} quota hits). Falling back to Groq.`);
 
-  // ── PHASE 2: Try all Groq models ──
+  // ── PHASE 2: Try OpenRouter ──
+if (OPENROUTER_KEY) {
+  console.warn("[AI] Trying OpenRouter...");
+
+  for (const model of OPENROUTER_MODELS) {
+    try {
+      const result = await tryOpenRouter({
+        model,
+        prompt,
+        jsonMode,
+      });
+
+      console.log(`[AI] ✅ OpenRouter success model=${model}`);
+
+      if (jsonMode) {
+        try {
+          JSON.parse(result);
+        } catch {
+          console.warn("[AI] Invalid JSON from OpenRouter.");
+          continue;
+        }
+      }
+
+      return result;
+    } catch (error) {
+      lastError = error;
+
+      console.warn(
+        `[AI] ❌ OpenRouter ${model}: ${error.message?.slice(0, 120)}`
+      );
+
+      continue;
+    }
+  }
+}
+  // ── PHASE 3: Try all Groq models ──
   if (GROQ_KEY) {
     for (const model of GROQ_MODELS) {
       try {
@@ -234,59 +347,68 @@ export async function generateJSON(prompt) {
 }
 
 /* ============================================================
-   VISION — Analyze an image with Gemini
+   VISION — Structured image analysis with Gemini
 ============================================================ */
 
 /**
- * Analyze a base64 image and return a description
+ * Analyze a base64 image and return structured metadata.
  * @param {string} base64Image - Full data URL (data:image/png;base64,...)
- * @returns {Promise<string>} - Description of what's in the image
+ * @returns {Promise<object>} - { label, subject, categories, mood, composition, bestUse, description }
  */
 export async function analyzeImage(base64Image) {
+  const empty = {
+    label: "",
+    subject: "",
+    categories: [],
+    mood: "",
+    composition: "",
+    bestUse: [],
+    description: "",
+  };
+
   if (!base64Image || typeof base64Image !== "string") {
-    return "";
+    return empty;
   }
 
-  // Extract mimeType and pure base64 from data URL
-  const match = base64Image.match(/^data:(image\/[a-z]+);base64,(.+)$/i);
+  const match = base64Image.match(/^data:(image\/[a-z+]+);base64,(.+)$/i);
   if (!match) {
     console.warn("[Vision] Invalid image format");
-    return "";
+    return empty;
   }
 
   const mimeType = match[1];
   const data = match[2];
 
-  const prompt = `Describe this image in 3-6 words maximum. Focus on WHAT is shown (subject, object, screen, scene).
+  const prompt = `Analyze this image for use in an AI-generated commercial video.
 
-Examples of good descriptions:
-- "dashboard analytics chart"
-- "signup form"
-- "mobile app home screen"
-- "team meeting laptop"
-- "product landing page"
+Return ONLY valid JSON in this exact shape (no markdown, no fences):
 
-Return ONLY the description. No punctuation, no explanation.`;
+{
+  "label": "short 3-6 word summary",
+  "subject": "primary subject in one phrase",
+  "categories": ["choose from: people, product, logo, office, building, food, clothing, technology, vehicle, document, environment, close-up, wide-shot, portrait, screenshot, illustration, texture, hands, team, workspace"],
+  "mood": "one word: energetic | calm | professional | luxurious | playful | serious | inspiring | intimate | dramatic",
+  "composition": "one phrase describing layout: centered subject | rule of thirds | negative space left | negative space right | full frame | symmetrical | busy",
+  "bestUse": ["choose 1-3 from: opening, product-showcase, testimonial, demonstration, team-reveal, environment-establishing, closing-cta, logo-reveal, transition, b-roll"],
+  "description": "one sentence describing what's in the image and why it would work in a commercial"
+}
+
+Be precise. Categories and bestUse must be from the allowed lists.`;
 
   const contents = [
     {
       role: "user",
       parts: [
         { text: prompt },
-        {
-          inlineData: {
-            mimeType,
-            data,
-          },
-        },
+        { inlineData: { mimeType, data } },
       ],
     },
   ];
 
-  // Use Gemini directly (vision requires structured contents, not our text engine)
-  const geminiKeys = GEMINI_KEY_2 ? [GEMINI_KEY_1, GEMINI_KEY_2] : [GEMINI_KEY_1];
+  const geminiKeys = [GEMINI_KEY_1, GEMINI_KEY_2, GEMINI_KEY_3].filter(Boolean);
   const visionModels = [
     "gemini-2.0-flash",
+    "gemini-2.5-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b",
   ];
@@ -299,8 +421,9 @@ Return ONLY the description. No punctuation, no explanation.`;
           model,
           contents,
           config: {
-            maxOutputTokens: 100,
+            maxOutputTokens: 500,
             temperature: 0.3,
+            responseMimeType: "application/json",
           },
         });
 
@@ -309,11 +432,33 @@ Return ONLY the description. No punctuation, no explanation.`;
         else if (typeof response?.text === "string") text = response.text;
         else text = response?.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
 
-        if (text) {
-          const cleaned = String(text).trim().toLowerCase().replace(/[."]/g, "");
-          console.log(`[Vision] ✅ Analyzed: "${cleaned}"`);
-          return cleaned;
-        }
+        if (!text) continue;
+
+        const cleaned = String(text)
+          .trim()
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
+
+        const parsed = JSON.parse(cleaned);
+
+        const result = {
+          label: (parsed.label || "").toString().trim(),
+          subject: (parsed.subject || "").toString().trim(),
+          categories: Array.isArray(parsed.categories)
+            ? parsed.categories.map((c) => String(c).toLowerCase().trim())
+            : [],
+          mood: (parsed.mood || "").toString().toLowerCase().trim(),
+          composition: (parsed.composition || "").toString().toLowerCase().trim(),
+          bestUse: Array.isArray(parsed.bestUse)
+            ? parsed.bestUse.map((u) => String(u).toLowerCase().trim())
+            : [],
+          description: (parsed.description || "").toString().trim(),
+        };
+
+        console.log(`[Vision] ✅ ${result.label} · ${result.categories.join(", ")}`);
+        return result;
       } catch (err) {
         console.warn(`[Vision] ❌ ${model} failed: ${err.message?.slice(0, 100)}`);
         continue;
@@ -321,6 +466,6 @@ Return ONLY the description. No punctuation, no explanation.`;
     }
   }
 
-  console.warn("[Vision] All models failed for this image");
-  return "";
+  console.warn("[Vision] All vision models failed");
+  return empty;
 }

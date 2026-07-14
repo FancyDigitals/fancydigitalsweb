@@ -2,6 +2,23 @@
 const nextConfig = {
   reactStrictMode: false,
 
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "50mb",
+    },
+  },
+
+  serverExternalPackages: [
+    "@remotion/renderer",
+    "@remotion/bundler",
+    "@remotion/compositor-win32-x64-msvc",
+    "@remotion/compositor-linux-x64-gnu",
+    "@remotion/compositor-linux-x64-musl",
+    "@remotion/compositor-darwin-x64",
+    "@remotion/compositor-darwin-arm64",
+    "esbuild",
+  ],
+
   images: {
     remotePatterns: [
       {
@@ -12,10 +29,33 @@ const nextConfig = {
         protocol: "https",
         hostname: "secure.gravatar.com",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+      },
+      {
+        protocol: "https",
+        hostname: "pixabay.com",
+      },
     ],
   },
 
-  // Permanent 301 redirects from old URLs to new ones
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = [
+        ...(config.externals || []),
+        "@remotion/renderer",
+        "@remotion/bundler",
+        "esbuild",
+      ];
+    }
+    return config;
+  },
+
   async redirects() {
     return [
       {
@@ -28,10 +68,14 @@ const nextConfig = {
         destination: "/free-ai-cover-letter",
         permanent: true,
       },
+      {
+      source: "/free-ai-video-ad-generator/:path*",
+      destination: "/free-ai-video-generator",
+      permanent: true,
+    },
     ];
   },
 
-  // Headers for FFmpeg.wasm on the video generator page only
   async headers() {
     return [
       {

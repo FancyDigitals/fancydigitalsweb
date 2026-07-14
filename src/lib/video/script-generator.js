@@ -78,48 +78,204 @@ RULES FOR needsImage:
 
 RETURN THIS EXACT JSON:
 {
-  "hook": "Main headline",
-  "scenes": [
+  "hook":"Main headline",
+
+  "creativeDirection":{
+      "style":"Apple commercial",
+      "editing":"fast cinematic",
+      "musicMood":"uplifting",
+      "colorGrade":"warm premium",
+      "voice":"confident",
+      "pacing":"medium"
+  },
+
+  "scenes":[
     {
-      "type": "headline",
-      "title": "Full title",
-      "highlightWords": ["most", "important"],
-      "subtitle": "Supporting line",
-      "needsImage": false,
-      "imageIntent": "",
-      "duration": ${secondsPerScene}
+      "type":"headline",
+
+      "duration":5,
+
+      "title":"Build Faster",
+
+      "highlightWords":[
+        "Build",
+        "Faster"
+      ],
+
+      "subtitle":"Launch your business in minutes.",
+
+      "needsImage":false,
+
+      "imageIntent":"",
+
+      "visualType":"text",
+
+      "imagePrompt":"",
+
+      "videoPrompt":"",
+
+      "cameraMotion":"none",
+
+      "cameraAngle":"center",
+
+      "lens":"",
+
+      "lighting":"",
+
+      "transition":"fade",
+
+      "animation":"kinetic",
+
+      "music":"uplifting",
+
+      "soundEffect":"whoosh"
     },
+
     {
-      "type": "visual",
-      "title": "Bold overlay text",
-      "highlightWords": ["key"],
-      "subtitle": "Short caption",
-      "needsImage": true,
-      "imageIntent": "dashboard screenshot",
-      "duration": ${secondsPerScene}
+      "type":"visual",
+
+      "duration":5,
+
+      "title":"Beautiful Landing Pages",
+
+      "highlightWords":[
+        "Beautiful"
+      ],
+
+      "subtitle":"AI builds them instantly.",
+
+      "needsImage":true,
+
+      "imageIntent":"landing page",
+
+      "visualType":"ai_video",
+
+      "imagePrompt":"Modern startup office with premium website displayed on a MacBook Pro, Apple aesthetic, emerald green accents, cinematic lighting, shallow depth of field, ultra realistic.",
+
+      "videoPrompt":"Slow cinematic dolly shot toward a premium MacBook showing an AI landing page builder, warm morning light, Apple commercial style, realistic reflections, depth of field, 4K.",
+
+      "cameraMotion":"push_in",
+
+      "cameraAngle":"eye_level",
+
+      "lens":"50mm",
+
+      "lighting":"golden hour",
+
+      "transition":"zoom",
+
+      "animation":"cinematic",
+
+      "music":"inspiring",
+
+      "soundEffect":"soft whoosh"
     },
+
     {
-      "type": "cta",
-      "title": "Action headline",
-      "highlightWords": ["action"],
-      "subtitle": "Encouragement",
-      "ctaText": "Button text",
-      "ctaUrl": "yoursite.com",
-      "needsImage": false,
-      "imageIntent": "",
-      "duration": ${secondsPerScene}
+      "type":"cta",
+
+      "duration":5,
+
+      "title":"Start Today",
+
+      "highlightWords":[
+        "Today"
+      ],
+
+      "subtitle":"Build your first project free.",
+
+      "ctaText":"Get Started",
+
+      "ctaUrl":"example.com",
+
+      "needsImage":false,
+
+      "imageIntent":"",
+
+      "visualType":"text",
+
+      "imagePrompt":"",
+
+      "videoPrompt":"",
+
+      "cameraMotion":"none",
+
+      "transition":"fade",
+
+      "animation":"kinetic",
+
+      "music":"epic",
+
+      "soundEffect":"logo reveal"
     }
   ],
-  "cta": "Final CTA"
+
+  "cta":"Start now"
 }
 
-RULES:
-- Return valid JSON only, no markdown
-- LAST scene MUST have type: "cta"
-- highlightWords must be exact words from title
-- imageIntent: use plain descriptive words (e.g. "product dashboard", "happy user", "team meeting")
-- imageIntent must be lowercase
-- Every scene MUST have title and subtitle`;
+You are not simply writing an ad.
+
+You are directing a premium commercial.
+
+Think like:
+
+• Creative Director
+• Hollywood Cinematographer
+• Motion Designer
+• Commercial Editor
+• Award-winning Copywriter
+
+Every scene must feel expensive.
+
+Every visual should look like an Apple keynote,
+Nike commercial,
+Tesla advertisement,
+Stripe launch film,
+or Linear product announcement.
+
+Whenever a scene needs visuals, generate BOTH:
+
+imagePrompt
+
+AND
+
+videoPrompt
+
+The videoPrompt should contain:
+
+• subject
+• environment
+• action
+• camera movement
+• camera angle
+• lighting
+• composition
+• realism
+• atmosphere
+
+Do NOT write generic prompts.
+
+BAD:
+
+"A person using laptop."
+
+GOOD:
+
+"A confident young entrepreneur working on a sleek MacBook Pro inside a modern glass office overlooking the city at sunrise. Slow cinematic push-in shot with soft golden hour lighting, shallow depth of field, Apple commercial style, ultra realistic 4K."
+
+Choose one:
+
+visualType:
+
+"text"
+"user_upload"
+"stock"
+"ai_image"
+"ai_video"
+
+Only use ai_video for scenes that truly benefit from motion.
+
+Most scenes should still use ai_image.`;
 
   const result = await generateJSON(prompt);
 

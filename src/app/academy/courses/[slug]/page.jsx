@@ -44,14 +44,23 @@ export async function generateMetadata({ params }) {
 export default async function CourseDetailPage({ params }) {
   const { slug } = await params;
 
-  const { data: course } = await admin
+  const { data: course, error: courseError } = await admin
     .from("academy_courses")
     .select("*")
     .eq("slug", slug)
     .eq("is_published", true)
     .single();
 
+  console.log("═══════════════════════════════════════");
+  console.log("[Course Page] slug param:", slug);
+  console.log("[Course Page] SUPABASE_URL exists:", !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.log("[Course Page] SERVICE_ROLE exists:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+  console.log("[Course Page] course found:", !!course);
+  console.log("[Course Page] error:", courseError);
+  console.log("═══════════════════════════════════════");
+
   if (!course) notFound();
+
 
   const { data: modules } = await admin
     .from("academy_modules")

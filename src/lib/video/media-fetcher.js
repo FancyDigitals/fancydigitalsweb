@@ -1,3 +1,7 @@
+import {
+    generateImage,
+    generateVideo,
+} from "./openrouter-media";
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY;
 
@@ -26,6 +30,52 @@ export async function fetchStockMedia(query, type = "image") {
 
   // Ultimate fallback — gradient placeholder
   return "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg";
+}
+
+
+export async function resolveSceneMedia({
+  scene,
+  uploadedImages = [],
+  isPro = false,
+}) {
+  // Doesn't need media
+  if (!scene.needsImage) {
+    return {
+      imageUrl: null,
+      imageSource: null,
+    };
+  }
+
+  // User uploaded an image
+  if (uploadedImages.length > 0) {
+    const upload = uploadedImages[0];
+
+    return {
+      imageUrl: typeof upload === "string" ? upload : upload.data,
+      imageSource: "upload",
+    };
+  }
+
+  // Pro users → AI Video
+if (isPro && scene.visualType === "ai_video" && scene.videoPrompt) {
+  console.log("[Media] Generating AI Video...");
+  return await generateVideo(scene);
+}
+
+// Pro users → AI Image
+if (isPro && (scene.visualType === "ai_image" || scene.visualType === "visual") && scene.imagePrompt) {
+  console.log("[Media] Generating AI Image...");
+  return await generateImage(scene);
+}
+
+  // Everyone else → Stock
+  return {
+    imageUrl: await fetchStockMedia(
+      scene.imageIntent || scene.title,
+      "image"
+    ),
+    imageSource: "stock",
+  };
 }
 
 async function fetchFromPexels(query, type = "image") {

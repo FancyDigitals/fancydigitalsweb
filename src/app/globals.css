@@ -47,6 +47,30 @@ html, body {
   color: #0f172a !important;
 }
 
+/* Academy pages override — dark mode scoped to academy layout */
+[data-theme="dark"] {
+  color-scheme: dark;
+  background: #080b14 !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:focus {
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.95) !important;
+  -webkit-box-shadow: 0 0 0 30px #111827 inset !important;
+}
+
 /* =====================================================
    TAILWIND THEME BRIDGE
 ===================================================== */

@@ -1,0 +1,190 @@
+:root {
+  --fd-brand: #0E7A43;
+  --fd-brand-soft: rgba(14, 122, 67, 0.15);
+  --fd-brand-glow: rgba(14, 122, 67, 0.35);
+}
+
+.video-workspace {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr) 340px;
+  grid-template-rows: minmax(720px, 1fr) 170px;
+  width: 100%;
+  background: #070707;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 40px 80px -20px rgba(0, 0, 0, 0.6),
+    0 0 120px -40px var(--fd-brand-soft);
+}
+
+.video-workspace > :nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+  overflow: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.video-workspace > :nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+  overflow: hidden;
+}
+
+.video-workspace > :nth-child(3) {
+  grid-column: 3;
+  grid-row: 1;
+  overflow: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.video-workspace > :nth-child(4) {
+  grid-column: 1 / span 3;
+  grid-row: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Focus states — brand color */
+.video-workspace input:focus,
+.video-workspace textarea:focus,
+.video-workspace select:focus {
+  border-color: var(--fd-brand) !important;
+  box-shadow: 0 0 0 3px var(--fd-brand-soft);
+}
+
+/* Custom scrollbars */
+.video-workspace *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.video-workspace *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.video-workspace *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.video-workspace *::-webkit-scrollbar-thumb:hover {
+  background: var(--fd-brand-soft);
+}
+
+/* Selection color */
+.video-workspace ::selection {
+  background: var(--fd-brand-soft);
+  color: #fff;
+}
+
+/* ============ TABLET (1024px and below) ============ */
+@media (max-width: 1024px) {
+  .video-workspace {
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: minmax(600px, 1fr) auto 150px;
+    border-radius: 20px;
+  }
+
+  .video-workspace > :nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .video-workspace > :nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .video-workspace > :nth-child(3) {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    max-height: 400px;
+  }
+
+  .video-workspace > :nth-child(4) {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+  }
+}
+
+/* Input / textarea / select text color enforcement */
+.video-workspace input,
+.video-workspace textarea,
+.video-workspace select {
+  color: #FAFAFA !important;
+  -webkit-text-fill-color: #FAFAFA;
+  caret-color: var(--fd-brand);
+}
+
+.video-workspace input::placeholder,
+.video-workspace textarea::placeholder {
+  color: #555 !important;
+  -webkit-text-fill-color: #555;
+  opacity: 1;
+}
+
+/* Native select dropdown options */
+.video-workspace select option {
+  background: #141414;
+  color: #FAFAFA;
+  font-weight: 500;
+}
+
+/* Autofill fix (Chrome yellow background) */
+.video-workspace input:-webkit-autofill,
+.video-workspace textarea:-webkit-autofill,
+.video-workspace select:-webkit-autofill {
+  -webkit-text-fill-color: #FAFAFA;
+  -webkit-box-shadow: 0 0 0 1000px #141414 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ============ MOBILE (768px and below) ============ */
+@media (max-width: 768px) {
+  .video-workspace {
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    min-height: auto;
+  }
+
+  .video-workspace > :nth-child(2) {
+    order: 1;
+    min-height: 480px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .video-workspace > :nth-child(1) {
+    order: 2;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    max-height: none;
+  }
+
+  .video-workspace > :nth-child(4) {
+    order: 3;
+    border-top: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .video-workspace > :nth-child(3) {
+    order: 4;
+    border-left: none;
+    border-top: none;
+    max-height: none;
+  }
+}
+
+/* ============ SMALL MOBILE (480px and below) ============ */
+@media (max-width: 480px) {
+  .video-workspace {
+    border-radius: 12px;
+  }
+
+  .video-workspace > :nth-child(2) {
+    min-height: 420px;
+  }
+}

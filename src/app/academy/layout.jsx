@@ -4,7 +4,7 @@ export const metadata = {
 
 export default function AcademyLayout({ children }) {
   return (
-    <div className="academy-root">
+    <div className="academy-root" data-theme="dark">
       {children}
     </div>
   );

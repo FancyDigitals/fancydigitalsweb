@@ -41,8 +41,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
     }
 
-    // TEMP: Disable cache while rebuilding the lesson engine.
-// We'll restore caching after the new lesson format is stable.
+   // Check if lesson is already cached
+if (!studentAge && lesson.content_cache && Object.keys(lesson.content_cache).length > 0) {
+  return NextResponse.json({
+    success: true,
+    content: lesson.content_cache,
+    cached: true,
+  });
+}
 
     // Get lesson number
     const { count: lessonsBefore } = await admin

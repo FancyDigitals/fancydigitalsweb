@@ -19,6 +19,15 @@ export async function middleware(request) {
   const hostname = (request.headers.get("host") || "").toLowerCase();
   const path = url.pathname;
 
+    // Public API routes that must skip auth (needed by headless render)
+  if (
+  path.startsWith("/api/audio-proxy") ||
+  path.startsWith("/api/media-proxy") ||
+  path.startsWith("/music/")
+) {
+  return NextResponse.next();
+}
+
   // Skip internal paths
   const isInternal =
     path.startsWith("/_next") ||
@@ -95,6 +104,6 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/audio-proxy|api/media-proxy|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
