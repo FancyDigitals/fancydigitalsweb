@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { generateVideoProject } from "@/lib/video-ai/project";
 
 export const runtime = "nodejs";
-export const maxDuration = 600;
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 /**
