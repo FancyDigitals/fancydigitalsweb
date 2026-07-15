@@ -79,7 +79,8 @@ Return ONLY valid JSON, no markdown:
       "personDescription": "Detailed description of the person in the shot. Include: gender, approximate age, ethnicity (be diverse — vary across the 3 thumbnails), expression (shocked, laughing, pointing, confident smile), pose (mid-shot facing camera, looking at camera, hand gesture). Position them on the LEFT or RIGHT side (leave opposite side empty for text). Example: 'Confident 30-year-old Asian woman with black hair, laughing with mouth open showing surprise, wearing a bright red hoodie, positioned on RIGHT side of frame, looking directly at camera, hand raised in a pointing gesture'",
       "personPosition": "left | right",
       "backgroundDescription": "Environment/setting behind the person. Should support the topic. Example: 'Modern minimalist office with soft bokeh lights, subtle geometric shapes floating in background'",
-      "primaryColor": "Hex color for background/lighting accent (bright, saturated — like #FF0033, #FFD700, #00E5FF, #7C3AED, #FF6B00)",
+      "primaryColor": "MUST be one of these VIRAL YouTube colors: #FF0033 (hot red), #FFD700 (gold), #00E5FF (electric cyan), #7C3AED (vibrant purple), #FF6B00 (neon orange), #00FF88 (electric green), #FF10F0 (magenta). Pick ONE that matches the mood.",
+"secondaryColor": "Complementary VIRAL color from the same list. Must strongly contrast with primaryColor for a split-color effect. Example pairings: purple+cyan, red+gold, magenta+green, orange+cyan.",
       "secondaryColor": "Complementary hex color for lighting/glow accents",
       "mood": "high-energy | shocked | confident | mysterious | urgent | inspiring",
       "textOverlay": {
@@ -88,7 +89,7 @@ Return ONLY valid JSON, no markdown:
         "subText": "Optional smaller line above/below (5-8 words). Can be empty string.",
         "textPosition": "left | right (opposite of personPosition)",
         "textColor": "white | yellow | black (pick for max contrast against background)",
-        "accentColor": "Hex for the highlight word — bright + vibrant. Must pop against background."
+        "accentColor": "MUST be one of: #FFD700 (gold — best CTR), #FF0033 (red — for urgency/warning), #00FF88 (green — for money/success), #00E5FF (cyan — for tech/futuristic). Gold (#FFD700) is the safest, highest-converting choice."
       }
     }
   ],
