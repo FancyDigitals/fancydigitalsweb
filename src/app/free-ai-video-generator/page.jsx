@@ -2,9 +2,9 @@ import Link from "next/link";
 import Script from "next/script";
 
 export const metadata = {
-  title: "Free AI Video Generator — Hollywood-Quality Videos in 60 Seconds | Fancy Digitals",
+  title: "AI Video Generator — Hollywood-Quality Videos in 60 Seconds | Fancy Digitals",
   description:
-    "Create Hollywood-quality AI videos in 60 seconds. Natural voiceover, cinematic scenes, motion graphics, background music, and export to MP4. Free, no signup.",
+    "Create Hollywood-quality AI videos in 60 seconds. Natural voiceover, cinematic scenes, motion graphics, background music, and MP4 export. Free plan available.",
   keywords: [
     "ai video generator",
     "free ai video generator",
@@ -21,9 +21,9 @@ export const metadata = {
     canonical: "https://fancydigitals.com.ng/free-ai-video-generator",
   },
   openGraph: {
-    title: "Free AI Video Generator — Hollywood-Quality Videos in 60 Seconds",
+    title: "AI Video Generator — Hollywood-Quality Videos in 60 Seconds",
     description:
-      "Natural voiceover. Cinematic scenes. Motion graphics. Export to MP4. Free, no signup.",
+      "Natural voiceover. Cinematic scenes. Motion graphics. Export to MP4. Free plan available.",
     url: "https://fancydigitals.com.ng/free-ai-video-generator",
     siteName: "Fancy Digitals",
     images: [
@@ -39,9 +39,9 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free AI Video Generator — Hollywood-Quality in 60 Seconds",
+    title: "AI Video Generator — Hollywood-Quality in 60 Seconds",
     description:
-      "Natural voiceover, cinematic scenes, motion graphics. Free, no signup.",
+      "Natural voiceover, cinematic scenes, motion graphics. Free plan available.",
     images: ["https://fancydigitals.com.ng/tools/ai-video-generator.png"],
   },
 };
@@ -101,30 +101,91 @@ const WHO_FOR = [
 const HOW_IT_WORKS = [
   {
     step: "01",
-    title: "Describe your video",
-    desc: "Tell us your business, goal, and any creative brief. Upload your logo and images if you have them.",
+    title: "Sign up free in seconds",
+    desc: "Create a free account. 2 videos per day forever, no credit card required.",
   },
   {
     step: "02",
-    title: "AI directs the video",
-    desc: "Claude Sonnet 4.5 writes cinematic scenes. Vision AI matches your uploads to the right scenes. Deepgram generates the voiceover.",
+    title: "Describe your video",
+    desc: "Tell us your business, goal, and creative brief. Upload your logo and images if you have them.",
   },
   {
     step: "03",
-    title: "Preview and edit live",
-    desc: "Play your video in the browser. Drag scenes to reorder, edit text, tweak timing. Everything updates instantly.",
+    title: "AI directs the video",
+    desc: "Claude Sonnet 4.5 writes cinematic scenes. Vision AI matches uploads to scenes. Deepgram generates the voiceover.",
   },
   {
     step: "04",
-    title: "Export MP4",
-    desc: "One click. Download in vertical, landscape, or square. Ready for TikTok, YouTube, Instagram, or anywhere.",
+    title: "Preview, edit, and export",
+    desc: "Play in the browser. Reorder scenes, edit text, tweak timing. Export MP4 in any format.",
+  },
+];
+
+const PLANS = [
+  {
+    name: "Free",
+    price: "$0",
+    period: "forever",
+    highlight: false,
+    features: [
+      "2 videos per day",
+      "All templates (Apple + Launch)",
+      "AI voiceover included",
+      "Background music included",
+      "MP4 export (all formats)",
+      "Multi-image upload",
+      "Custom logo + brand color",
+      "Timeline editor",
+    ],
+    cta: "Start Free",
+    ctaLink: "/signup",
+  },
+  {
+    name: "Pro",
+    price: "$9",
+    period: "per month",
+    highlight: true,
+    features: [
+      "10 videos per day",
+      "Everything in Free",
+      "Priority generation queue",
+      "Custom voiceover upload",
+      "Custom music upload",
+      "Advanced brand controls",
+      "Extended asset library",
+      "Save unlimited projects",
+    ],
+    cta: "Go Pro",
+    ctaLink: "/pricing",
+  },
+  {
+    name: "Agency",
+    price: "$29",
+    period: "per month",
+    highlight: false,
+    features: [
+      "Unlimited videos",
+      "Everything in Pro",
+      "10 client workspaces",
+      "White-label export",
+      "3 custom domains",
+      "Team collaboration",
+      "Priority support",
+      "API access (coming)",
+    ],
+    cta: "Get Agency",
+    ctaLink: "/pricing",
   },
 ];
 
 const FAQ = [
   {
-    q: "Is the AI Video Generator really free?",
-    a: "Yes — completely free, no signup required. All templates, AI voiceover, background music, motion graphics, and export formats are included.",
+    q: "Is the AI Video Generator free?",
+    a: "Yes. The Free plan gives you 2 videos per day forever, with no credit card required. Includes all templates, AI voiceover, background music, motion graphics, and MP4 export. Pro unlocks 10 videos per day, and Agency is unlimited.",
+  },
+  {
+    q: "Do I need to sign up?",
+    a: "Yes — a free account is required. Signup takes 30 seconds and gives you 2 free videos per day forever. This lets us protect the compute cost of every generation and give you a saved project history.",
   },
   {
     q: "How long does generation take?",
@@ -140,11 +201,11 @@ const FAQ = [
   },
   {
     q: "Does it include voiceover?",
-    a: "Yes. Every video includes an AI-generated voiceover using Deepgram Aura's most natural voices — conversational, human, and paced to match your video. You can also upload your own voiceover if you prefer.",
+    a: "Yes. Every video includes an AI-generated voiceover using Deepgram Aura's most natural voices — conversational, human, and paced to match your video. Pro users can upload their own voiceover.",
   },
   {
     q: "Does it include background music?",
-    a: "Yes. Music is auto-selected to match the mood of your video, with intelligent ducking so it drops in volume when the voiceover speaks.",
+    a: "Yes. Music is auto-selected to match the mood of your video, with intelligent ducking so it drops in volume when the voiceover speaks. Pro users can upload their own music.",
   },
   {
     q: "How long can my video be?",
@@ -162,6 +223,10 @@ const FAQ = [
     q: "Do I own the videos I create?",
     a: "Yes. 100%. You own every video generated. Use them commercially, on any platform, anywhere.",
   },
+  {
+    q: "Can I upgrade or cancel anytime?",
+    a: "Yes. Upgrade from Free to Pro or Agency anytime. Cancel anytime with no penalty — your account stays active until the end of your billing period.",
+  },
 ];
 
 const JSON_LD = {
@@ -172,18 +237,18 @@ const JSON_LD = {
       name: "Fancy Digitals AI Video Generator",
       operatingSystem: "Web",
       applicationCategory: "MultimediaApplication",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: [
+        { "@type": "Offer", price: "0", priceCurrency: "USD", name: "Free — 2 videos/day" },
+        { "@type": "Offer", price: "9", priceCurrency: "USD", name: "Pro — 10 videos/day" },
+        { "@type": "Offer", price: "29", priceCurrency: "USD", name: "Agency — Unlimited" },
+      ],
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "4.9",
         ratingCount: "1284",
       },
       description:
-        "Free AI video generator with natural voiceover, cinematic scenes, motion graphics, background music, and MP4 export.",
+        "AI video generator with natural voiceover, cinematic scenes, motion graphics, background music, and MP4 export. Free plan available.",
       url: "https://fancydigitals.com.ng/free-ai-video-generator",
     },
     {
@@ -191,10 +256,7 @@ const JSON_LD = {
       mainEntity: FAQ.map((item) => ({
         "@type": "Question",
         name: item.q,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.a,
-        },
+        acceptedAnswer: { "@type": "Answer", text: item.a },
       })),
     },
     {
@@ -229,7 +291,7 @@ export default function AIVideoGeneratorLandingPage() {
           <div className="relative mx-auto max-w-5xl text-center">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 mb-5 text-xs font-bold text-green-700">
               <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-              FREE — No Signup Required
+              FREE — 2 Videos Per Day
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 leading-tight tracking-tight">
@@ -264,7 +326,7 @@ export default function AIVideoGeneratorLandingPage() {
                 </svg>
               </Link>
               <p className="text-sm text-gray-500">
-                No credit card · No signup · Full features
+                Free signup · No credit card · 2 videos/day
               </p>
             </div>
 
@@ -287,7 +349,6 @@ export default function AIVideoGeneratorLandingPage() {
                     </p>
                   </div>
                 </div>
-                {/* Fake progress bar */}
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
                   <div className="h-full w-2/5 bg-[#0a8f01]" />
                 </div>
@@ -372,8 +433,114 @@ export default function AIVideoGeneratorLandingPage() {
           </div>
         </section>
 
-        {/* ============ WHO FOR ============ */}
+        {/* ============ PRICING ============ */}
         <section className="px-4 py-20 sm:px-6 lg:px-10 bg-gray-50">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center mb-14">
+              <div className="text-xs font-bold text-[#075a01] uppercase tracking-wider mb-2">
+                Pricing
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                Simple pricing. Serious value.
+              </h2>
+              <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                Start free. Upgrade when you're ready. Cancel anytime.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {PLANS.map((plan) => (
+                <div
+                  key={plan.name}
+                  className={`relative rounded-3xl p-8 flex flex-col ${
+                    plan.highlight
+                      ? "bg-gradient-to-br from-[#075a01] to-[#0a8f01] text-white shadow-2xl scale-105"
+                      : "bg-white border-2 border-gray-100"
+                  }`}
+                >
+                  {plan.highlight && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#ff914d] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      Most Popular
+                    </div>
+                  )}
+
+                  <div className="mb-6">
+                    <h3
+                      className={`text-2xl font-bold ${
+                        plan.highlight ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {plan.name}
+                    </h3>
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span
+                        className={`text-5xl font-black ${
+                          plan.highlight ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {plan.price}
+                      </span>
+                      <span
+                        className={`text-sm ${
+                          plan.highlight ? "text-white/80" : "text-gray-500"
+                        }`}
+                      >
+                        {plan.period}
+                      </span>
+                    </div>
+                  </div>
+
+                  <ul className="flex-1 space-y-3 mb-8">
+                    {plan.features.map((f) => (
+                      <li
+                        key={f}
+                        className={`flex items-start gap-2 text-sm ${
+                          plan.highlight ? "text-white/90" : "text-gray-700"
+                        }`}
+                      >
+                        <svg
+                          className={`h-5 w-5 shrink-0 mt-0.5 ${
+                            plan.highlight ? "text-white" : "text-[#075a01]"
+                          }`}
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href={plan.ctaLink}
+                    className={`w-full inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-bold transition ${
+                      plan.highlight
+                        ? "bg-white text-[#075a01] hover:bg-gray-50"
+                        : "bg-gray-900 text-white hover:bg-gray-800"
+                    }`}
+                  >
+                    {plan.cta}
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-center mt-8 text-sm text-gray-500">
+              Prices in USD. Regional pricing available at checkout.{" "}
+              <Link href="/pricing" className="text-[#075a01] font-semibold hover:underline">
+                See all plans
+              </Link>
+            </p>
+          </div>
+        </section>
+
+        {/* ============ WHO FOR ============ */}
+        <section className="px-4 py-20 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-5xl">
             <div className="text-center mb-14">
               <div className="text-xs font-bold text-[#075a01] uppercase tracking-wider mb-2">
@@ -388,7 +555,7 @@ export default function AIVideoGeneratorLandingPage() {
               {WHO_FOR.map((w) => (
                 <div
                   key={w.title}
-                  className="rounded-2xl bg-white border-2 border-gray-100 p-6 text-center"
+                  className="rounded-2xl bg-white border-2 border-gray-100 p-6 text-center hover:border-[#075a01]/30 transition"
                 >
                   <h3 className="text-lg font-bold text-gray-900 mb-1">
                     {w.title}
@@ -401,7 +568,7 @@ export default function AIVideoGeneratorLandingPage() {
         </section>
 
         {/* ============ FAQ ============ */}
-        <section className="px-4 py-20 sm:px-6 lg:px-10">
+        <section className="px-4 py-20 sm:px-6 lg:px-10 bg-gray-50">
           <div className="mx-auto max-w-3xl">
             <div className="text-center mb-14">
               <div className="text-xs font-bold text-[#075a01] uppercase tracking-wider mb-2">
@@ -453,7 +620,7 @@ export default function AIVideoGeneratorLandingPage() {
                   cinematic AI video?
                 </h2>
                 <p className="mt-4 text-lg text-white/80 max-w-xl mx-auto">
-                  Free forever. No signup. No credit card. No watermark. Just
+                  Free signup. No credit card. 2 videos per day forever. Just
                   press generate.
                 </p>
 

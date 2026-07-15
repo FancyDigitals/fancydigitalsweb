@@ -35,7 +35,7 @@ export const PLAN_LIMITS = {
     resumePerDay: 3,
     coverLetterPerDay: 3,
     landingPagePerDay: 2,
-    videoAdPerDay: 1,
+    videoGeneratorPerDay: 2,   // ← was videoAdPerDay: 1
     aiCheckerPerDay: 2,
     documentViewerPerDay: 10,
     websiteAuditPerDay: 1,
@@ -51,7 +51,7 @@ export const PLAN_LIMITS = {
     resumePerDay: Infinity,
     coverLetterPerDay: Infinity,
     landingPagePerDay: Infinity,
-    videoAdPerDay: Infinity,
+    videoGeneratorPerDay: 10,   // ← was Infinity, now 10/day per your spec
     aiCheckerPerDay: Infinity,
     documentViewerPerDay: Infinity,
     websiteAuditPerDay: Infinity,
@@ -67,7 +67,7 @@ export const PLAN_LIMITS = {
     resumePerDay: Infinity,
     coverLetterPerDay: Infinity,
     landingPagePerDay: Infinity,
-    videoAdPerDay: Infinity,
+    videoGeneratorPerDay: Infinity,
     aiCheckerPerDay: Infinity,
     documentViewerPerDay: Infinity,
     websiteAuditPerDay: Infinity,

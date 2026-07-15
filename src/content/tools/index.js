@@ -70,7 +70,7 @@ export const tools = [
   order: 0,
   isLive: true,
   isAI: true,
-  requiresLogin: false,
+  requiresLogin: true,
   accent: "#075a01",
   accentLight: "from-[#075a01]/10 to-[#0a8f01]/10",
   popular: true,

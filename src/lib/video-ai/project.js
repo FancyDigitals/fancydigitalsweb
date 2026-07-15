@@ -56,6 +56,13 @@ export async function generateVideoProject(input) {
 
   const normalizedScenes = sceneResult.scenes.map(normalizeScene);
 
+  // Enforce user's theme choice on every scene
+const forcedTheme = input.theme || "apple";
+const themedScenes = normalizedScenes.map((s) => ({
+  ...s,
+  theme: forcedTheme,
+}));
+
   let project = {
     creative,
     storyboard,
@@ -71,7 +78,7 @@ export async function generateVideoProject(input) {
       analysis: u.analysis,
       image: u.image,
     })),
-    scenes: buildTimeline(normalizedScenes),
+    scenes: buildTimeline(themedScenes),
   };
 
   console.log("========== STEP 4 : TIMELINE ==========");

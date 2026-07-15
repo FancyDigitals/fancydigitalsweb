@@ -124,7 +124,8 @@ Return ONLY valid JSON. Every field is MANDATORY. Never leave "voiceover", "titl
       "sceneNumber": 1,
       "purpose": "opening | hook | problem | product | demo | feature | team | benefit | testimonial | cta | closing",
       "layout": "hero",
-      "theme": "apple",
+      "theme": "apple | launch",
+      "launchScene": "logo | search | browser | laptop | phone | dashboard | panels | features | stats | card | cta | default",
       "backgroundStyle": "gradient",
       "title": "Short punchy title here",
       "subtitle": "Supporting sentence here.",
@@ -256,24 +257,58 @@ Alternate styles across scenes to create rhythm.
 THEME
 --------------------------------------------------
 
-apple | tesla | luxury | startup | minimal | corporate | cinematic | social
+Two themes are available:
+
+**apple** — Cinematic, editorial, minimal typography, deep silence, keynote feel. Uses real photography/uploads as fullscreen media.
+
+**launch** — Motion graphics, product launch, SaaS aesthetic. UI-focused. Uploads are embedded inside browser windows, laptops, phones, or floating cards. Think Framer, Linear, Raycast, Stripe launch videos.
+
+Pick the theme that best matches the business:
+- SaaS / tech / dashboards / apps → prefer "launch"
+- Emotional / lifestyle / brand storytelling → prefer "apple"
+- Product reveals / feature announcements → "launch"
+- Cinematic narratives → "apple"
+
+You can mix themes across scenes, but be consistent — never bounce back and forth every scene.
 
 --------------------------------------------------
 BACKGROUND STYLE
 --------------------------------------------------
 
-gradient | glass | studio | dark | light | product | spotlight | minimal
+Apple theme: gradient | glass | studio | dark | light | product | spotlight | minimal
+Launch theme: light | dark | gradient | minimal
 
 --------------------------------------------------
-MEDIA
+LAUNCH SCENE COMPONENT (only for theme: "launch")
 --------------------------------------------------
 
-mediaType: image | video
-mediaSource: upload | ai | stock
-mediaUrl: null (always)
-visualType: ai_image | ai_video | upload | stock
+When theme is "launch", ALSO include a "launchScene" field on each scene.
 
-If visualType = "upload" → also set assignedUploadIndex to a valid uploaded image index.
+Choose one:
+
+- "logo"      → Opening or closing logo reveal
+- "search"    → Search bar expands, types URL, reveals a website (great for hook/problem scenes)
+- "browser"   → Uploaded screenshot appears inside a browser window with tabs
+- "laptop"    → Uploaded screenshot rendered inside a floating laptop mockup
+- "phone"     → Uploaded screenshot rendered inside a phone frame
+- "dashboard" → Product/dashboard reveal with UI panels animating in
+- "panels"    → Multiple floating cards stacked with parallax
+- "features"  → Grid of feature cards
+- "stats"     → Big animated numbers with labels
+- "card"      → Single centered card with content
+- "cta"       → Final call-to-action with animated button
+- "default"   → Fallback — clean text on background
+
+CHOOSE INTELLIGENTLY:
+- Screenshots → "browser", "laptop", or "phone"
+- Mobile-first products → "phone"
+- Desktop products → "browser" or "laptop"
+- Statistics or numbers → "stats"
+- Feature lists → "features"
+- Opening → "logo" or "search"
+- Closing → "logo" or "cta"
+
+Launch scenes should NOT repeat the same launchScene twice in a row.
 
 --------------------------------------------------
 PROMPTS

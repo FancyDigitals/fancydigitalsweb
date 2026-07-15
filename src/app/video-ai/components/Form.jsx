@@ -59,11 +59,14 @@ export default function Form({ video }) {
       />
 
       <Select
-        label="Theme"
-        value={form.theme}
-        options={["apple", "tesla", "luxury", "startup", "minimal", "cinematic"]}
-        onChange={(v) => update({ theme: v })}
-      />
+  label="Theme"
+  value={form.theme}
+  options={[
+    { value: "apple", label: "Apple — Cinematic" },
+    { value: "launch", label: "Launch — Product Reveal" },
+  ]}
+  onChange={(v) => update({ theme: v })}
+/>
 
       <Select
         label="Format"
@@ -185,6 +188,28 @@ export default function Form({ video }) {
         )}
       </div>
 
+      {video.usageInfo && video.usageInfo.limit && (
+  <div
+    style={{
+      padding: "10px 14px",
+      borderRadius: 10,
+      background: "rgba(14,122,67,0.08)",
+      border: "1px solid rgba(14,122,67,0.2)",
+      fontSize: 12,
+      color: "#A1A1A1",
+      textAlign: "center",
+    }}
+  >
+    <strong style={{ color: "#FAFAFA" }}>
+      {video.usageInfo.used}/{video.usageInfo.limit}
+    </strong>{" "}
+    videos used today ·{" "}
+    <a href="/pricing" style={{ color: "#0E7A43", fontWeight: 600 }}>
+      Upgrade for more
+    </a>
+  </div>
+)}
+
       <div style={{ marginTop: 12 }}>
         <GenerateButton loading={loading} onClick={generateVideo} />
       </div>
@@ -290,6 +315,10 @@ function Field({ label, value, onChange, textarea, placeholder }) {
 }
 
 function Select({ label, value, onChange, options, format }) {
+  const normalized = options.map((opt) =>
+    typeof opt === "object" ? opt : { value: opt, label: opt }
+  );
+
   return (
     <div>
       <label style={labelStyle}>{label}</label>
@@ -307,9 +336,9 @@ function Select({ label, value, onChange, options, format }) {
           textTransform: "capitalize",
         }}
       >
-        {options.map((item) => (
-          <option key={item} value={item}>
-            {format ? format(item) : String(item).replace(/-/g, " ")}
+        {normalized.map((item) => (
+          <option key={item.value} value={item.value}>
+            {format ? format(item.value) : String(item.label).replace(/-/g, " ")}
           </option>
         ))}
       </select>

@@ -8,6 +8,7 @@ const TOOL_LIMIT_KEY = {
   "ai-landing-page-generator": "landingPagePerDay",
   "document-viewer": "documentViewerPerDay",
   "website-audit": "websiteAuditPerDay",
+  "ai-video-generator": "videoGeneratorPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;

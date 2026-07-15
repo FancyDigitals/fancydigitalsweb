@@ -41,6 +41,7 @@ export function useVideoProject() {
   const historyRef = useRef([]);
   const futureRef = useRef([]);
   const skipHistoryRef = useRef(false);
+  const [usageInfo, setUsageInfo] = useState(null);
 
   // ---------- HISTORY ----------
   const pushHistory = useCallback((snapshot) => {
@@ -164,68 +165,93 @@ export function useVideoProject() {
   }, []);
 
   const generateVideo = useCallback(async () => {
-    setLoading(true);
-    setProgress([]);
+  setLoading(true);
+  setProgress([]);
 
-    try {
-      pushProgress("Understanding your business");
-      await new Promise((r) => setTimeout(r, 200));
+  try {
+    pushProgress("Understanding your business");
+    await new Promise((r) => setTimeout(r, 200));
 
-      pushProgress("Writing storyboard");
-      await new Promise((r) => setTimeout(r, 200));
+    pushProgress("Writing storyboard");
+    await new Promise((r) => setTimeout(r, 200));
 
-      pushProgress("Creating scenes");
-      await new Promise((r) => setTimeout(r, 200));
+    pushProgress("Creating scenes");
+    await new Promise((r) => setTimeout(r, 200));
 
-      pushProgress("Generating images");
+    pushProgress("Generating images");
 
-      const res = await fetch("/api/tools/ai-video-generator", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-  businessName: form.businessName,
-  description: form.description,
-  audience: form.audience,
-  duration: form.duration,
-  tone: form.theme,
-  aspectRatio: form.format,
-  creativeBrief: form.creativeBrief,
-  uploadedImages: (form.uploadedImages || []).map((img) => ({
-    name: img.name,
-    data: img.data,
-    role: img.role || "auto",
-    note: img.note || "",
-  })),
-  brand: form.brand?.logo ? form.brand : null,
-  customVoiceover: form.customVoiceover?.data || null,
-  customMusic: form.customMusic?.data || null,
-}),
-      });
+    const res = await fetch("/api/tools/ai-video-generator", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        businessName: form.businessName,
+        description: form.description,
+        audience: form.audience,
+        duration: form.duration,
+        tone: form.theme,
+        theme: form.theme,
+        aspectRatio: form.format,
+        creativeBrief: form.creativeBrief,
+        uploadedImages: (form.uploadedImages || []).map((img) => ({
+          name: img.name,
+          data: img.data,
+          role: img.role || "auto",
+          note: img.note || "",
+        })),
+        brand: form.brand?.logo ? form.brand : null,
+        customVoiceover: form.customVoiceover?.data || null,
+        customMusic: form.customMusic?.data || null,
+      }),
+    });
 
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || "Generation failed");
+    const json = await res.json();
 
-      pushProgress("Building composition");
-      await new Promise((r) => setTimeout(r, 150));
-
-      skipHistoryRef.current = true;
-      setProjectState(json.project);
-      setSceneIndex(0);
-
-      completeProgress();
-      await new Promise((r) => setTimeout(r, 400));
-    } catch (err) {
-      console.error("[generate]", err);
-      setProgress((prev) => [
-        ...prev,
-        { label: `Error: ${err.message}`, error: true },
-      ]);
-      await new Promise((r) => setTimeout(r, 1500));
-    } finally {
-      setLoading(false);
-      setTimeout(() => setProgress([]), 500);
+    // Handle quota + auth errors
+    if (res.status === 401) {
+      window.location.href = "/signin?redirect=/video-ai";
+      return;
     }
-  }, [form, pushProgress, completeProgress]);
+
+    if (res.status === 429) {
+      setProgress([
+        {
+          label: json.error || "Daily limit reached. Upgrade to Pro for more.",
+          error: true,
+          requiresUpgrade: true,
+        },
+      ]);
+      await new Promise((r) => setTimeout(r, 3000));
+      return;
+    }
+
+    if (!json.success) throw new Error(json.error || "Generation failed");
+
+    pushProgress("Building composition");
+    await new Promise((r) => setTimeout(r, 150));
+
+    skipHistoryRef.current = true;
+    setProjectState(json.project);
+    setSceneIndex(0);
+
+    // Store usage info for UI
+    if (json.usage) {
+      setUsageInfo(json.usage);
+    }
+
+    completeProgress();
+    await new Promise((r) => setTimeout(r, 400));
+  } catch (err) {
+    console.error("[generate]", err);
+    setProgress((prev) => [
+      ...prev,
+      { label: `Error: ${err.message}`, error: true },
+    ]);
+    await new Promise((r) => setTimeout(r, 1500));
+  } finally {
+    setLoading(false);
+    setTimeout(() => setProgress([]), 500);
+  }
+}, [form, pushProgress, completeProgress]);
 
   // ---------- PLAYBACK ----------
   const play = useCallback(() => {
@@ -279,6 +305,7 @@ export function useVideoProject() {
     progress,
     form,
     setForm,
+    usageInfo,
 
     // scene ops
     updateScene,
