@@ -38,7 +38,7 @@ export default function NicheTab() {
     <div>
       <form
         onSubmit={handleAnalyze}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6"
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mb-4 sm:mb-6"
       >
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-bold text-gray-900">
@@ -54,18 +54,20 @@ export default function NicheTab() {
             </button>
           )}
         </div>
-        <div className="flex gap-3">
+
+        {/* Stack on mobile, row on desktop */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             value={form.niche}
             onChange={(e) => setForm({ ...form, niche: e.target.value })}
-            placeholder="e.g. AI agencies, productivity, home cooking, crypto trading"
+            placeholder="e.g. AI agencies, productivity, home cooking"
             className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-red-500"
           />
           <button
             type="submit"
             disabled={loading || !form.niche.trim()}
-            className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition"
+            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition whitespace-nowrap"
           >
             {loading ? "Analyzing…" : "Analyze Niche"}
           </button>
@@ -78,47 +80,82 @@ export default function NicheTab() {
       </form>
 
       {result?.insights && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
             <div className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">
               Niche Overview: {result.niche}
             </div>
-            <p className="text-gray-800 leading-relaxed">
+            <p className="text-gray-800 leading-relaxed text-sm sm:text-base">
               {result.insights.nicheOverview}
             </p>
             {result.insights.predictedGrowthDifficulty && (
               <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-sm font-semibold">
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
                 Difficulty: {result.insights.predictedGrowthDifficulty}
               </div>
             )}
           </div>
 
           {result.insights.winningPatterns && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h4 className="font-bold text-gray-900 mb-4">Winning Patterns</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Title Formats</div>
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+              <h4 className="font-bold text-gray-900 mb-4">
+                Winning Patterns
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="p-3 sm:p-4 rounded-lg bg-gray-50 border border-gray-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                    Title Formats
+                  </div>
                   <ul className="space-y-1">
-                    {result.insights.winningPatterns.titleFormats?.map((f, i) => (
-                      <li key={i} className="text-sm text-gray-800">• {f}</li>
-                    ))}
+                    {result.insights.winningPatterns.titleFormats?.map(
+                      (f, i) => (
+                        <li key={i} className="text-sm text-gray-800">
+                          <span className="text-gray-400 mr-1">•</span> {f}
+                        </li>
+                      )
+                    )}
                   </ul>
                 </div>
-                <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Video Lengths</div>
-                  <div className="text-sm text-gray-800">{result.insights.winningPatterns.videoLengths}</div>
+                <div className="p-3 sm:p-4 rounded-lg bg-gray-50 border border-gray-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                    Video Lengths
+                  </div>
+                  <div className="text-sm text-gray-800">
+                    {result.insights.winningPatterns.videoLengths}
+                  </div>
                 </div>
-                <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Upload Cadence</div>
-                  <div className="text-sm text-gray-800">{result.insights.winningPatterns.uploadCadence}</div>
+                <div className="p-3 sm:p-4 rounded-lg bg-gray-50 border border-gray-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                    Upload Cadence
+                  </div>
+                  <div className="text-sm text-gray-800">
+                    {result.insights.winningPatterns.uploadCadence}
+                  </div>
                 </div>
-                <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Common Hooks</div>
+                <div className="p-3 sm:p-4 rounded-lg bg-gray-50 border border-gray-100">
+                  <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                    Common Hooks
+                  </div>
                   <ul className="space-y-1">
-                    {result.insights.winningPatterns.commonHooks?.map((h, i) => (
-                      <li key={i} className="text-sm text-gray-800">• {h}</li>
-                    ))}
+                    {result.insights.winningPatterns.commonHooks?.map(
+                      (h, i) => (
+                        <li key={i} className="text-sm text-gray-800">
+                          <span className="text-gray-400 mr-1">•</span> {h}
+                        </li>
+                      )
+                    )}
                   </ul>
                 </div>
               </div>
@@ -126,13 +163,29 @@ export default function NicheTab() {
           )}
 
           {result.insights.whiteSpaceTopics?.length > 0 && (
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-6">
-              <div className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">
-                💎 White-space Topics (Low competition)
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-4 sm:p-6">
+              <div className="flex items-center gap-2 text-xs font-bold text-green-700 uppercase tracking-wider mb-2">
+                <svg
+                  className="w-4 h-4 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                  />
+                </svg>
+                White-space Topics (Low competition)
               </div>
               <ul className="space-y-2 mt-3">
                 {result.insights.whiteSpaceTopics.map((t, i) => (
-                  <li key={i} className="text-sm text-gray-800 p-3 bg-white rounded-lg border border-green-100">
+                  <li
+                    key={i}
+                    className="text-sm text-gray-800 p-3 bg-white rounded-lg border border-green-100"
+                  >
                     {t}
                   </li>
                 ))}
@@ -141,32 +194,44 @@ export default function NicheTab() {
           )}
 
           {result.insights.entryStrategy && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
               <h4 className="font-bold text-gray-900 mb-4">Entry Strategy</h4>
               <div className="space-y-3">
-                {Object.entries(result.insights.entryStrategy).map(([key, val]) => (
-                  <div key={key} className="p-4 rounded-lg bg-gray-50">
-                    <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                      {key.replace(/([A-Z])/g, " $1").replace(/^as/, "As")}
+                {Object.entries(result.insights.entryStrategy).map(
+                  ([key, val]) => (
+                    <div key={key} className="p-3 sm:p-4 rounded-lg bg-gray-50">
+                      <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+                        {key
+                          .replace(/([A-Z])/g, " $1")
+                          .replace(/^as/, "As")}
+                      </div>
+                      <div className="text-sm text-gray-800 leading-relaxed">
+                        {val}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-800 leading-relaxed">{val}</div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </div>
           )}
 
           {result.channels?.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <h4 className="font-bold text-gray-900 mb-3">Top Channels Analyzed</h4>
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
+              <h4 className="font-bold text-gray-900 mb-3">
+                Top Channels Analyzed
+              </h4>
               <div className="space-y-2">
                 {result.channels.map((c, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-                    <div>
-                      <div className="font-semibold text-gray-900">{c.title}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">
-                        {fmt(c.subscribers)} subs · {fmt(c.avgViews)} avg views · {c.uploadsPerMonth}/mo
-                      </div>
+                  <div
+                    key={i}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-gray-50 border border-gray-100 gap-1"
+                  >
+                    <div className="font-semibold text-gray-900 truncate">
+                      {c.title}
+                    </div>
+                    <div className="text-xs text-gray-500 shrink-0">
+                      {fmt(c.subscribers)} subs · {fmt(c.avgViews)} avg views ·{" "}
+                      {c.uploadsPerMonth}/mo
                     </div>
                   </div>
                 ))}
