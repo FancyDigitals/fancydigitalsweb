@@ -1,17 +1,5 @@
-import { NextResponse } from "next/server";
-import { fetchFullChannelData } from "@/lib/youtube/fetcher";
-import { calculateMetrics } from "@/lib/youtube/metrics";
-import { generateAuditInsights } from "@/lib/youtube/audit-engine";
-import { checkAndIncrementUsage } from "@/lib/usage";
-import { createClient } from "@/lib/supabase/server";
-
-export const runtime = "nodejs";
-export const maxDuration = 120;
-export const dynamic = "force-dynamic";
-
 export async function POST(req) {
   try {
-    // ===== AUTH + QUOTA =====
     const usage = await checkAndIncrementUsage("youtube-auditor");
     if (!usage.allowed) {
       const status = usage.error === "Not authenticated" ? 401 : 429;
@@ -27,7 +15,12 @@ export async function POST(req) {
       );
     }
 
-    const { channelUrl, generateInsights = true } = await req.json();
+    const {
+      channelUrl,
+      generateInsights = true,
+      skipSave = false,
+    } = await req.json();
+
     if (!channelUrl) {
       return NextResponse.json(
         { success: false, error: "Missing channelUrl" },
@@ -35,13 +28,15 @@ export async function POST(req) {
       );
     }
 
-    console.log(`[YT-Auditor] Auditing: ${channelUrl} · plan=${usage.plan}`);
+    console.log(
+      `[YT-Auditor] ${channelUrl} · plan=${usage.plan} · insights=${generateInsights}`
+    );
 
     // ===== 1. FETCH DATA =====
     const { channel, videos } = await fetchFullChannelData(channelUrl);
     const enrichedChannel = calculateMetrics({ channel, videos });
 
-    // ===== 2. AI INSIGHTS =====
+    // ===== 2. AI INSIGHTS (only if requested) =====
     let insights = null;
     if (generateInsights) {
       try {
@@ -55,23 +50,25 @@ export async function POST(req) {
       }
     }
 
-    // ===== 3. SAVE TO PROJECTS =====
-    try {
-      const supabase = await createClient();
-      await supabase.from("projects").insert({
-        user_id: usage.userId,
-        tool_slug: "youtube-auditor",
-        title: `${enrichedChannel.title} — YouTube Audit`,
-        prompt: channelUrl,
-        input_data: { channelUrl },
-        output_data: {
-          channel: enrichedChannel,
-          videos: videos?.slice(0, 20), // trim to save space
-          insights,
-        },
-      });
-    } catch (saveErr) {
-      console.warn("[YT-Auditor] Save failed (non-fatal):", saveErr.message);
+    // ===== 3. SAVE (skip on insights-only call) =====
+    if (!skipSave) {
+      try {
+        const supabase = await createClient();
+        await supabase.from("projects").insert({
+          user_id: usage.userId,
+          tool_slug: "youtube-auditor",
+          title: `${enrichedChannel.title} — YouTube Audit`,
+          prompt: channelUrl,
+          input_data: { channelUrl },
+          output_data: {
+            channel: enrichedChannel,
+            videos: videos?.slice(0, 20),
+            insights,
+          },
+        });
+      } catch (saveErr) {
+        console.warn("[YT-Auditor] Save failed (non-fatal):", saveErr.message);
+      }
     }
 
     return NextResponse.json({
