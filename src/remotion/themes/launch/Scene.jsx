@@ -77,7 +77,7 @@ export default function LaunchScene({ scene, project }) {
 
       <SubScene scene={enrichedScene} project={project} />
 
-      <LaunchCaption scene={enrichedScene} />
+      {project?.captionsEnabled && <LaunchCaption scene={enrichedScene} />}
 
       <Watermark brand={project?.brand} />
 

@@ -30,6 +30,7 @@ export async function generateVideoProject(input) {
   const brand = input.brand || null;
   const creativeBrief = input.creativeBrief || "";
   const businessInput = stripHeavyFields(input);
+  const captionsEnabled = input.captionsEnabled ?? false;
 
   console.log("========== STEP 1 : CREATIVE ==========");
   const creative = await generateCreativeDirection(businessInput);
@@ -69,6 +70,7 @@ const themedScenes = normalizedScenes.map((s) => ({
     metadata: buildProjectMetadata(input),
     brand,
     creativeBrief,
+    captionsEnabled,
     uploads: uploads.map((u) => ({
       id: u.id,
       index: u.index,
@@ -80,6 +82,7 @@ const themedScenes = normalizedScenes.map((s) => ({
     })),
     scenes: buildTimeline(themedScenes),
   };
+  
 
   console.log("========== STEP 4 : TIMELINE ==========");
   project = validateProject(project);

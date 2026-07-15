@@ -9,6 +9,8 @@ const TOOL_LIMIT_KEY = {
   "document-viewer": "documentViewerPerDay",
   "website-audit": "websiteAuditPerDay",
   "ai-video-generator": "videoGeneratorPerDay",
+  "youtube-auditor": "youtubeAuditPerDay",
+  "youtube-titles": "youtubeTitlesPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;

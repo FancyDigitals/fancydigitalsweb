@@ -24,6 +24,7 @@ export function useVideoProject() {
   duration: 30,
   theme: "apple",
   format: "9:16",
+  captionsEnabled: false,
   creativeBrief: "",
   uploadedImages: [],
   brand: {
@@ -190,6 +191,7 @@ export function useVideoProject() {
         duration: form.duration,
         tone: form.theme,
         theme: form.theme,
+        captionsEnabled: form.captionsEnabled, 
         aspectRatio: form.format,
         creativeBrief: form.creativeBrief,
         uploadedImages: (form.uploadedImages || []).map((img) => ({

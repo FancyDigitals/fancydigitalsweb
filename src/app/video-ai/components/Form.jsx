@@ -64,6 +64,7 @@ export default function Form({ video }) {
   options={[
     { value: "apple", label: "Apple — Cinematic" },
     { value: "launch", label: "Launch — Product Reveal" },
+    { value: "explainer", label: "Explainer — 2D Animation" },
   ]}
   onChange={(v) => update({ theme: v })}
 />
@@ -74,6 +75,13 @@ export default function Form({ video }) {
         options={["9:16", "16:9", "1:1"]}
         onChange={(v) => update({ format: v })}
       />
+
+      <Toggle
+  label="Show captions"
+  value={form.captionsEnabled}
+  onChange={(v) => update({ captionsEnabled: v })}
+  description="Small pill at bottom of each scene"
+/>
 
       {/* ================= CREATIVE DIRECTION ================= */}
 <div
@@ -342,6 +350,63 @@ function Select({ label, value, onChange, options, format }) {
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+function Toggle({ label, value, onChange, description }) {
+  return (
+    <div>
+      <div
+        onClick={() => onChange(!value)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "12px 14px",
+          background: "#141414",
+          border: "1px solid rgba(255,255,255,.06)",
+          borderRadius: 10,
+          cursor: "pointer",
+          transition: "border-color 0.15s ease",
+        }}
+      >
+        <div>
+          <div style={{ color: "#FAFAFA", fontSize: 13, fontWeight: 500 }}>
+            {label}
+          </div>
+          {description && (
+            <div style={{ color: "#666", fontSize: 11, marginTop: 2 }}>
+              {description}
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            width: 40,
+            height: 22,
+            borderRadius: 999,
+            background: value ? "#0E7A43" : "#2A2A2A",
+            position: "relative",
+            transition: "background 0.15s ease",
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 2,
+              left: value ? 20 : 2,
+              width: 18,
+              height: 18,
+              borderRadius: "50%",
+              background: "#FFF",
+              transition: "left 0.15s ease",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

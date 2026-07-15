@@ -124,8 +124,9 @@ Return ONLY valid JSON. Every field is MANDATORY. Never leave "voiceover", "titl
       "sceneNumber": 1,
       "purpose": "opening | hook | problem | product | demo | feature | team | benefit | testimonial | cta | closing",
       "layout": "hero",
-      "theme": "apple | launch",
-      "launchScene": "logo | search | browser | laptop | phone | dashboard | panels | features | stats | card | cta | default",
+      "theme": "apple | launch | explainer",
+"launchScene": "logo | search | browser | laptop | phone | dashboard | panels | features | stats | card | cta | default",
+"explainerScene": "talk | problem | solution | features | speech | chart | cta | default",
       "backgroundStyle": "gradient",
       "title": "Short punchy title here",
       "subtitle": "Supporting sentence here.",
@@ -257,19 +258,20 @@ Alternate styles across scenes to create rhythm.
 THEME
 --------------------------------------------------
 
-Two themes are available:
+Three themes are available:
 
-**apple** — Cinematic, editorial, minimal typography, deep silence, keynote feel. Uses real photography/uploads as fullscreen media.
+**apple** — Cinematic, editorial, minimal typography, deep silence, keynote feel. Uses real photography/uploads as fullscreen media. Best for: emotional storytelling, lifestyle, brand narratives, luxury products.
 
-**launch** — Motion graphics, product launch, SaaS aesthetic. UI-focused. Uploads are embedded inside browser windows, laptops, phones, or floating cards. Think Framer, Linear, Raycast, Stripe launch videos.
+**launch** — Motion graphics, product launch, SaaS aesthetic. UI-focused. Uploads embedded in browser windows, laptops, phones, floating cards. Best for: SaaS, tech, dashboards, product reveals.
 
-Pick the theme that best matches the business:
-- SaaS / tech / dashboards / apps → prefer "launch"
-- Emotional / lifestyle / brand storytelling → prefer "apple"
-- Product reveals / feature announcements → "launch"
-- Cinematic narratives → "apple"
+**explainer** — 2D animated characters, speech bubbles, illustrated backgrounds, whiteboard elements, hand-drawn underlines. Fun, friendly, approachable. Best for: how-to videos, product education, service explanations, tutorials, kid-friendly content.
 
-You can mix themes across scenes, but be consistent — never bounce back and forth every scene.
+Pick ONE theme for the entire video based on the business:
+- SaaS / tech / dashboards / apps → "launch"
+- Emotional / lifestyle / brand / luxury → "apple"
+- Educational / service explanation / friendly small biz → "explainer"
+
+Never mix themes across scenes — keep ONE theme for the whole video.
 
 --------------------------------------------------
 BACKGROUND STYLE
@@ -310,6 +312,46 @@ CHOOSE INTELLIGENTLY:
 
 Launch scenes should NOT repeat the same launchScene twice in a row.
 
+--------------------------------------------------
+EXPLAINER SCENE COMPONENT (only for theme: "explainer")
+--------------------------------------------------
+
+When theme is "explainer", ALSO include an "explainerScene" field on each scene.
+
+Choose one:
+
+- "talk"     → Character presenting with speech bubble (great for openings/hooks)
+- "problem"  → Character looking concerned, showing the pain point
+- "solution" → Character presenting the fix with a lightbulb
+- "features" → Grid of 4 animated feature icons
+- "speech"   → Testimonial quote with character
+- "chart"    → Animated bar chart showing progress/growth
+- "cta"      → Character waving with a rocket + big call-to-action button
+- "default"  → Simple text + waving character (fallback)
+
+ALSO include a "backdrop" field for the scene's environment:
+"office" | "home" | "city" | "park" | "cafe" | "plain"
+
+CHOOSE INTELLIGENTLY:
+- Opening/hook scenes → "talk"
+- Problem scenes → "problem"
+- Solution/product scenes → "solution"
+- Feature/benefit scenes → "features"
+- Testimonials → "speech"
+- Metrics/results → "chart"
+- CTA/closing → "cta"
+
+Do NOT repeat the same explainerScene twice in a row.
+
+The "backdrop" field is deprecated — abstract animated backgrounds are now chosen
+automatically based on scene mood. Ignore any backdrop instructions.
+
+Optional per-scene fields for richer output:
+- "quote": "Testimonial quote text" (for speech scenes)
+- "author": "Person's name" (for speech scenes)
+- "features": [{icon: "⚡", label: "Fast", color: "#FFD93D"}, ...] (for features scenes)
+- "chartData": [{label: "Q1", value: 40, suffix: "%"}, ...] (for chart scenes)
+- "ctaLabel": "Get Started" (for cta scenes)
 --------------------------------------------------
 PROMPTS
 --------------------------------------------------

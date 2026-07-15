@@ -202,6 +202,19 @@ export default function RootLayout({ children }) {
         <meta name="msapplication-TileColor" content="#075a01" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/logo.png" />
+        <link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+/>
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossOrigin="anonymous"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&display=swap"
+  rel="stylesheet"
+/>
       </head>
       <body className="min-h-screen bg-[#050705] text-white antialiased">
         <NewYearPopup />

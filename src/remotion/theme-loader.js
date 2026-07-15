@@ -1,9 +1,11 @@
 import apple from "./themes/apple/theme";
 import launch from "./themes/launch/theme";
+import explainer from "./themes/explainer/theme";
 
 const themes = {
   apple,
   launch,
+  explainer,
 };
 
 export function getTheme(name = "apple") {

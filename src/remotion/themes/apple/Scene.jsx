@@ -48,7 +48,7 @@ export default function AppleScene({ scene, project }) {
       {/* AnimatedText now handles glass internally */}
       <AnimatedText scene={enrichedScene} themeName="apple" />
 
-      <AppleCaption scene={enrichedScene} />
+      {project?.captionsEnabled && <AppleCaption scene={enrichedScene} />}
 
       <LogoRenderer brand={project?.brand} aspectRatio={aspectRatio} />
 
