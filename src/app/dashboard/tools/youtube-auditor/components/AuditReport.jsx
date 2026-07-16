@@ -140,30 +140,33 @@ export default function AuditReport({ result }) {
       <div ref={reportRef} className="space-y-6 bg-gray-50 p-6 rounded-2xl">
         {/* ===== PDF-ONLY BRANDED HEADER ===== */}
         <div className="hidden pdf-header items-center justify-between pb-4 border-b-2 border-red-600 mb-2">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center text-white font-black text-lg shadow-md">
-              F
-            </div>
-            <div>
-              <div className="font-black text-gray-900 text-lg">Fancy Digitals</div>
-              <div className="text-[10px] text-gray-500 uppercase tracking-widest">
-                YouTube Growth Studio
-              </div>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[10px] text-gray-500 uppercase tracking-widest">
-              Report Generated
-            </div>
-            <div className="text-sm font-semibold text-gray-900">
-              {new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </div>
-          </div>
-        </div>
+  <div className="flex items-center gap-3">
+    <img
+      src="/logo.png"
+      alt="Fancy Digitals"
+      crossOrigin="anonymous"
+      className="h-10 w-auto object-contain"
+    />
+    <div>
+      <div className="font-black text-gray-900 text-lg">Fancy Digitals</div>
+      <div className="text-[10px] text-gray-500 uppercase tracking-widest">
+        YouTube Growth Studio
+      </div>
+    </div>
+  </div>
+  <div className="text-right">
+    <div className="text-[10px] text-gray-500 uppercase tracking-widest">
+      Report Generated
+    </div>
+    <div className="text-sm font-semibold text-gray-900">
+      {new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })}
+    </div>
+  </div>
+</div>
 
         {/* ===== CHANNEL HEADER ===== */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -402,14 +405,17 @@ export default function AuditReport({ result }) {
         <div className="hidden pdf-footer pt-6 mt-4 border-t-2 border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center text-white font-black text-sm">
-                F
-              </div>
-              <div>
-                <div className="font-bold text-gray-900 text-sm">Fancy Digitals</div>
-                <div className="text-[10px] text-gray-500">YouTube Growth Studio</div>
-              </div>
-            </div>
+  <img
+    src="/logo.png"
+    alt="Fancy Digitals"
+    crossOrigin="anonymous"
+    className="h-8 w-auto object-contain"
+  />
+  <div>
+    <div className="font-bold text-gray-900 text-sm">Fancy Digitals</div>
+    <div className="text-[10px] text-gray-500">YouTube Growth Studio</div>
+  </div>
+</div>
             <div className="text-right">
               <div className="text-[10px] text-gray-500">Powered by</div>
               <div className="text-sm font-bold text-red-600">fancydigitals.com.ng</div>
