@@ -5,8 +5,8 @@ import { generateAuditInsights } from "@/lib/youtube/audit-engine";
 import { checkAndIncrementUsage } from "@/lib/usage";
 import { createClient } from "@/lib/supabase/server";
 
-export const runtime = "nodejs";
-export const maxDuration = 120;
+export const runtime = "edge";
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {

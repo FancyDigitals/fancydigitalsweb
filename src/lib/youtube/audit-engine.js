@@ -7,7 +7,7 @@ const MODELS = [
 ];
 
 const MAX_ATTEMPTS_PER_MODEL = 1;
-const TIMEOUT_MS = 8000;
+const TIMEOUT_MS = 55000;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
