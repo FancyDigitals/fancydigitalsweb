@@ -14,17 +14,15 @@ export default function AuditTab({ isPro }) {
   const [loadingInsights, setLoadingInsights] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
-  const [insights, setInsights] = useState(null);
   const [showCompetitors, setShowCompetitors] = useState(false);
 
-  // ===== STEP 1: Fetch YouTube data only (fast) =====
+  // STEP 1
   const handleAudit = async (e) => {
     e?.preventDefault();
     if (!form.channelUrl.trim()) return;
     setLoadingData(true);
     setError("");
     setResult(null);
-    setInsights(null);
     setShowCompetitors(false);
 
     try {
@@ -33,7 +31,7 @@ export default function AuditTab({ isPro }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           channelUrl: form.channelUrl,
-          generateInsights: false, // data only, no AI
+          generateInsights: false,
         }),
       });
       const json = await res.json();
@@ -46,7 +44,7 @@ export default function AuditTab({ isPro }) {
     }
   };
 
-  // ===== STEP 2: Generate AI insights separately =====
+  // STEP 2 — merge insights into result so AuditReport re-renders
   const handleGenerateInsights = async () => {
     if (!form.channelUrl.trim()) return;
     setLoadingInsights(true);
@@ -59,12 +57,17 @@ export default function AuditTab({ isPro }) {
         body: JSON.stringify({
           channelUrl: form.channelUrl,
           generateInsights: true,
-          skipSave: true, // already saved on step 1
+          skipSave: true,
         }),
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Insights failed");
-      setInsights(json.insights);
+
+      // MERGE insights into result
+      setResult((prev) => ({
+        ...prev,
+        insights: json.insights,
+      }));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -72,9 +75,10 @@ export default function AuditTab({ isPro }) {
     }
   };
 
+  const hasInsights = !!result?.insights;
+
   return (
     <div>
-      {/* ===== STEP 1 FORM ===== */}
       <form
         onSubmit={handleAudit}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mb-4 sm:mb-6"
@@ -127,10 +131,10 @@ export default function AuditTab({ isPro }) {
 
       {result && !loadingData && (
         <>
-          <AuditReport result={{ ...result, insights }} />
+          <AuditReport result={result} />
 
-          {/* ===== STEP 2: AI INSIGHTS CTA ===== */}
-          {!insights && (
+          {/* STEP 2 CTA — only show if no insights yet */}
+          {!hasInsights && (
             <div className="mt-4 sm:mt-6 bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="min-w-0">
@@ -162,20 +166,7 @@ export default function AuditTab({ isPro }) {
             </div>
           )}
 
-          {/* ===== INSIGHTS RESULT ===== */}
-          {insights && (
-            <div className="mt-4 sm:mt-6 bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl p-4 sm:p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-sm font-bold text-gray-900">
-                  AI Insights Generated
-                </span>
-              </div>
-              {/* AuditReport already receives insights via result prop above */}
-            </div>
-          )}
-
-          {/* ===== FIND COMPETITORS CTA ===== */}
+          {/* FIND COMPETITORS */}
           <div className="mt-4 sm:mt-6 bg-gradient-to-br from-red-50 to-orange-50 border border-red-100 rounded-2xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
@@ -196,19 +187,6 @@ export default function AuditTab({ isPro }) {
                 </button>
               ) : (
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 text-amber-800 text-xs font-bold">
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
                   Pro Feature
                 </div>
               )}
