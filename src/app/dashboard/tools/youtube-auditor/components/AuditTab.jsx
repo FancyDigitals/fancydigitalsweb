@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFormPersist } from "../hooks/useFormPersist";
 import AuditReport from "./AuditReport";
 import CompetitorSuggestions from "./CompetitorSuggestions";
+import AuditChat from "./AuditChat";
 
 const INITIAL = { channelUrl: "" };
 
@@ -132,6 +133,12 @@ export default function AuditTab({ isPro }) {
       {result && !loadingData && (
         <>
           <AuditReport result={result} />
+
+          {hasInsights && (
+  <div className="mt-4 sm:mt-6">
+    <AuditChat auditData={result} isPro={isPro} />
+  </div>
+)}
 
           {/* STEP 2 CTA — only show if no insights yet */}
           {!hasInsights && (
