@@ -59,6 +59,8 @@ export default function YoutubeAuditorWorkspace({ user, plan }) {
   const [upgradePrompt, setUpgradePrompt] = useState(null);
 
   const isPro = checkIsPro(plan);
+  console.log("PLAN:", plan);
+console.log("IS PRO:", checkIsPro(plan));
 
   const handleTabClick = (tab) => {
     if (tab.pro && !isPro) {

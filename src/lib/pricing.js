@@ -9,19 +9,29 @@ export const PLANS = {
 
 export function isPro(plan) {
   if (!plan) return false;
+
   const p = String(plan).toUpperCase();
-  return (
-    p === "PRO_MONTHLY" ||
-    p === "PRO" ||
-    p === "AGENCY_MONTHLY" ||
-    p === "AGENCY"
-  );
+
+  return [
+    "PRO",
+    "PRO_MONTHLY",
+    "PRO_YEARLY",
+    "AGENCY",
+    "AGENCY_MONTHLY",
+    "AGENCY_YEARLY",
+  ].includes(p);
 }
 
 export function isAgency(plan) {
   if (!plan) return false;
+
   const p = String(plan).toUpperCase();
-  return p === "AGENCY_MONTHLY" || p === "AGENCY";
+
+  return [
+    "AGENCY",
+    "AGENCY_MONTHLY",
+    "AGENCY_YEARLY",
+  ].includes(p);
 }
 
 // ============================================
