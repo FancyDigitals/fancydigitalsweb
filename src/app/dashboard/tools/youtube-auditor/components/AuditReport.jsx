@@ -14,9 +14,9 @@ export default function AuditReport({ result }) {
 
     try {
       const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
-        import("jspdf"),
-        import("html2canvas"),
-      ]);
+  import("jspdf"),
+  import("html2canvas-pro"),
+]);
 
       // Add export mode class for cleaner rendering
       reportRef.current.classList.add("pdf-export-mode");
