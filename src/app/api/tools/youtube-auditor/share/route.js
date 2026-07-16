@@ -50,7 +50,7 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       id,
-      url: `/audit/${id}`,
+      url: `/youtube-audit/${id}`,
     });
   } catch (err) {
     console.error("[share]", err);

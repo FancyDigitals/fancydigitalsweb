@@ -37,7 +37,6 @@ async function getShared(id) {
     .maybeSingle();
 
   if (data) {
-    // Increment view count (fire and forget)
     supabase
       .from("shared_audits")
       .update({ views: (data.views || 0) + 1 })
@@ -75,7 +74,6 @@ export default async function SharedAuditPage({ params }) {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* ===== BRAND HEADER ===== */}
       <div className="bg-white border-b border-gray-100 sticky top-0 z-30 backdrop-blur">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -98,7 +96,6 @@ export default async function SharedAuditPage({ params }) {
         </div>
       </div>
 
-      {/* ===== REPORT ===== */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6 bg-white rounded-2xl border border-gray-100 p-4 sm:p-5">
           <div className="text-[10px] font-bold uppercase tracking-widest text-red-600 mb-1">
@@ -114,7 +111,6 @@ export default async function SharedAuditPage({ params }) {
 
         <AuditReport result={shared.data} />
 
-        {/* ===== FOOTER CTA ===== */}
         <div className="mt-8 bg-gradient-to-br from-red-600 to-orange-600 rounded-3xl p-8 sm:p-12 text-center text-white shadow-xl">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">
             Want an audit like this for your channel?
@@ -128,11 +124,7 @@ export default async function SharedAuditPage({ params }) {
             className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-red-600 font-bold px-6 py-3 rounded-xl transition"
           >
             Get Your Free Audit
-            <svg
-              className="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
+            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
                 d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
