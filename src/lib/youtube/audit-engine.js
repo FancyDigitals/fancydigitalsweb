@@ -2,13 +2,12 @@ import { openrouter } from "@/lib/ai/openrouter";
 import { buildAuditPrompt } from "./prompts/audit";
 
 const MODELS = [
-  "anthropic/claude-sonnet-4.5",
-  "openai/gpt-4.1",
   "google/gemini-2.5-flash",
+  "openai/gpt-4o-mini",
 ];
 
-const MAX_ATTEMPTS_PER_MODEL = 2;
-const TIMEOUT_MS = 60000;
+const MAX_ATTEMPTS_PER_MODEL = 1;
+const TIMEOUT_MS = 8000;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
