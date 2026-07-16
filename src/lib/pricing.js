@@ -29,7 +29,20 @@ export function isAgency(plan) {
 // ============================================
 export const PLAN_LIMITS = {
   FREE: {
-    // ... existing keys
+    publishedPages: 1,
+    clientSites: 0,
+    customDomains: 0,
+    resumePerDay: 3,
+    coverLetterPerDay: 3,
+    landingPagePerDay: 2,
+    videoGeneratorPerDay: 2,   // ← was videoAdPerDay: 1
+    aiCheckerPerDay: 2,
+    documentViewerPerDay: 10,
+    websiteAuditPerDay: 1,
+    extraLanguages: false,
+    brandColors: false,
+    extendedLeadForm: false,
+    whiteLabel: false,
     youtubeAuditPerDay: 1,
     youtubeTitlesPerDay: 3,
     youtubeCompetitorCompare: false,
@@ -37,7 +50,20 @@ export const PLAN_LIMITS = {
     youtubePDFExport: false,
   },
   PRO_MONTHLY: {
-    // ... existing keys
+    publishedPages: Infinity,
+    clientSites: 0,
+    customDomains: 1,
+    resumePerDay: Infinity,
+    coverLetterPerDay: Infinity,
+    landingPagePerDay: Infinity,
+    videoGeneratorPerDay: 10,   // ← was Infinity, now 10/day per your spec
+    aiCheckerPerDay: Infinity,
+    documentViewerPerDay: Infinity,
+    websiteAuditPerDay: Infinity,
+    extraLanguages: true,
+    brandColors: true,
+    extendedLeadForm: true,
+    whiteLabel: false,
     youtubeAuditPerDay: 20,
     youtubeTitlesPerDay: Infinity,
     youtubeCompetitorCompare: true,
@@ -45,7 +71,20 @@ export const PLAN_LIMITS = {
     youtubePDFExport: false,
   },
   AGENCY_MONTHLY: {
-    // ... existing keys
+    publishedPages: Infinity,
+    clientSites: 10,
+    customDomains: 3,
+    resumePerDay: Infinity,
+    coverLetterPerDay: Infinity,
+    landingPagePerDay: Infinity,
+    videoGeneratorPerDay: Infinity,
+    aiCheckerPerDay: Infinity,
+    documentViewerPerDay: Infinity,
+    websiteAuditPerDay: Infinity,
+    extraLanguages: true,
+    brandColors: true,
+    extendedLeadForm: true,
+    whiteLabel: true,
     youtubeAuditPerDay: Infinity,
     youtubeTitlesPerDay: Infinity,
     youtubeCompetitorCompare: true,
