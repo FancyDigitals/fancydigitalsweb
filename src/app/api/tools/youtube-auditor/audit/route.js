@@ -1,3 +1,14 @@
+import { NextResponse } from "next/server";
+import { fetchFullChannelData } from "@/lib/youtube/fetcher";
+import { calculateMetrics } from "@/lib/youtube/metrics";
+import { generateAuditInsights } from "@/lib/youtube/audit-engine";
+import { checkAndIncrementUsage } from "@/lib/usage";
+import { createClient } from "@/lib/supabase/server";
+
+export const runtime = "nodejs";
+export const maxDuration = 120;
+export const dynamic = "force-dynamic";
+
 export async function POST(req) {
   try {
     const usage = await checkAndIncrementUsage("youtube-auditor");
