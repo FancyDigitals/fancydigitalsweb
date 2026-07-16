@@ -7,6 +7,34 @@ export default function AuditReport({ result }) {
   const m = channel.metrics;
   const reportRef = useRef(null);
   const [exporting, setExporting] = useState(false);
+  const [sharing, setSharing] = useState(false);
+const [shareUrl, setShareUrl] = useState(null);
+
+const handleShare = async () => {
+  setSharing(true);
+  try {
+    const res = await fetch("/api/tools/youtube-auditor/share", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelUrl: channel.customUrl || channel.id,
+        data: result,
+      }),
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
+
+    const fullUrl = `${window.location.origin}${json.url}`;
+    setShareUrl(fullUrl);
+
+    // Auto-copy
+    await navigator.clipboard.writeText(fullUrl);
+  } catch (err) {
+    alert("Failed to create share link: " + err.message);
+  } finally {
+    setSharing(false);
+  }
+};
 
   const handleExport = async () => {
   if (!reportRef.current) return;
@@ -104,55 +132,64 @@ while (heightLeft > 0) {
   return (
     <div>
       {/* ===== EXPORT BAR (not included in PDF) ===== */}
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm shadow-sm"
-        >
-          {exporting ? (
-            <>
-              <svg
-                className="w-4 h-4 animate-spin"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                />
-              </svg>
-              Generating PDF…
-            </>
-          ) : (
-            <>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Export PDF Report
-            </>
-          )}
-        </button>
-      </div>
+      <div className="flex flex-col sm:flex-row justify-end gap-2 mb-4">
+  {shareUrl && (
+    <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2 text-xs">
+      <svg className="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+      <span className="text-green-800 font-semibold truncate">
+        Copied! {shareUrl.replace(/^https?:\/\//, "")}
+      </span>
+    </div>
+  )}
+
+  <button
+    onClick={handleShare}
+    disabled={sharing}
+    className="inline-flex items-center justify-center gap-2 bg-white border-2 border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-50 text-gray-900 font-semibold px-5 py-2.5 rounded-xl transition text-sm"
+  >
+    {sharing ? (
+      <>
+        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+        Creating link…
+      </>
+    ) : (
+      <>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+        Share Report
+      </>
+    )}
+  </button>
+
+  <button
+    onClick={handleExport}
+    disabled={exporting}
+    className="inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm shadow-sm"
+  >
+    {exporting ? (
+      <>
+        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+        Generating PDF…
+      </>
+    ) : (
+      <>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Export PDF
+      </>
+    )}
+  </button>
+</div>
 
       {/* ===== REPORT (this is what gets exported) ===== */}
       <div ref={reportRef} className="space-y-6 bg-gray-50 p-6 rounded-2xl">
