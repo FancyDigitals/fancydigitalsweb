@@ -58,6 +58,7 @@ export const PLAN_LIMITS = {
     youtubeCompetitorCompare: false,
     youtubeNicheReport: false,
     youtubePDFExport: false,
+    pitchDeckPerDay: 1, 
   },
   PRO_MONTHLY: {
     publishedPages: Infinity,
@@ -79,6 +80,7 @@ export const PLAN_LIMITS = {
     youtubeCompetitorCompare: true,
     youtubeNicheReport: true,
     youtubePDFExport: false,
+    pitchDeckPerDay: Infinity,
   },
   AGENCY_MONTHLY: {
     publishedPages: Infinity,
@@ -100,6 +102,7 @@ export const PLAN_LIMITS = {
     youtubeCompetitorCompare: true,
     youtubeNicheReport: true,
     youtubePDFExport: true,
+    pitchDeckPerDay: Infinity,
   },
 };
 

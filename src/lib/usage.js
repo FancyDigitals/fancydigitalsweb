@@ -11,6 +11,7 @@ const TOOL_LIMIT_KEY = {
   "ai-video-generator": "videoGeneratorPerDay",
   "youtube-auditor": "youtubeAuditPerDay",
   "youtube-titles": "youtubeTitlesPerDay",
+  "ai-pitch-deck": "pitchDeckPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;
