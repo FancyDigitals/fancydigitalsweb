@@ -61,6 +61,7 @@ export const PLAN_LIMITS = {
     pitchDeckPerDay: 1,
     businessPlanPerDay: 1,
     emailSequencePerDay: 1,
+    socialPostPerDay: 3,
   },
   PRO_MONTHLY: {
     publishedPages: Infinity,
@@ -85,6 +86,7 @@ export const PLAN_LIMITS = {
     pitchDeckPerDay: Infinity,
     businessPlanPerDay: Infinity,
     emailSequencePerDay: Infinity,
+    socialPostPerDay: Infinity,
   },
   AGENCY_MONTHLY: {
     publishedPages: Infinity,
@@ -109,6 +111,7 @@ export const PLAN_LIMITS = {
     pitchDeckPerDay: Infinity,
     businessPlanPerDay: Infinity,
     emailSequencePerDay: Infinity,
+    socialPostPerDay: Infinity,
   },
 };
 

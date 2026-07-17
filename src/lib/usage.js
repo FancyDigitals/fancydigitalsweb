@@ -14,6 +14,7 @@ const TOOL_LIMIT_KEY = {
   "ai-pitch-deck": "pitchDeckPerDay",
   "ai-business-plan": "businessPlanPerDay",
   "ai-email-sequence": "emailSequencePerDay",
+  "ai-social-media-post": "socialPostPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;
