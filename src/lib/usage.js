@@ -12,6 +12,8 @@ const TOOL_LIMIT_KEY = {
   "youtube-auditor": "youtubeAuditPerDay",
   "youtube-titles": "youtubeTitlesPerDay",
   "ai-pitch-deck": "pitchDeckPerDay",
+  "ai-business-plan": "businessPlanPerDay",
+  "ai-email-sequence": "emailSequencePerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;

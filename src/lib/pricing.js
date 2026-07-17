@@ -45,7 +45,7 @@ export const PLAN_LIMITS = {
     resumePerDay: 3,
     coverLetterPerDay: 3,
     landingPagePerDay: 2,
-    videoGeneratorPerDay: 2,   // ← was videoAdPerDay: 1
+    videoGeneratorPerDay: 2,
     aiCheckerPerDay: 2,
     documentViewerPerDay: 10,
     websiteAuditPerDay: 1,
@@ -58,7 +58,9 @@ export const PLAN_LIMITS = {
     youtubeCompetitorCompare: false,
     youtubeNicheReport: false,
     youtubePDFExport: false,
-    pitchDeckPerDay: 1, 
+    pitchDeckPerDay: 1,
+    businessPlanPerDay: 1,
+    emailSequencePerDay: 1,
   },
   PRO_MONTHLY: {
     publishedPages: Infinity,
@@ -67,7 +69,7 @@ export const PLAN_LIMITS = {
     resumePerDay: Infinity,
     coverLetterPerDay: Infinity,
     landingPagePerDay: Infinity,
-    videoGeneratorPerDay: 10,   // ← was Infinity, now 10/day per your spec
+    videoGeneratorPerDay: 10,
     aiCheckerPerDay: Infinity,
     documentViewerPerDay: Infinity,
     websiteAuditPerDay: Infinity,
@@ -81,6 +83,8 @@ export const PLAN_LIMITS = {
     youtubeNicheReport: true,
     youtubePDFExport: false,
     pitchDeckPerDay: Infinity,
+    businessPlanPerDay: Infinity,
+    emailSequencePerDay: Infinity,
   },
   AGENCY_MONTHLY: {
     publishedPages: Infinity,
@@ -103,6 +107,8 @@ export const PLAN_LIMITS = {
     youtubeNicheReport: true,
     youtubePDFExport: true,
     pitchDeckPerDay: Infinity,
+    businessPlanPerDay: Infinity,
+    emailSequencePerDay: Infinity,
   },
 };
 
