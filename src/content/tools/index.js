@@ -320,7 +320,7 @@ export const tools = [
   published: true,
   order: 0,
   isLive: true,
-  isAI: false, // Positioned as an analytics tool, not "AI slop"
+  isAI: true, // Positioned as an analytics tool, not "AI slop"
   requiresLogin: true,
   accent: "#FF0000",
   accentLight: "from-[#FF0000]/10 to-[#FF4444]/10",
