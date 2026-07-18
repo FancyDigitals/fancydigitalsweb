@@ -31,6 +31,8 @@ const GEMINI_MODELS = [
   "gemini-2.0-flash-lite",
   "gemini-1.5-flash",
   "gemini-1.5-flash-8b",
+  "gemini-2.5-flash-image-preview",
+  "gemini-2.0-flash-preview-image-generation",
 ];
 
 const GROQ_MODELS = [
@@ -347,6 +349,112 @@ export async function generateJSON(prompt) {
 }
 
 /* ============================================================
+   IMAGE GENERATION — Logo & brand mark creation
+============================================================ */
+
+/**
+ * Generate a logo image using Gemini 2.5 Flash Image.
+ * Returns base64 data URL.
+ * @param {string} prompt - The image generation prompt
+ * @returns {Promise<string|null>} - data:image/png;base64,... or null on failure
+ */
+export async function generateLogoImage(prompt) {
+  if (!prompt || typeof prompt !== "string") return null;
+
+  const geminiKeys = [GEMINI_KEY_1, GEMINI_KEY_2, GEMINI_KEY_3].filter(Boolean);
+
+  // ── PHASE 1: Try Gemini image models ──
+  for (const model of GEMINI_IMAGE_MODELS) {
+    for (const key of geminiKeys) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: key });
+        const keyLabel = key === GEMINI_KEY_1 ? "PRIMARY" : "SECONDARY";
+        console.log(`[Image] Trying ${model} key=${keyLabel}`);
+
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            responseModalities: ["Image"],
+          },
+        });
+
+        // Extract image data from response
+        const parts = response?.candidates?.[0]?.content?.parts || [];
+        for (const part of parts) {
+          if (part?.inlineData?.data) {
+            const mimeType = part.inlineData.mimeType || "image/png";
+            const base64 = part.inlineData.data;
+            console.log(`[Image] ✅ Success model=${model}`);
+            return `data:${mimeType};base64,${base64}`;
+          }
+        }
+
+        console.warn(`[Image] No image data in response from ${model}`);
+      } catch (error) {
+        const errType = classifyError(error);
+        console.warn(
+          `[Image] ❌ ${errType} model=${model}: ${error.message?.slice(0, 120)}`
+        );
+        continue;
+      }
+    }
+  }
+
+  // ── PHASE 2: OpenRouter fallback (FLUX Schnell — free/cheap) ──
+  if (OPENROUTER_KEY) {
+    try {
+      console.log("[Image] Trying OpenRouter FLUX fallback");
+      const client = new OpenAI({
+        apiKey: OPENROUTER_KEY,
+        baseURL: "https://openrouter.ai/api/v1",
+        defaultHeaders: {
+          "HTTP-Referer": "https://fancydigitals.com.ng",
+          "X-Title": "Fancy Digitals",
+        },
+      });
+
+      const response = await client.chat.completions.create({
+        model: "google/gemini-2.5-flash-image-preview",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        modalities: ["image", "text"],
+      });
+
+      const content = response?.choices?.[0]?.message;
+      // OpenRouter returns images differently — check for images array
+      if (content?.images && content.images.length > 0) {
+        const img = content.images[0];
+        if (img?.image_url?.url) {
+          console.log("[Image] ✅ OpenRouter success");
+          return img.image_url.url; // Already a data URL
+        }
+      }
+    } catch (err) {
+      console.warn(`[Image] ❌ OpenRouter fallback failed: ${err.message?.slice(0, 120)}`);
+    }
+  }
+
+  console.warn("[Image] All image providers failed");
+  return null;
+}
+
+/**
+ * Generate multiple logo images in parallel.
+ * @param {Array<string>} prompts - Array of prompts
+ * @returns {Promise<Array<string|null>>} - Array of base64 data URLs
+ */
+export async function generateLogoImages(prompts) {
+  if (!Array.isArray(prompts) || prompts.length === 0) return [];
+  const results = await Promise.all(prompts.map((p) => generateLogoImage(p)));
+  return results;
+}
+
+/* ============================================================
    VISION — Structured image analysis with Gemini
 ============================================================ */
 
@@ -465,6 +573,8 @@ Be precise. Categories and bestUse must be from the allowed lists.`;
       }
     }
   }
+
+
 
   console.warn("[Vision] All vision models failed");
   return empty;

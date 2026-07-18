@@ -62,6 +62,8 @@ export const PLAN_LIMITS = {
     businessPlanPerDay: 1,
     emailSequencePerDay: 1,
     socialPostPerDay: 3,
+    brandKitPerDay: 1,
+brandKitZipExport: false,
   },
   PRO_MONTHLY: {
     publishedPages: Infinity,
@@ -87,6 +89,8 @@ export const PLAN_LIMITS = {
     businessPlanPerDay: Infinity,
     emailSequencePerDay: Infinity,
     socialPostPerDay: Infinity,
+    brandKitPerDay: Infinity,
+brandKitZipExport: true,
   },
   AGENCY_MONTHLY: {
     publishedPages: Infinity,
@@ -112,6 +116,8 @@ export const PLAN_LIMITS = {
     businessPlanPerDay: Infinity,
     emailSequencePerDay: Infinity,
     socialPostPerDay: Infinity,
+    brandKitPerDay: Infinity,
+brandKitZipExport: true,
   },
 };
 
