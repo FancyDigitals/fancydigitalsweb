@@ -151,20 +151,10 @@ Return a JSON object with this EXACT structure:
     { "type": "Wordmark", "description": "Clean typography-based logo using the heading font" },
     { "type": "Combination", "description": "Icon + text combination with initials in a rounded shape" },
     { "type": "Icon", "description": "Standalone icon/monogram using brand initials" }
-  ],
-  "logo_prompts": [
-    "Detailed AI image prompt for a wordmark logo in style X for Midjourney",
-    "Detailed AI image prompt for an icon logo in style Y for Midjourney",
-    "Detailed AI image prompt for a combination logo in style Z for Midjourney"
-  ],
-  "logo_image_prompts": [
-    "SPECIFIC ICON-ONLY prompt for AI image generation — abstract symbol/mark WITHOUT text, related to the industry, using the primary brand color, minimalist, geometric, professional, centered on white background, vector-style logo design, high contrast, clean lines",
-    "SPECIFIC ICON-ONLY prompt for a second alternative mark — different concept, WITHOUT text, using brand colors, professional logo design",
-    "SPECIFIC ICON-ONLY prompt for a third alternative mark — bold and unique, WITHOUT text, professional icon design"
   ]
 }
 
-Make everything genuinely strategic and on-brand. Colors should reflect industry and personality. Fonts should match the style. The logo_image_prompts MUST specify NO TEXT in the image — only icons/symbols. This is critical.`;
+Make everything genuinely strategic and on-brand. Colors should reflect the industry and personality. Fonts should match the style.`;
 
     const result = await generateJSON(prompt);
 
@@ -176,29 +166,130 @@ Make everything genuinely strategic and on-brand. Colors should reflect industry
     }
 
     // ─────────────────────────────────────────────
-    // STEP 2: Generate real AI image logos
+    // STEP 1B: Generate SVG logo marks + palette-locked prompts
+    // ─────────────────────────────────────────────
+    const primaryHex = result.colors?.[0]?.hex || "#075a01";
+    const secondaryHex = result.colors?.[1]?.hex || "#0a8f01";
+    const accentHex = result.colors?.[2]?.hex || "#ff914d";
+    const darkHex = result.colors?.find((c) => c.name?.toLowerCase().includes("dark"))?.hex || "#111827";
+
+    const logoSystemPrompt = `You are a world-class logo designer with expertise in vector art and SVG.
+
+Business: ${result.business_name}
+Industry: ${industry || "General"}
+Style: ${style || "Modern"}
+Brand feel: ${personalityText}
+
+Use ONLY these EXACT brand colors:
+Primary: ${primaryHex}
+Secondary: ${secondaryHex}
+Accent: ${accentHex}
+Dark: ${darkHex}
+(You may also use pure white #ffffff for negative space)
+
+CRITICAL: Return PLAIN TEXT ONLY. No markdown, no code fences, no backticks.
+
+Return valid JSON with this EXACT structure:
+
+{
+  "logo_svg_marks": [
+    {
+      "name": "Concept 1 — Abstract",
+      "type": "Abstract Mark",
+      "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'>...actual paths and shapes...</svg>"
+    },
+    {
+      "name": "Concept 2 — Geometric",
+      "type": "Geometric Mark",
+      "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'>...actual paths and shapes...</svg>"
+    },
+    {
+      "name": "Concept 3 — Modern",
+      "type": "Modern Mark",
+      "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'>...actual paths and shapes...</svg>"
+    }
+  ],
+  "logo_image_prompts": [
+    "Icon-only image prompt WITHOUT any text/letters. Abstract symbol representing the business essence. Use exact colors primary ${primaryHex} and secondary ${secondaryHex}. Minimalist vector logo, centered, white background, high contrast, professional brand mark, geometric shapes, clean lines.",
+    "Icon-only image prompt WITHOUT any text/letters. Different geometric concept. Use exact colors primary ${primaryHex} and accent ${accentHex}. Modern vector logo, centered, white background, bold shapes, professional design.",
+    "Icon-only image prompt WITHOUT any text/letters. Third unique abstract concept. Use exact colors primary ${primaryHex} and secondary ${secondaryHex}. Sleek minimalist mark, centered, white background, distinctive silhouette, memorable design."
+  ],
+  "logo_prompts": [
+    "Full lockup logo prompt for Midjourney/DALL-E. ${result.business_name} wordmark using modern sans-serif typography. Use exact colors primary ${primaryHex} and secondary ${secondaryHex}. Clean, minimalist, professional, --ar 16:9",
+    "Icon logo prompt for Midjourney/DALL-E. Abstract mark representing ${industry || 'the business'}. Use exact colors primary ${primaryHex} and accent ${accentHex}. Vector style, minimalist, professional, --ar 1:1",
+    "Combination mark prompt for Midjourney/DALL-E. ${result.business_name} with abstract icon. Use exact colors primary ${primaryHex} and secondary ${secondaryHex}. Modern, geometric, professional brand identity, --ar 3:2"
+  ]
+}
+
+SVG DESIGN RULES (CRITICAL — follow exactly):
+- viewBox MUST be "0 0 512 512"
+- width="512" height="512"
+- xmlns="http://www.w3.org/2000/svg" REQUIRED
+- Use ONLY these SVG elements: <circle>, <rect>, <path>, <polygon>, <ellipse>, <g>, <line>, <linearGradient>, <radialGradient>, <defs>, <stop>
+- NO <text> elements — icon marks only (no letters)
+- NO external images, NO <image>, NO base64
+- NO fonts required
+- Centered composition — most content between coords 80-432
+- Use fill attribute with the exact brand hex colors above
+- Can use gradients (linearGradient/radialGradient) with brand colors
+- Design should be modern, geometric, minimal, brandable
+- Think: Stripe, Linear, Vercel, Notion, Framer logo aesthetics
+- Each concept must be VISUALLY DIFFERENT from the others
+- Escape all quotes properly if inline (use single quotes for attributes inside svg strings)
+
+EXAMPLES of great SVG mark structures:
+- Layered geometric shapes with brand colors
+- Overlapping circles with gradient fills
+- Abstract letterforms (not real text — pure shapes)
+- Interlocking geometric patterns
+- Minimalist single-color marks with clever negative space
+- Bold shapes with accent color highlights`;
+
+    let logoSystem = null;
+    try {
+      logoSystem = await generateJSON(logoSystemPrompt);
+      console.log(`[BrandKit] Logo system generated: ${logoSystem?.logo_svg_marks?.length || 0} SVG marks`);
+    } catch (e) {
+      console.warn("[BrandKit] Logo system generation failed:", e?.message);
+    }
+
+    // Attach SVG marks + palette-locked prompts to the result
+    if (logoSystem?.logo_svg_marks?.length) {
+      // Validate each SVG has proper structure
+      const validSvgs = logoSystem.logo_svg_marks.filter(
+        (m) => m?.svg && typeof m.svg === "string" && m.svg.includes("<svg") && m.svg.includes("</svg>")
+      );
+      result.logo_svg_marks = validSvgs;
+    } else {
+      result.logo_svg_marks = [];
+    }
+
+    result.logo_image_prompts = logoSystem?.logo_image_prompts || [];
+    result.logo_prompts = logoSystem?.logo_prompts || [];
+
+    // ─────────────────────────────────────────────
+    // STEP 2: Generate real AI image logos (PNG)
     // ─────────────────────────────────────────────
     const userIsPro = usageResult.isPro;
     const numImagesToGenerate = userIsPro ? 3 : 1;
 
-    // Build enhanced prompts with brand colors baked in
-    const primaryHex = result.colors?.[0]?.hex || "#075a01";
-    const secondaryHex = result.colors?.[1]?.hex || "#0a8f01";
-    const enhancedPrompts = (result.logo_image_prompts || [])
+    const enhancedImagePrompts = (result.logo_image_prompts || [])
       .slice(0, numImagesToGenerate)
       .map(
         (p) =>
-          `${p}. NO TEXT, NO LETTERS, NO WORDS in the image. Pure icon/mark only. Use these exact brand colors: primary ${primaryHex}, secondary ${secondaryHex}. White background. Minimalist vector logo style. Centered composition. High resolution. Professional brand mark.`
+          `${p} ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS in the image. Pure icon/mark only. White background. Minimalist vector logo style. Centered composition. High resolution. Professional brand mark. Sharp clean edges.`
       );
 
     let logoImages = [];
-    try {
-      logoImages = await generateLogoImages(enhancedPrompts);
-      logoImages = logoImages.filter(Boolean); // Remove nulls
-      console.log(`[BrandKit] Generated ${logoImages.length}/${numImagesToGenerate} logo images`);
-    } catch (err) {
-      console.warn("[BrandKit] Image generation failed, continuing without", err.message);
-      logoImages = [];
+    if (enhancedImagePrompts.length > 0) {
+      try {
+        logoImages = await generateLogoImages(enhancedImagePrompts);
+        logoImages = logoImages.filter(Boolean); // Remove nulls
+        console.log(`[BrandKit] Generated ${logoImages.length}/${numImagesToGenerate} PNG logo images`);
+      } catch (err) {
+        console.warn("[BrandKit] Image generation failed, continuing without", err.message);
+        logoImages = [];
+      }
     }
 
     result.logo_images = logoImages;

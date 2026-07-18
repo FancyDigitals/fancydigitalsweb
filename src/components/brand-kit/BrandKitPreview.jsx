@@ -24,7 +24,7 @@ import { buildBrandKitZip, downloadBrandKitZip } from "@/lib/brand-kit/zip-build
 // ─────────────────────────────────────────────
 // COLOR SWATCH
 // ─────────────────────────────────────────────
-function ColorSwatch({ color, onUpdate }) {
+function ColorSwatch({ color }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
@@ -67,7 +67,65 @@ function ColorSwatch({ color, onUpdate }) {
 }
 
 // ─────────────────────────────────────────────
-// LOGO PREVIEW (SVG rendered)
+// SVG MARK CARD (new — displays AI-generated vector marks)
+// ─────────────────────────────────────────────
+function SvgMarkCard({ mark, businessName, index }) {
+  const [copied, setCopied] = useState(false);
+
+  const downloadSvg = () => {
+    const blob = new Blob([mark.svg], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${(businessName || "brand").toLowerCase().replace(/\s+/g, "-")}-mark-${index + 1}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const copySvg = async () => {
+    try {
+      await navigator.clipboard.writeText(mark.svg);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden group">
+      <div
+        className="aspect-square p-6 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:h-auto [&_svg]:w-auto"
+        dangerouslySetInnerHTML={{ __html: mark.svg }}
+      />
+      <div className="p-3 border-t border-gray-100">
+        <div className="text-xs font-bold text-gray-900 mb-0.5">{mark.name}</div>
+        <div className="text-[10px] text-gray-500 mb-2">{mark.type}</div>
+
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={downloadSvg}
+            className="flex-1 flex items-center justify-center gap-1 text-[10px] font-bold text-white bg-gray-900 hover:bg-gray-800 px-2 py-1.5 rounded-lg transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            SVG
+          </button>
+          <button
+            type="button"
+            onClick={copySvg}
+            className="flex items-center justify-center gap-1 text-[10px] font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 px-2 py-1.5 rounded-lg transition-colors"
+          >
+            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// LOGO PREVIEW (initials-based fallback)
 // ─────────────────────────────────────────────
 function LogoPreview({ businessName, primaryColor, secondaryColor, type = "combination" }) {
   const initials = (businessName || "Brand")
@@ -424,7 +482,6 @@ export default function BrandKitPreview({
         {/* OVERVIEW */}
         {activeSection === "overview" && (
           <>
-            {/* Hero */}
             <div
               className="rounded-2xl p-8 text-center border"
               style={{
@@ -440,7 +497,6 @@ export default function BrandKitPreview({
               </p>
             </div>
 
-            {/* Brand story */}
             <div>
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
                 Brand Story
@@ -453,7 +509,6 @@ export default function BrandKitPreview({
               />
             </div>
 
-            {/* Mission & Vision */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
@@ -477,7 +532,6 @@ export default function BrandKitPreview({
               </div>
             </div>
 
-            {/* Values */}
             {kit.values && kit.values.length > 0 && (
               <div>
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
@@ -562,22 +616,49 @@ export default function BrandKitPreview({
           </div>
         )}
 
-                {/* LOGOS */}
+        {/* LOGOS */}
         {activeSection === "logos" && (
           <div className="space-y-6">
-            {/* AI-Generated Real Image Logos */}
+            {/* AI Vector SVG Marks (top priority — most impressive) */}
+            {kit.logo_svg_marks && kit.logo_svg_marks.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    AI Vector Logo Marks
+                  </h3>
+                  <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-2 py-0.5 rounded-full">
+                    EDITABLE SVG
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mb-4">
+                  Real vector marks generated by AI. Perfect for favicons, social avatars, and app icons. Edit in Figma or any SVG editor.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {kit.logo_svg_marks.map((mark, i) => (
+                    <SvgMarkCard
+                      key={i}
+                      mark={mark}
+                      businessName={kit.business_name}
+                      index={i}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* AI-Generated Real Image Logos (PNG) */}
             {kit.logo_images && kit.logo_images.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    AI-Generated Logos
+                    AI Image Logos
                   </h3>
                   <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-2 py-0.5 rounded-full">
-                    REAL AI IMAGES
+                    PNG • REAL AI IMAGES
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mb-4">
-                  Icon marks generated by AI. Combine with your business name in the ZIP for full brand lockup.
+                  Image logos generated by AI. Great for high-fidelity visuals and photorealistic marks.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {kit.logo_images.map((imgData, i) => (
@@ -590,11 +671,6 @@ export default function BrandKitPreview({
                         alt={`AI Logo ${i + 1}`}
                         className="w-full h-full object-contain p-4"
                       />
-                      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="text-[10px] font-bold text-white text-center">
-                          Concept {i + 1}
-                        </div>
-                      </div>
                       <a
                         href={imgData}
                         download={`${(kit.business_name || "brand").toLowerCase().replace(/\s+/g, "-")}-logo-${i + 1}.png`}
@@ -607,24 +683,23 @@ export default function BrandKitPreview({
                   ))}
                 </div>
 
-                {/* Upgrade prompt for Free users */}
                 {!userIsPro && kit.logo_images.length < 3 && (
                   <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200">
                     <p className="text-xs text-amber-800">
-                      <strong>Upgrade to Pro</strong> to get 3 AI-generated logo concepts instead of 1, plus the full brand kit ZIP.
+                      <strong>Upgrade to Pro</strong> to get 3 AI-generated PNG logos instead of 1, plus the full brand kit ZIP.
                     </p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Editable SVG Logo Concepts */}
+            {/* Wordmark / Combination lockups (initials-based) */}
             <div>
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
-                Editable SVG Concepts
+                Brand Name Lockups
               </h3>
               <p className="text-xs text-gray-500 mb-4">
-                Vector logos with your business name — edit in Figma, Illustrator, or any SVG editor.
+                Text-based logo variations with your business name — guaranteed correct spelling.
               </p>
               <div className="space-y-3">
                 <LogoPreview
@@ -755,7 +830,6 @@ export default function BrandKitPreview({
         {/* ASSETS */}
         {activeSection === "assets" && (
           <div className="space-y-5">
-            {/* Taglines */}
             {kit.taglines && (
               <div>
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
@@ -781,7 +855,6 @@ export default function BrandKitPreview({
               </div>
             )}
 
-            {/* Social bios */}
             {kit.social_bios && (
               <div>
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
@@ -817,7 +890,6 @@ export default function BrandKitPreview({
         )}
       </div>
 
-      {/* ZIP CTA for Free users */}
       {!canExportZip && (
         <div className="px-5 py-4 border-t border-gray-100 bg-gradient-to-br from-amber-50 to-orange-50">
           <div className="flex items-center gap-3">
@@ -842,7 +914,6 @@ export default function BrandKitPreview({
         </div>
       )}
 
-      {/* Share modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">

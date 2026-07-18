@@ -545,6 +545,15 @@ export async function buildBrandKitZip(kitData) {
     });
   }
 
+    // Add AI-generated SVG marks (icon-only)
+  if (kitData.logo_svg_marks && Array.isArray(kitData.logo_svg_marks)) {
+    kitData.logo_svg_marks.forEach((m, i) => {
+      if (m?.svg) {
+        logoFolder.file(`logo-mark-${i + 1}.svg`, m.svg);
+      }
+    });
+  }
+
   // Add editable SVG logos (always included)
   logoFolder.file("logo-combination.svg", generateCombinationLogo(businessName, primaryColor, lightColor, headingFont));
   logoFolder.file("logo-wordmark.svg", generateWordmarkLogo(businessName, primaryColor, headingFont));
