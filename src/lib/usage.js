@@ -16,6 +16,7 @@ const TOOL_LIMIT_KEY = {
   "ai-email-sequence": "emailSequencePerDay",
   "ai-social-media-post": "socialPostPerDay",
   "ai-brand-kit": "brandKitPerDay",
+  "ai-content-calendar": "contentCalendarPerDay",
 };
 
 const ANON_DAILY_LIMIT = 1;
@@ -38,7 +39,7 @@ export async function checkUsage(toolSlug) {
     .from("profiles")
     .select("plan")
     .eq("id", user.id)
-    .single();
+    .maybeSingle()
 
   const plan = profile?.plan || "FREE";
   const limits = getLimits(plan);
@@ -98,7 +99,7 @@ export async function checkAndIncrementUsage(toolSlug) {
     .from("profiles")
     .select("plan")
     .eq("id", user.id)
-    .single();
+    .maybeSingle()
 
   const plan = profile?.plan || "FREE";
   const limits = getLimits(plan);

@@ -6,6 +6,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
+  // ← ADD THIS: fixes the lucide-react Youtube barrel error
+  transpilePackages: ["lucide-react"],
+
   experimental: {
     serverActions: {
       bodySizeLimit: "50mb",
@@ -61,39 +64,39 @@ const nextConfig = {
   },
 
   async redirects() {
-  return [
-    {
-      source: "/tools/ai-resume-builder",
-      destination: "/free-ai-resume-builder",
-      permanent: true,
-    },
-    {
-      source: "/tools/ai-cover-letter",
-      destination: "/free-ai-cover-letter",
-      permanent: true,
-    },
-    {
-      source: "/free-ai-video-ad-generator",
-      destination: "/free-ai-video-generator",
-      permanent: true,
-    },
-    {
-      source: "/free-ai-video-ad-generator/:path*",
-      destination: "/free-ai-video-generator",
-      permanent: true,
-    },
-    {
-      source: "/dashboard/video-ai",
-      destination: "/video-ai",
-      permanent: false,
-    },
-    {
-      source: "/dashboard/video-ai/:path*",
-      destination: "/video-ai",
-      permanent: false,
-    },
-  ];
-},
+    return [
+      {
+        source: "/tools/ai-resume-builder",
+        destination: "/free-ai-resume-builder",
+        permanent: true,
+      },
+      {
+        source: "/tools/ai-cover-letter",
+        destination: "/free-ai-cover-letter",
+        permanent: true,
+      },
+      {
+        source: "/free-ai-video-ad-generator",
+        destination: "/free-ai-video-generator",
+        permanent: true,
+      },
+      {
+        source: "/free-ai-video-ad-generator/:path*",
+        destination: "/free-ai-video-generator",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/video-ai",
+        destination: "/video-ai",
+        permanent: false,
+      },
+      {
+        source: "/dashboard/video-ai/:path*",
+        destination: "/video-ai",
+        permanent: false,
+      },
+    ];
+  },
 
   async headers() {
     return [

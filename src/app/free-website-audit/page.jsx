@@ -757,7 +757,7 @@ useEffect(() => {
                           <ImageIcon className="h-4 w-4 text-indigo-400 shrink-0" />
                           <p className="text-xs font-bold text-gray-900">{insight.label}</p>
                         </div>
-                        <p className="text-[11px] text-gray-500 mb-2">{insight.whatWeeSee}</p>
+                        <p className="text-[11px] text-gray-500 mb-2">{insight.whatWeSee}</p>
                         {insight.strengths?.length > 0 && (
                           <ul className="mb-2 space-y-1">
                             {insight.strengths.map((s, j) => (

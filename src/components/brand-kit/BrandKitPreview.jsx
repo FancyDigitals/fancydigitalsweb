@@ -18,6 +18,7 @@ import {
   Sparkles,
   Package,
   RefreshCw,
+  ImageIcon,
 } from "lucide-react";
 import { buildBrandKitZip, downloadBrandKitZip } from "@/lib/brand-kit/zip-builder";
 
@@ -67,65 +68,49 @@ function ColorSwatch({ color }) {
 }
 
 // ─────────────────────────────────────────────
-// SVG MARK CARD (new — displays AI-generated vector marks)
+// AI LOGO CARD (real PNG image)
 // ─────────────────────────────────────────────
-function SvgMarkCard({ mark, businessName, index }) {
-  const [copied, setCopied] = useState(false);
-
-  const downloadSvg = () => {
-    const blob = new Blob([mark.svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
+function LogoImageCard({ imgData, meta, businessName, index }) {
+  const download = () => {
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `${(businessName || "brand").toLowerCase().replace(/\s+/g, "-")}-mark-${index + 1}.svg`;
+    a.href = imgData;
+    a.download = `${(businessName || "brand").toLowerCase().replace(/\s+/g, "-")}-logo-${index + 1}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
-  const copySvg = async () => {
-    try {
-      await navigator.clipboard.writeText(mark.svg);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
-  };
+  const name = meta?.name || `Logo Concept ${index + 1}`;
+  const type = meta?.type || "AI-generated logo mark";
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden group">
-      <div
-        className="aspect-square p-6 flex items-center justify-center bg-gradient-to-br from-gray-50 to-white [&_svg]:max-w-full [&_svg]:max-h-full [&_svg]:h-auto [&_svg]:w-auto"
-        dangerouslySetInnerHTML={{ __html: mark.svg }}
-      />
+      <div className="aspect-square bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-6 relative">
+        <img
+          src={imgData}
+          alt={name}
+          className="w-full h-full object-contain"
+        />
+      </div>
       <div className="p-3 border-t border-gray-100">
-        <div className="text-xs font-bold text-gray-900 mb-0.5">{mark.name}</div>
-        <div className="text-[10px] text-gray-500 mb-2">{mark.type}</div>
+        <div className="text-xs font-bold text-gray-900 mb-0.5">{name}</div>
+        <div className="text-[10px] text-gray-500 mb-2">{type}</div>
 
-        <div className="flex gap-1.5">
-          <button
-            type="button"
-            onClick={downloadSvg}
-            className="flex-1 flex items-center justify-center gap-1 text-[10px] font-bold text-white bg-gray-900 hover:bg-gray-800 px-2 py-1.5 rounded-lg transition-colors"
-          >
-            <Download className="w-3 h-3" />
-            SVG
-          </button>
-          <button
-            type="button"
-            onClick={copySvg}
-            className="flex items-center justify-center gap-1 text-[10px] font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 px-2 py-1.5 rounded-lg transition-colors"
-          >
-            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={download}
+          className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-white bg-gray-900 hover:bg-gray-800 px-2 py-1.5 rounded-lg transition-colors"
+        >
+          <Download className="w-3 h-3" />
+          Download PNG
+        </button>
       </div>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────
-// LOGO PREVIEW (initials-based fallback)
+// LOGO PREVIEW (initials-based wordmark/lockup)
 // ─────────────────────────────────────────────
 function LogoPreview({ businessName, primaryColor, secondaryColor, type = "combination" }) {
   const initials = (businessName || "Brand")
@@ -380,6 +365,8 @@ export default function BrandKitPreview({
     { id: "assets", label: "Assets", icon: Layers },
   ];
 
+  const hasRealLogos = kit.logo_images && kit.logo_images.length > 0;
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Toolbar */}
@@ -619,81 +606,50 @@ export default function BrandKitPreview({
         {/* LOGOS */}
         {activeSection === "logos" && (
           <div className="space-y-6">
-            {/* AI Vector SVG Marks (top priority — most impressive) */}
-            {kit.logo_svg_marks && kit.logo_svg_marks.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    AI Vector Logo Marks
-                  </h3>
-                  <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-2 py-0.5 rounded-full">
-                    EDITABLE SVG
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mb-4">
-                  Real vector marks generated by AI. Perfect for favicons, social avatars, and app icons. Edit in Figma or any SVG editor.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {kit.logo_svg_marks.map((mark, i) => (
-                    <SvgMarkCard
-                      key={i}
-                      mark={mark}
-                      businessName={kit.business_name}
-                      index={i}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* AI Logo Concepts — REAL PNG IMAGES */}
+{hasRealLogos ? (
+  <div>
+    <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
+      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+        AI Logo Concepts
+      </h3>
+      <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-2 py-0.5 rounded-full">
+        PNG • REAL AI LOGOS
+      </span>
+    </div>
+    {kit.logo_preference && (
+      <p className="text-[11px] text-[#075a01] font-semibold mb-2">
+        Style: {kit.logo_preference}
+      </p>
+    )}
+    <p className="text-xs text-gray-500 mb-4">
+      Three unique {kit.logo_preference?.toLowerCase() || "logo"} concepts generated by AI, tailored to your business. Download as PNG for immediate use, or refine further in Figma, Photoshop, or Illustrator.
+    </p>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {kit.logo_images.map((imgData, i) => (
+        <LogoImageCard
+          key={i}
+          imgData={imgData}
+          meta={kit.logo_concepts_meta?.[i]}
+          businessName={kit.business_name}
+          index={i}
+        />
+      ))}
+    </div>
+  </div>
+) : (
+  <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-6 text-center">
+    <ImageIcon className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+    <p className="text-sm font-bold text-amber-900 mb-1">
+      Logo images unavailable
+    </p>
+    <p className="text-xs text-amber-800">
+      The image AI is temporarily busy. Your brand kit is still ready below. Try regenerating in a minute for logo concepts.
+    </p>
+  </div>
+)}
 
-            {/* AI-Generated Real Image Logos (PNG) */}
-            {kit.logo_images && kit.logo_images.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    AI Image Logos
-                  </h3>
-                  <span className="text-[10px] font-bold text-white bg-gradient-to-r from-[#075a01] to-[#0a8f01] px-2 py-0.5 rounded-full">
-                    PNG • REAL AI IMAGES
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mb-4">
-                  Image logos generated by AI. Great for high-fidelity visuals and photorealistic marks.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {kit.logo_images.map((imgData, i) => (
-                    <div
-                      key={i}
-                      className="relative group rounded-2xl border-2 border-gray-200 bg-white overflow-hidden aspect-square"
-                    >
-                      <img
-                        src={imgData}
-                        alt={`AI Logo ${i + 1}`}
-                        className="w-full h-full object-contain p-4"
-                      />
-                      <a
-                        href={imgData}
-                        download={`${(kit.business_name || "brand").toLowerCase().replace(/\s+/g, "-")}-logo-${i + 1}.png`}
-                        className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-white"
-                        title="Download PNG"
-                      >
-                        <Download className="w-3 h-3 text-gray-700" />
-                      </a>
-                    </div>
-                  ))}
-                </div>
-
-                {!userIsPro && kit.logo_images.length < 3 && (
-                  <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200">
-                    <p className="text-xs text-amber-800">
-                      <strong>Upgrade to Pro</strong> to get 3 AI-generated PNG logos instead of 1, plus the full brand kit ZIP.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Wordmark / Combination lockups (initials-based) */}
+            {/* Wordmark / Combination lockups (initials-based, guaranteed correct spelling) */}
             <div>
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
                 Brand Name Lockups

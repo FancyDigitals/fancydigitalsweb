@@ -350,107 +350,92 @@ export async function generateJSON(prompt) {
 
 /* ============================================================
    IMAGE GENERATION — Logo & brand mark creation
-============================================================ */
+============================================================ *
 
 /**
- * Generate a logo image using Gemini 2.5 Flash Image.
- * Returns base64 data URL.
+ * Generate a logo image using Pollinations.ai (free Flux image generation).
+ * No API key required. Returns base64 data URL.
  * @param {string} prompt - The image generation prompt
  * @returns {Promise<string|null>} - data:image/png;base64,... or null on failure
  */
 export async function generateLogoImage(prompt) {
   if (!prompt || typeof prompt !== "string") return null;
 
-  const geminiKeys = [GEMINI_KEY_1, GEMINI_KEY_2, GEMINI_KEY_3].filter(Boolean);
+  try {
+    const seed = Math.floor(Math.random() * 999999);
+    const encodedPrompt = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}&model=flux`;
 
-  // ── PHASE 1: Try Gemini image models ──
-  for (const model of GEMINI_IMAGE_MODELS) {
-    for (const key of geminiKeys) {
-      try {
-        const ai = new GoogleGenAI({ apiKey: key });
-        const keyLabel = key === GEMINI_KEY_1 ? "PRIMARY" : "SECONDARY";
-        console.log(`[Image] Trying ${model} key=${keyLabel}`);
+    console.log(`[Image] Fetching from Pollinations.ai (seed=${seed})`);
 
-        const response = await ai.models.generateContent({
-          model,
-          contents: prompt,
-          config: {
-            responseModalities: ["Image"],
-          },
-        });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 40000);
 
-        // Extract image data from response
-        const parts = response?.candidates?.[0]?.content?.parts || [];
-        for (const part of parts) {
-          if (part?.inlineData?.data) {
-            const mimeType = part.inlineData.mimeType || "image/png";
-            const base64 = part.inlineData.data;
-            console.log(`[Image] ✅ Success model=${model}`);
-            return `data:${mimeType};base64,${base64}`;
-          }
-        }
+    const response = await fetch(imageUrl, {
+      redirect: "follow",
+      signal: controller.signal,
+    });
 
-        console.warn(`[Image] No image data in response from ${model}`);
-      } catch (error) {
-        const errType = classifyError(error);
-        console.warn(
-          `[Image] ❌ ${errType} model=${model}: ${error.message?.slice(0, 120)}`
-        );
-        continue;
-      }
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
-  }
 
-  // ── PHASE 2: OpenRouter fallback (FLUX Schnell — free/cheap) ──
-  if (OPENROUTER_KEY) {
-    try {
-      console.log("[Image] Trying OpenRouter FLUX fallback");
-      const client = new OpenAI({
-        apiKey: OPENROUTER_KEY,
-        baseURL: "https://openrouter.ai/api/v1",
-        defaultHeaders: {
-          "HTTP-Referer": "https://fancydigitals.com.ng",
-          "X-Title": "Fancy Digitals",
-        },
-      });
+    const buffer = await response.arrayBuffer();
 
-      const response = await client.chat.completions.create({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        modalities: ["image", "text"],
-      });
-
-      const content = response?.choices?.[0]?.message;
-      // OpenRouter returns images differently — check for images array
-      if (content?.images && content.images.length > 0) {
-        const img = content.images[0];
-        if (img?.image_url?.url) {
-          console.log("[Image] ✅ OpenRouter success");
-          return img.image_url.url; // Already a data URL
-        }
-      }
-    } catch (err) {
-      console.warn(`[Image] ❌ OpenRouter fallback failed: ${err.message?.slice(0, 120)}`);
+    if (buffer.byteLength < 5000) {
+      throw new Error(`Image too small (${buffer.byteLength} bytes) — likely an error page`);
     }
-  }
 
-  console.warn("[Image] All image providers failed");
-  return null;
+    const base64 = Buffer.from(buffer).toString("base64");
+    const contentType = response.headers.get("content-type") || "image/png";
+    const mimeType = contentType.split(";")[0].trim();
+
+    console.log(`[Image] ✅ Pollinations.ai success (${Math.round(buffer.byteLength / 1024)}KB)`);
+    return `data:${mimeType};base64,${base64}`;
+  } catch (err) {
+    if (err.name === "AbortError") {
+      console.warn("[Image] ❌ Pollinations.ai timed out (40s)");
+    } else {
+      console.warn(`[Image] ❌ Pollinations.ai error: ${err.message?.slice(0, 200)}`);
+    }
+    return null;
+  }
 }
 
 /**
- * Generate multiple logo images in parallel.
- * @param {Array<string>} prompts - Array of prompts
- * @returns {Promise<Array<string|null>>} - Array of base64 data URLs
+ * Generate multiple logo images SEQUENTIALLY to avoid Pollinations rate limiting.
+ * @param {string[]} prompts - Array of image generation prompts
+ * @returns {Promise<Array<string|null>>}
  */
 export async function generateLogoImages(prompts) {
   if (!Array.isArray(prompts) || prompts.length === 0) return [];
-  const results = await Promise.all(prompts.map((p) => generateLogoImage(p)));
+
+  console.log(`[Image] Generating ${prompts.length} logos sequentially`);
+  const results = [];
+
+  for (let i = 0; i < prompts.length; i++) {
+    try {
+      const result = await generateLogoImage(prompts[i]);
+      if (result) {
+        console.log(`[Image] ✅ Logo ${i + 1}/${prompts.length} done`);
+        results.push(result);
+      } else {
+        console.warn(`[Image] ❌ Logo ${i + 1}/${prompts.length} failed`);
+        results.push(null);
+      }
+    } catch (err) {
+      console.warn(`[Image] ❌ Logo ${i + 1} error: ${err.message?.slice(0, 120)}`);
+      results.push(null);
+    }
+
+    // Small delay between requests to avoid Pollinations rate limiting
+    if (i < prompts.length - 1) {
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+  }
+
   return results;
 }
 
@@ -574,8 +559,136 @@ Be precise. Categories and bestUse must be from the allowed lists.`;
     }
   }
 
+  
+
 
 
   console.warn("[Vision] All vision models failed");
   return empty;
+}
+
+// ============================================================
+// LOGO GENERATION — Tiered: OpenRouter for Pro, Pollinations for Free
+// ============================================================
+
+/**
+ * Generate a logo icon PNG image using Flux Schnell via OpenRouter.
+ * Falls back to Pollinations.ai (free) if OpenRouter fails.
+ * @param {string} prompt - Image generation prompt (icon only, no text)
+ * @param {boolean} usePremium - If true, use paid OpenRouter Flux. If false, use free Pollinations.
+ * @returns {Promise<string|null>} - data:image/png;base64,... or null
+ */
+export async function generateLogoIcon(prompt, usePremium = false) {
+  if (!prompt || typeof prompt !== "string") return null;
+
+  // ── Pro users: Try OpenRouter Flux Schnell first ($0.003/image) ──
+  if (usePremium && OPENROUTER_KEY) {
+    try {
+      console.log(`[Logo] Trying OpenRouter Flux Schnell (premium)`);
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENROUTER_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://fancydigitals.com.ng",
+          "X-Title": "Fancy Digitals",
+        },
+        body: JSON.stringify({
+          model: "black-forest-labs/flux-schnell",
+          messages: [{ role: "user", content: prompt }],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const message = data?.choices?.[0]?.message;
+        if (message?.images?.[0]) {
+          const img = message.images[0];
+          const url = img?.image_url?.url || img?.url;
+          if (url && url.startsWith("data:")) {
+            console.log(`[Logo] ✅ OpenRouter Flux success (premium)`);
+            return url;
+          }
+        }
+      } else {
+        const errText = await response.text();
+        console.warn(`[Logo] ❌ OpenRouter HTTP ${response.status}: ${errText.slice(0, 150)}`);
+      }
+    } catch (err) {
+      console.warn(`[Logo] ❌ OpenRouter error: ${err.message?.slice(0, 150)}`);
+    }
+  }
+
+  // ── Fallback: Pollinations.ai (free, unlimited) ──
+  try {
+    const seed = Math.floor(Math.random() * 999999);
+    const encodedPrompt = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${seed}&model=flux`;
+
+    console.log(`[Logo] Fetching from Pollinations (seed=${seed})`);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 45000);
+
+    const response = await fetch(imageUrl, {
+      redirect: "follow",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const buffer = await response.arrayBuffer();
+    if (buffer.byteLength < 5000) {
+      throw new Error(`Image too small (${buffer.byteLength} bytes)`);
+    }
+
+    const base64 = Buffer.from(buffer).toString("base64");
+    const contentType = response.headers.get("content-type") || "image/png";
+    const mimeType = contentType.split(";")[0].trim();
+
+    console.log(`[Logo] ✅ Pollinations success (${Math.round(buffer.byteLength / 1024)}KB)`);
+    return `data:${mimeType};base64,${base64}`;
+  } catch (err) {
+    console.warn(`[Logo] ❌ Pollinations error: ${err.message?.slice(0, 150)}`);
+    return null;
+  }
+}
+
+/**
+ * Generate multiple logo icons sequentially (avoids rate limits).
+ * @param {string[]} prompts - Array of icon prompts
+ * @param {boolean} usePremium - Use paid OpenRouter for Pro users
+ * @returns {Promise<Array<string|null>>}
+ */
+export async function generateLogoIcons(prompts, usePremium = false) {
+  if (!Array.isArray(prompts) || prompts.length === 0) return [];
+
+  console.log(`[Logo] Generating ${prompts.length} icons (premium=${usePremium})`);
+  const results = [];
+
+  for (let i = 0; i < prompts.length; i++) {
+    try {
+      const result = await generateLogoIcon(prompts[i], usePremium);
+      results.push(result);
+      if (result) {
+        console.log(`[Logo] ✅ Icon ${i + 1}/${prompts.length} done`);
+      } else {
+        console.warn(`[Logo] ❌ Icon ${i + 1}/${prompts.length} failed`);
+      }
+    } catch (err) {
+      console.warn(`[Logo] ❌ Icon ${i + 1} error: ${err.message?.slice(0, 120)}`);
+      results.push(null);
+    }
+
+    // Small delay between requests
+    if (i < prompts.length - 1) {
+      await new Promise((r) => setTimeout(r, 1200));
+    }
+  }
+
+  return results;
 }

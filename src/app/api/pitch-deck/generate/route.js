@@ -133,14 +133,14 @@ Return ONLY a valid JSON object in this exact shape:
       "id": "slide-1",
       "type": "cover",
       "title": "slide title",
-      "subtitle": "slide subtitle or null",
-      "body": "main body content as plain text",
-      "bullets": ["bullet 1", "bullet 2"],
+      "subtitle": "short subtitle or null",
+      "body": "1-2 sentence intro paragraph (MAX 40 words). NEVER walls of text.",
+      "bullets": ["4-6 concise bullet points, each 10-18 words max"],
       "stats": [
-        { "label": "stat label", "value": "stat value", "description": "context" }
+        { "label": "stat label (2-4 words)", "value": "stat value (short)", "description": "1 sentence context (max 15 words)" }
       ],
-      "callout": "highlighted callout text or null",
-      "speakerNotes": "professional speaker notes for this slide",
+      "callout": "one powerful highlighted sentence or null",
+      "speakerNotes": "2-3 sentences of real speaker guidance",
       "layout": "hero | split | bullets | stats | timeline | comparison | team | closing"
     }
   ],
@@ -149,18 +149,65 @@ Return ONLY a valid JSON object in this exact shape:
   "executiveSummary": "2-3 paragraph executive summary of the entire deck"
 }
 
-RULES:
-- Every slide must have real, specific, professional content. Never use placeholder text.
-- CRITICAL: Return PLAIN TEXT ONLY. Never use markdown syntax. No asterisks (**), no underscores (_), no hashes (#), no backticks. Write labels like "Premium Web Development:" not "**Premium Web Development:**".
-- bullets array can be empty [] if not applicable.
-- stats array can be empty [] if not applicable.
-- subtitle and callout can be null if not applicable.
-- speakerNotes must be 2-3 sentences of real speaking guidance.
-- layout must be one of: hero, split, bullets, stats, timeline, comparison, team, closing
-- Choose layout intelligently based on slide type.
-- emailBody must be complete and ready to send with no blanks.
-- Make the content compelling, investor-ready, and highly professional.
-- Match the tone: ${formData.tone || "Professional"}
+═══════════════════════════════════════════════════════════
+CRITICAL CONTENT RULES — DO NOT VIOLATE:
+═══════════════════════════════════════════════════════════
+
+1. STRUCTURE OVER PROSE: Slides are for SCANNING, not reading. Break every piece of information into bullets, stats, or callouts. NEVER write a paragraph longer than 40 words in the "body" field.
+
+2. BULLETS ARE MANDATORY: Every content slide MUST have 4-6 bullets. Only these slide types can skip bullets: "cover", "closing", "contact", "quotes", "ceo-message", "headline". All others MUST have bullets.
+
+3. BULLETS MUST BE SHORT: Each bullet: 10-18 words maximum. Punchy, scannable, action-oriented. NOT full sentences with clauses.
+
+4. BODY FIELD IS AN INTRO ONLY: The "body" field is a 1-2 sentence introduction. Then use "bullets" for the actual content. NEVER dump paragraphs into body.
+
+5. USE STATS WHENEVER POSSIBLE: For these slide types, ALWAYS include 3-5 stats with real numbers:
+   - market, market-size, opportunity
+   - traction, performance, results, milestones
+   - financials, financial-projections, revenue, budget
+   - impact, benefits, kpis
+
+6. USE CALLOUTS FOR IMPACT: Every 2-3 slides should have a "callout" — one powerful sentence that reinforces the key message.
+
+7. PLAIN TEXT ONLY: No markdown syntax. No asterisks (**), underscores (_), hashes (#), or backticks. Write "Premium Web Development:" not "**Premium Web Development:**".
+
+8. REAL SPECIFIC CONTENT: Never generic. Reference the actual business name, industry, and details provided above.
+
+9. LAYOUT CHOICE:
+   - "hero" → cover, closing slides
+   - "stats" → market, traction, financials, performance, results, opportunity, impact
+   - "bullets" → problem, solution, features, benefits, scope, strategy, services
+   - "split" → about-us, mission-vision, comparison
+   - "team" → team slide
+   - "timeline" → timeline, roadmap, process, milestones
+   - "comparison" → competition, before/after
+
+10. speakerNotes: 2-3 real sentences of guidance, not filler.
+
+11. emailBody: Complete, ready-to-send, no [placeholders].
+
+12. TONE: ${formData.tone || "Professional"} throughout.
+
+═══════════════════════════════════════════════════════════
+EXAMPLE OF BAD OUTPUT (do NOT do this):
+"body": "Our company is a smart AI-powered platform transforming how emergencies are reported, managed, and communicated across Africa. We address the critical problem of fragmented systems which often lead to delayed responses. Our intelligent ecosystem connects citizens, emergency responders, and organizations enabling faster response and proactive safety awareness. Our solution leverages AI and real-time mapping to bridge communication gaps..."
+
+EXAMPLE OF GOOD OUTPUT (do THIS):
+"body": "SafetyGrid is Africa's first AI-powered emergency response platform.",
+"bullets": [
+  "Connects citizens, responders, and agencies in one unified system",
+  "Reduces emergency response times by up to 60 percent",
+  "Verified reporting eliminates false alarms and prank calls",
+  "Real-time mapping shows incidents as they happen",
+  "Community-driven safety awareness alerts"
+],
+"stats": [
+  { "label": "Response Time Reduced", "value": "60%", "description": "Faster than traditional dispatch systems" },
+  { "label": "Cities Ready", "value": "12", "description": "Launching across major African metros in year one" },
+  { "label": "Users Onboarded", "value": "50K+", "description": "Pilot program across three test cities" }
+],
+"callout": "Every second saved is a life protected."
+═══════════════════════════════════════════════════════════
 `;
 }
 

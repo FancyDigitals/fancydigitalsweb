@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -200,23 +200,30 @@ function LogoOverlay({ logo, position }) {
    SLIDE RENDERER
 ═══════════════════════════════════════════════════════════════════ */
 
-function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, totalSlides, logo, logoPosition }) {
+function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, totalSlides, logo, logoPosition, readOnly = false }) {
   const t = getTheme(theme);
   const isCover = slide.type === "cover" || slideIndex === 0;
   const isClosing = slide.type === "closing" || slide.type === "call-to-action" || slide.type === "contact";
 
-  const updateField = (field, value) => onUpdate({ ...slide, [field]: value });
-  const updateBullet = (idx, value) => { const bullets = [...(slide.bullets || [])]; bullets[idx] = value; onUpdate({ ...slide, bullets }); };
-  const addBullet = () => onUpdate({ ...slide, bullets: [...(slide.bullets || []), "New point"] });
-  const removeBullet = (idx) => onUpdate({ ...slide, bullets: (slide.bullets || []).filter((_, i) => i !== idx) });
-  const updateStat = (idx, field, value) => { const stats = [...(slide.stats || [])]; stats[idx] = { ...stats[idx], [field]: value }; onUpdate({ ...slide, stats }); };
-  const addStat = () => onUpdate({ ...slide, stats: [...(slide.stats || []), { label: "New Metric", value: "0", description: "" }] });
-  const removeStat = (idx) => onUpdate({ ...slide, stats: (slide.stats || []).filter((_, i) => i !== idx) });
+  const updateField = (field, value) => onUpdate && onUpdate({ ...slide, [field]: value });
+  const updateBullet = (idx, value) => { const bullets = [...(slide.bullets || [])]; bullets[idx] = value; onUpdate && onUpdate({ ...slide, bullets }); };
+  const addBullet = () => onUpdate && onUpdate({ ...slide, bullets: [...(slide.bullets || []), "New point"] });
+  const removeBullet = (idx) => onUpdate && onUpdate({ ...slide, bullets: (slide.bullets || []).filter((_, i) => i !== idx) });
+  const updateStat = (idx, field, value) => { const stats = [...(slide.stats || [])]; stats[idx] = { ...stats[idx], [field]: value }; onUpdate && onUpdate({ ...slide, stats }); };
+  const addStat = () => onUpdate && onUpdate({ ...slide, stats: [...(slide.stats || []), { label: "New Metric", value: "0", description: "" }] });
+  const removeStat = (idx) => onUpdate && onUpdate({ ...slide, stats: (slide.stats || []).filter((_, i) => i !== idx) });
 
-  /* ── COVER SLIDE (no eyebrow badge) ── */
+  // Read-only text renderer for print mode
+  const StaticText = ({ value, className, as: Tag = "div", placeholder }) => (
+    <Tag className={className}>{value ? renderInlineText(value) : (placeholder || "")}</Tag>
+  );
+
+  const TextComponent = readOnly ? StaticText : EditableText;
+
+  /* ── COVER SLIDE ── */
   if (isCover) {
     return (
-      <div className={`relative overflow-hidden rounded-3xl ${t.coverBg} min-h-[560px] flex flex-col justify-between p-10 sm:p-14`}>
+      <div className={`relative overflow-hidden rounded-3xl ${t.coverBg} min-h-[560px] flex flex-col justify-between p-10 sm:p-14 h-full`}>
         <CoverDecor personality={t.personality} />
         <LogoOverlay logo={logo} position={logoPosition} />
 
@@ -228,14 +235,14 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
 
         <div className="relative z-10 space-y-5">
           <div className="h-1 w-20 rounded-full" style={{ backgroundColor: primaryColor }} />
-          <EditableText as="h1" value={slide.title} onChange={(v) => updateField("title", v)}
+          <TextComponent as="h1" value={slide.title} onChange={(v) => updateField("title", v)}
             className={`text-5xl sm:text-6xl lg:text-7xl ${t.fontDisplay} ${t.coverText} leading-[0.95]`} placeholder="Your Title" />
           {(slide.subtitle || slide.subtitle === "") && (
-            <EditableText as="p" value={slide.subtitle} onChange={(v) => updateField("subtitle", v)}
+            <TextComponent as="p" value={slide.subtitle} onChange={(v) => updateField("subtitle", v)}
               className={`text-xl sm:text-2xl ${t.coverSubText} ${t.fontBody} max-w-2xl leading-snug`} placeholder="Add a subtitle" />
           )}
           {slide.body && (
-            <EditableText value={slide.body} onChange={(v) => updateField("body", v)} multiline
+            <TextComponent value={slide.body} onChange={(v) => updateField("body", v)} multiline
               className={`text-base ${t.coverMuted} leading-relaxed max-w-xl pt-2`} placeholder="Add description" />
           )}
         </div>
@@ -259,7 +266,7 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
   /* ── CLOSING SLIDE ── */
   if (isClosing) {
     return (
-      <div className={`relative overflow-hidden rounded-3xl ${t.coverBg} min-h-[560px] flex flex-col items-center justify-center text-center p-10 sm:p-14`}>
+      <div className={`relative overflow-hidden rounded-3xl ${t.coverBg} min-h-[560px] flex flex-col items-center justify-center text-center p-10 sm:p-14 h-full`}>
         <CoverDecor personality={t.personality} />
         <LogoOverlay logo={logo} position={logoPosition} />
 
@@ -271,15 +278,15 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
             </span>
             <div className="h-px w-12" style={{ backgroundColor: primaryColor }} />
           </div>
-          <EditableText as="h2" value={slide.title} onChange={(v) => updateField("title", v)}
+          <TextComponent as="h2" value={slide.title} onChange={(v) => updateField("title", v)}
             className={`text-5xl sm:text-6xl ${t.fontDisplay} ${t.coverText} leading-[1]`} placeholder="Closing Title" />
           {slide.body && (
-            <EditableText value={slide.body} onChange={(v) => updateField("body", v)} multiline
+            <TextComponent value={slide.body} onChange={(v) => updateField("body", v)} multiline
               className={`text-lg ${t.coverSubText} leading-relaxed`} placeholder="Closing message" />
           )}
           {slide.callout && (
             <div className="inline-block rounded-2xl px-8 py-4 text-base font-bold text-white shadow-2xl" style={{ backgroundColor: primaryColor }}>
-              <EditableText value={slide.callout} onChange={(v) => updateField("callout", v)} className="text-white" placeholder="Call to action" />
+              <TextComponent value={slide.callout} onChange={(v) => updateField("callout", v)} className="text-white" placeholder="Call to action" />
             </div>
           )}
         </div>
@@ -287,9 +294,9 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
     );
   }
 
-  /* ── CONTENT SLIDE (uses slideBg not coverBg) ── */
+  /* ── CONTENT SLIDE ── */
   return (
-    <div className={`relative overflow-hidden rounded-3xl ${t.slideBg} border ${t.border} min-h-[560px] p-10 sm:p-14`}>
+    <div className={`relative overflow-hidden rounded-3xl ${t.slideBg} border ${t.border} min-h-[560px] p-10 sm:p-14 h-full`}>
       <ContentDecor personality={t.personality} />
       <LogoOverlay logo={logo} position={logoPosition} />
 
@@ -310,16 +317,16 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
         </span>
       </div>
 
-      <EditableText as="h2" value={slide.title} onChange={(v) => updateField("title", v)}
+      <TextComponent as="h2" value={slide.title} onChange={(v) => updateField("title", v)}
         className={`relative ${t.fontDisplay} text-4xl sm:text-5xl ${t.slideText} leading-[1.05] mb-3`} placeholder="Slide Title" />
 
       {(slide.subtitle || slide.subtitle === "") && (
-        <EditableText as="p" value={slide.subtitle} onChange={(v) => updateField("subtitle", v)}
+        <TextComponent as="p" value={slide.subtitle} onChange={(v) => updateField("subtitle", v)}
           className={`relative text-base ${t.fontHead} ${t.accent} mb-6`} placeholder="Add subtitle" />
       )}
 
-      {slide.body !== undefined && (
-        <EditableText value={slide.body} onChange={(v) => updateField("body", v)} multiline
+      {slide.body !== undefined && slide.body && (
+        <TextComponent value={slide.body} onChange={(v) => updateField("body", v)} multiline
           className={`relative text-base ${t.subText} ${t.fontBody} leading-relaxed mb-8 max-w-3xl`} placeholder="Add body content" />
       )}
 
@@ -327,24 +334,28 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
         <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-4 my-8">
           {slide.stats.map((stat, i) => (
             <div key={i} className={`group relative rounded-2xl ${t.statBg} p-6 transition hover:shadow-lg`}>
-              <button onClick={() => removeStat(i)} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 h-6 w-6 rounded-md bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition">
-                <X className="h-3 w-3" />
-              </button>
+              {!readOnly && (
+                <button onClick={() => removeStat(i)} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 h-6 w-6 rounded-md bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition">
+                  <X className="h-3 w-3" />
+                </button>
+              )}
               <div className={`${t.fontDisplay} text-4xl mb-2`} style={{ color: primaryColor }}>
-                <EditableText value={stat.value} onChange={(v) => updateStat(i, "value", v)} className="" placeholder="0" />
+                <TextComponent value={stat.value} onChange={(v) => updateStat(i, "value", v)} className="" placeholder="0" />
               </div>
-              <EditableText value={stat.label} onChange={(v) => updateStat(i, "label", v)} className={`text-sm ${t.fontHead} ${t.slideText}`} placeholder="Label" />
+              <TextComponent value={stat.label} onChange={(v) => updateStat(i, "label", v)} className={`text-sm ${t.fontHead} ${t.slideText}`} placeholder="Label" />
               {(stat.description || stat.description === "") && (
-                <EditableText value={stat.description} onChange={(v) => updateStat(i, "description", v)} className={`text-xs ${t.subText} mt-1`} placeholder="Description" />
+                <TextComponent value={stat.description} onChange={(v) => updateStat(i, "description", v)} className={`text-xs ${t.subText} mt-1`} placeholder="Description" />
               )}
             </div>
           ))}
         </div>
       )}
 
-      <button onClick={addStat} className={`relative mb-6 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider ${t.subText} hover:opacity-70 transition`}>
-        <Plus className="h-3 w-3" /> Add metric
-      </button>
+      {!readOnly && (
+        <button onClick={addStat} className={`relative mb-6 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider ${t.subText} hover:opacity-70 transition`}>
+          <Plus className="h-3 w-3" /> Add metric
+        </button>
+      )}
 
       {slide.bullets && slide.bullets.length > 0 && (
         <ul className="relative space-y-4 my-6">
@@ -354,23 +365,27 @@ function SlideRenderer({ slide, theme, primaryColor, onUpdate, slideIndex, total
                 <span className={`text-xs font-bold ${t.subText} w-4`}>{String(i + 1).padStart(2, "0")}</span>
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: primaryColor }} />
               </div>
-              <EditableText value={bullet} onChange={(v) => updateBullet(i, v)} multiline
+              <TextComponent value={bullet} onChange={(v) => updateBullet(i, v)} multiline
                 className={`text-base ${t.slideText} ${t.fontBody} leading-relaxed flex-1`} placeholder="Add point" />
-              <button onClick={() => removeBullet(i)} className="opacity-0 group-hover:opacity-100 mt-2 h-6 w-6 rounded-md bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition shrink-0">
-                <X className="h-3 w-3" />
-              </button>
+              {!readOnly && (
+                <button onClick={() => removeBullet(i)} className="opacity-0 group-hover:opacity-100 mt-2 h-6 w-6 rounded-md bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition shrink-0">
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </li>
           ))}
         </ul>
       )}
 
-      <button onClick={addBullet} className={`relative flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider ${t.subText} hover:opacity-70 transition mb-6`}>
-        <Plus className="h-3 w-3" /> Add point
-      </button>
+      {!readOnly && (
+        <button onClick={addBullet} className={`relative flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider ${t.subText} hover:opacity-70 transition mb-6`}>
+          <Plus className="h-3 w-3" /> Add point
+        </button>
+      )}
 
       {slide.callout && (
         <div className="relative mt-8 rounded-2xl p-6 border-l-4" style={{ borderColor: primaryColor, backgroundColor: `${primaryColor}0d` }}>
-          <EditableText value={slide.callout} onChange={(v) => updateField("callout", v)} className={`text-base ${t.fontHead} ${t.slideText}`} placeholder="Add callout" />
+          <TextComponent value={slide.callout} onChange={(v) => updateField("callout", v)} className={`text-base ${t.fontHead} ${t.slideText}`} placeholder="Add callout" />
         </div>
       )}
     </div>
@@ -401,7 +416,7 @@ function EmailModal({ deck, savedId, onClose }) {
         const data = await res.json();
         if (data.success) {
           setShareUrl(data.shareUrl);
-          setBody(`${deck.emailBody || ""}\n\n─────────────────────────\n\n📎 View the full deck online:\n${data.shareUrl}\n\n─────────────────────────\n\nBest regards,\nFancy Digitals`);
+          setBody(`${deck.emailBody || ""}\n\n─────────────────────────\n\nView the full deck online:\n${data.shareUrl}\n\n─────────────────────────\n\nBest regards,\nFancy Digitals`);
         } else { setBody(deck.emailBody || ""); }
       } catch { setBody(deck.emailBody || ""); }
       finally { setGeneratingLink(false); }
@@ -426,7 +441,7 @@ function EmailModal({ deck, savedId, onClose }) {
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
         </div>
         <div className="p-5 space-y-4 overflow-y-auto">
-          {generatingLink && (<div className="rounded-lg bg-violet-50 border border-violet-100 px-3 py-2"><p className="text-xs text-violet-700">🔗 Generating shareable link...</p></div>)}
+          {generatingLink && (<div className="rounded-lg bg-violet-50 border border-violet-100 px-3 py-2"><p className="text-xs text-violet-700">Generating shareable link...</p></div>)}
           {shareUrl && (
             <div className="rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2.5">
               <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Shareable Link</p>
@@ -476,6 +491,9 @@ export default function PitchDeckPreview({ deck: initialDeck, savedId, userEmail
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [showExportContainer, setShowExportContainer] = useState(false);
+  const exportContainerRef = useRef(null);
 
   useEffect(() => setDeck(initialDeck), [initialDeck]);
 
@@ -540,7 +558,35 @@ export default function PitchDeckPreview({ deck: initialDeck, savedId, userEmail
     setTimeout(() => setSaveSuccess(false), 1500);
   };
 
-  const handlePrint = () => setTimeout(() => window.print(), 200);
+  // ═══════════════════════════════════════════════════════════════
+  // CLEAN PDF EXPORT USING html2canvas-pro + jsPDF
+  // Supports modern CSS colors (oklch, oklab, color())
+  // ═══════════════════════════════════════════════════════════════
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    setShowExportContainer(true);
+
+    // Wait for offscreen container to render + fonts to load
+    await new Promise((r) => setTimeout(r, 600));
+
+    try {
+      const { exportDeckToPDF } = await import("@/lib/pitch-deck/pdf-export");
+      const element = exportContainerRef.current;
+      if (!element) throw new Error("Export container not found");
+
+      const filename = `${(deck.title || "pitch-deck")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")}.pdf`;
+
+      await exportDeckToPDF(element, filename);
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      alert(`PDF export failed: ${err.message || "Please try again."}`);
+    } finally {
+      setIsExporting(false);
+      setShowExportContainer(false);
+    }
+  };
 
   const PREVIEW_TABS = [
     { id: "slides", label: "Slides", icon: Eye },
@@ -551,6 +597,55 @@ export default function PitchDeckPreview({ deck: initialDeck, savedId, userEmail
   return (
     <>
       {showEmail && <EmailModal deck={deck} savedId={savedId} onClose={() => setShowEmail(false)} />}
+
+      {/* ══════════════════════════════════════════════════════════
+          OFFSCREEN EXPORT CONTAINER
+          Renders each slide as a fixed-size 1400×990 page (A4 landscape ratio)
+          Each slide has data-slide-page so the exporter can find them
+      ══════════════════════════════════════════════════════════ */}
+      {showExportContainer && (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "1400px",
+      zIndex: 9999,
+      opacity: 0,           // Invisible but rendered normally
+      pointerEvents: "none",
+      background: "#ffffff",
+    }}
+  >
+          <div ref={exportContainerRef} style={{ background: "#ffffff" }}>
+            {slides.map((slide, i) => (
+              <div
+                key={slide.id || i}
+                data-slide-page
+                style={{
+                  width: "1400px",
+                  height: "990px",
+                  padding: "20px",
+                  boxSizing: "border-box",
+                  background: "#ffffff",
+                  overflow: "hidden",
+                }}
+              >
+                <SlideRenderer
+                  slide={slide}
+                  theme={theme}
+                  primaryColor={primaryColor}
+                  slideIndex={i}
+                  totalSlides={slides.length}
+                  onUpdate={() => {}}
+                  logo={deck.logo}
+                  logoPosition={deck.logoPosition}
+                  readOnly
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-100 bg-gray-50">
@@ -570,8 +665,22 @@ export default function PitchDeckPreview({ deck: initialDeck, savedId, userEmail
             <button onClick={() => setShowEmail(true)} className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50">
               <Mail className="h-3.5 w-3.5" /> Email
             </button>
-            <button onClick={handlePrint} className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white hover:bg-violet-700">
-              <Download className="h-3.5 w-3.5" /> Export PDF
+            <button
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-2 text-xs font-bold text-white hover:bg-violet-700 disabled:opacity-60"
+            >
+              {isExporting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Generating PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="h-3.5 w-3.5" />
+                  Export PDF
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -587,7 +696,7 @@ export default function PitchDeckPreview({ deck: initialDeck, savedId, userEmail
         {activeTab === "slides" && (
           <div className="p-5">
             <div className="mb-4 rounded-lg bg-violet-50 border border-violet-100 px-3 py-2 flex items-center gap-2">
-              <span className="text-[11px] text-violet-700">💡 <strong>Click any text</strong> on the slide to edit. Changes auto-save.</span>
+              <span className="text-[11px] text-violet-700">Click any text on the slide to edit. Changes auto-save.</span>
             </div>
 
             <div className="flex items-center justify-between mb-4">
@@ -659,6 +768,15 @@ export default function PitchDeckPreview({ deck: initialDeck, savedId, userEmail
                       <h4 className="text-sm font-bold text-gray-900">{slide.title}</h4>
                     </div>
                     {slide.body && (<p className="text-xs text-gray-500 line-clamp-2">{renderInlineText(slide.body)}</p>)}
+                    {slide.bullets && slide.bullets.length > 0 && (
+                      <ul className="mt-2 space-y-1">
+                        {slide.bullets.slice(0, 3).map((b, bi) => (
+                          <li key={bi} className="text-xs text-gray-600 pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-violet-500">
+                            {renderInlineText(b)}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>

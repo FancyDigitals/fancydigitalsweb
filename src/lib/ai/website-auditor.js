@@ -1,97 +1,289 @@
 import { generateWithGemini } from "@/lib/ai/gemini";
-import { fetchAndParseURL } from "@/lib/audit/html-parser";
+
+/**
+ * Fetch PageSpeed data with retry.
+ */
+async function fetchPageSpeed(url, strategy = "mobile") {
+  const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY;
+  if (!apiKey) return null;
+
+  const endpoint = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&category=performance&category=seo&category=accessibility&category=best-practices&key=${apiKey}`;
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch(endpoint, {
+        next: { revalidate: 0 },
+        signal: AbortSignal.timeout(60000),
+      });
+      if (!res.ok) {
+        console.warn(`[PageSpeed] ${strategy} attempt ${attempt} → HTTP ${res.status}`);
+        if (attempt === 2) return null;
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+      const data = await res.json();
+      return processPageSpeedResult(data);
+    } catch (err) {
+      console.warn(`[PageSpeed] ${strategy} attempt ${attempt} failed: ${err.message?.slice(0, 100)}`);
+      if (attempt === 2) return null;
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+  }
+  return null;
+}
+
+function processPageSpeedResult(result) {
+  if (!result?.lighthouseResult) return null;
+  const lh = result.lighthouseResult;
+
+  const opportunities = Object.values(lh.audits || {})
+    .filter((a) => a?.details?.type === "opportunity" && a.score !== null && a.score < 0.9)
+    .sort((a, b) => (a.score || 0) - (b.score || 0))
+    .slice(0, 8)
+    .map((a) => ({
+      title: a.title,
+      description: a.description?.replace(/\[.*?\]\(.*?\)/g, "").trim(),
+      score: a.score,
+      savingsMs: a.details?.overallSavingsMs || 0,
+    }));
+
+  const diagnostics = Object.values(lh.audits || {})
+    .filter((a) => a?.details?.type === "diagnostic" && a.score !== null && a.score < 1)
+    .slice(0, 5)
+    .map((a) => ({ title: a.title, description: a.description?.replace(/\[.*?\]\(.*?\)/g, "").trim() }));
+
+  return {
+    performanceScore: Math.round((lh.categories?.performance?.score || 0) * 100),
+    seoScore: Math.round((lh.categories?.seo?.score || 0) * 100),
+    accessibilityScore: Math.round((lh.categories?.accessibility?.score || 0) * 100),
+    bestPracticesScore: Math.round((lh.categories?.["best-practices"]?.score || 0) * 100),
+    fcp: lh.audits?.["first-contentful-paint"]?.displayValue,
+    lcp: lh.audits?.["largest-contentful-paint"]?.displayValue,
+    tbt: lh.audits?.["total-blocking-time"]?.displayValue,
+    cls: lh.audits?.["cumulative-layout-shift"]?.displayValue,
+    speedIndex: lh.audits?.["speed-index"]?.displayValue,
+    tti: lh.audits?.["interactive"]?.displayValue,
+    opportunities,
+    diagnostics,
+  };
+}
+
+/**
+ * Run both mobile + desktop PageSpeed in parallel.
+ */
+export async function fetchDualPageSpeed(url) {
+  const [mobile, desktop] = await Promise.all([
+    fetchPageSpeed(url, "mobile"),
+    fetchPageSpeed(url, "desktop"),
+  ]);
+  return { mobile, desktop };
+}
 
 export async function auditWebsite(url, pageSpeedData, parsedHTML, options = {}) {
   const { competitors = [], messagingApps = [], competitorData = [] } = options;
 
-  // ── Shared context builders (reused across passes) ──────────────────────────
+  // pageSpeedData is now { mobile, desktop } — normalize
+  const mobilePS = pageSpeedData?.mobile || null;
+  const desktopPS = pageSpeedData?.desktop || null;
 
-  const speedContext = pageSpeedData ? `
-GOOGLE PAGESPEED SCORES:
-- Performance: ${pageSpeedData.performanceScore}/100
-- SEO: ${pageSpeedData.seo?.score}/100
-- Accessibility: ${pageSpeedData.accessibility?.score}/100
-- Best Practices: ${pageSpeedData.bestPractices?.score}/100
-- FCP: ${pageSpeedData.fcp || "Unknown"}
-- LCP: ${pageSpeedData.lcp || "Unknown"}
-- TBT: ${pageSpeedData.tbt || "Unknown"}
-- Speed Index: ${pageSpeedData.speedIndex || "Unknown"}
-- CLS: ${pageSpeedData.cls || "Unknown"}
-SPEED OPPORTUNITIES:
-${pageSpeedData.opportunities?.map(o => `- ${o.title}: ${o.description}`).join("\n") || "None"}` 
-  : "PAGESPEED: Could not fetch";
+  // ─── DATA QUALITY GATE ────────────────────────────────────────────────────
+  const dataQuality = {
+    hasHTML: !!parsedHTML,
+    hasMobilePageSpeed: !!mobilePS,
+    hasDesktopPageSpeed: !!desktopPS,
+    isSPA: parsedHTML?.spa?.isLikelySPA || false,
+    warnings: [],
+  };
+  if (!parsedHTML) dataQuality.warnings.push("Website HTML could not be fetched or parsed.");
+  if (!mobilePS && !desktopPS) dataQuality.warnings.push("Google PageSpeed data unavailable — performance scores are approximate.");
+  if (parsedHTML?.spa?.warning) dataQuality.warnings.push(parsedHTML.spa.warning);
+
+  // ─── CONTEXT BUILDERS ────────────────────────────────────────────────────
+
+  const speedContext = (mobilePS || desktopPS) ? `
+GOOGLE PAGESPEED SCORES (REAL DATA):
+${mobilePS ? `
+MOBILE:
+- Performance: ${mobilePS.performanceScore}/100
+- SEO: ${mobilePS.seoScore}/100
+- Accessibility: ${mobilePS.accessibilityScore}/100
+- Best Practices: ${mobilePS.bestPracticesScore}/100
+- FCP (First Contentful Paint): ${mobilePS.fcp || "Unknown"}
+- LCP (Largest Contentful Paint): ${mobilePS.lcp || "Unknown"}
+- TBT (Total Blocking Time): ${mobilePS.tbt || "Unknown"}
+- CLS (Cumulative Layout Shift): ${mobilePS.cls || "Unknown"}
+- Speed Index: ${mobilePS.speedIndex || "Unknown"}
+- Time to Interactive: ${mobilePS.tti || "Unknown"}` : "MOBILE: Not available"}
+${desktopPS ? `
+DESKTOP:
+- Performance: ${desktopPS.performanceScore}/100
+- SEO: ${desktopPS.seoScore}/100
+- Accessibility: ${desktopPS.accessibilityScore}/100
+- Best Practices: ${desktopPS.bestPracticesScore}/100
+- FCP: ${desktopPS.fcp || "Unknown"}
+- LCP: ${desktopPS.lcp || "Unknown"}` : "DESKTOP: Not available"}
+
+TOP SPEED OPPORTUNITIES (${mobilePS?.opportunities?.length || 0} found):
+${mobilePS?.opportunities?.map((o) => `- ${o.title}${o.savingsMs > 0 ? ` (save ~${Math.round(o.savingsMs)}ms)` : ""}: ${o.description || ""}`).join("\n") || "None"}`
+    : "PAGESPEED: NOT AVAILABLE — do not invent performance scores. Use 'Unknown' if referenced.";
 
   const htmlContext = parsedHTML ? `
-WEBSITE STRUCTURE:
-Title: "${parsedHTML.meta?.title || "MISSING"}" (${parsedHTML.meta?.titleLength} chars)
-Meta Description: "${parsedHTML.meta?.description || "MISSING"}" (${parsedHTML.meta?.descriptionLength} chars)
-Canonical: ${parsedHTML.meta?.canonical || "MISSING"}
-Viewport: ${parsedHTML.meta?.viewport || "MISSING"}
-OG Image: ${parsedHTML.meta?.ogImage || "MISSING"}
-Schema: ${parsedHTML.meta?.hasSchema ? `YES (${parsedHTML.meta?.schemaCount} found)` : "MISSING"}
-H1s (${parsedHTML.headings?.h1Count}): ${parsedHTML.headings?.h1s?.join(" | ") || "NONE"}
-H2s (${parsedHTML.headings?.h2Count}): ${parsedHTML.headings?.h2s?.slice(0, 5).join(" | ") || "NONE"}
-Internal links: ${parsedHTML.links?.internalCount}
-External links: ${parsedHTML.links?.externalCount}
-Images total: ${parsedHTML.images?.total} | Missing alt: ${parsedHTML.images?.withoutAlt}
-Buttons: ${parsedHTML.ctas?.buttons?.join(", ") || "None"}
-Forms: ${parsedHTML.ctas?.forms}
-Pricing: ${parsedHTML.trustSignals?.hasPricing ? "YES" : "NO"}
-Testimonials: ${parsedHTML.trustSignals?.hasTestimonials ? "YES" : "NO"}
-Team: ${parsedHTML.trustSignals?.hasTeam ? "YES" : "NO"}
-FAQ: ${parsedHTML.trustSignals?.hasFAQ ? "YES" : "NO"}
-SSL: ${parsedHTML.trustSignals?.hasSSL ? "YES" : "NO"}
-Social links: ${parsedHTML.trustSignals?.hasSocialLinks ? "YES" : "NO"}
-Live chat: ${parsedHTML.trustSignals?.hasLiveChat ? "YES" : "NO"}
-Word count: ${parsedHTML.content?.wordCount}
-Content sample: ${parsedHTML.content?.textContent?.slice(0, 500)}
-Messaging apps: ${messagingApps.length > 0 ? messagingApps.join(", ") : "None"}`
-  : "HTML: Could not fetch";
+WEBSITE STRUCTURE (REAL PARSED DATA):
+Platform Detected: ${parsedHTML.platform}
+${parsedHTML.spa?.isLikelySPA ? `⚠️ SPA WARNING: ${parsedHTML.spa.warning}` : ""}
+
+META TAGS:
+- Title: "${parsedHTML.meta?.title || "MISSING"}" (${parsedHTML.meta?.titleLength} chars — ${parsedHTML.meta?.titleLength >= 30 && parsedHTML.meta?.titleLength <= 60 ? "GOOD" : parsedHTML.meta?.titleLength > 60 ? "TOO LONG" : "TOO SHORT"})
+- Meta Description: "${parsedHTML.meta?.description || "MISSING"}" (${parsedHTML.meta?.descriptionLength} chars — ${parsedHTML.meta?.descriptionLength >= 120 && parsedHTML.meta?.descriptionLength <= 160 ? "GOOD" : parsedHTML.meta?.descriptionLength > 160 ? "TOO LONG" : "TOO SHORT"})
+- Canonical: ${parsedHTML.meta?.canonical || "MISSING"}
+- Viewport: ${parsedHTML.meta?.viewport || "MISSING"}
+- Robots: ${parsedHTML.meta?.robots || "Not set (default: index, follow)"}
+- HTML Lang: ${parsedHTML.meta?.lang || "MISSING"}
+- Favicon: ${parsedHTML.meta?.favicon ? "PRESENT" : "MISSING"}
+- Theme Color: ${parsedHTML.meta?.themeColor || "MISSING"}
+
+OPEN GRAPH (Social Sharing):
+- OG Title: ${parsedHTML.meta?.ogTitle ? "PRESENT" : "MISSING"}
+- OG Description: ${parsedHTML.meta?.ogDescription ? "PRESENT" : "MISSING"}
+- OG Image: ${parsedHTML.meta?.ogImage ? "PRESENT" : "MISSING"}
+- Twitter Card: ${parsedHTML.meta?.twitterCard || "MISSING"}
+
+STRUCTURED DATA (Schema.org for AI Search):
+- Schema Count: ${parsedHTML.meta?.schemaCount || 0}
+- Valid Schemas: ${parsedHTML.meta?.validSchemas || 0}
+- Schema Types Detected: ${parsedHTML.meta?.schemaTypes?.join(", ") || "NONE"}
+
+HEADINGS HIERARCHY:
+- H1 Count: ${parsedHTML.headings?.h1Count} ${parsedHTML.headings?.multipleH1s ? "⚠️ MULTIPLE H1s (should be 1)" : parsedHTML.headings?.noH1 ? "⚠️ NO H1" : "✓ GOOD"}
+- H1s: ${parsedHTML.headings?.h1s?.slice(0, 3).join(" | ") || "NONE"}
+- H2 Count: ${parsedHTML.headings?.h2Count}
+- Top H2s: ${parsedHTML.headings?.h2s?.slice(0, 5).join(" | ") || "NONE"}
+- H3 Count: ${parsedHTML.headings?.h3Count}
+
+LINKS:
+- Total Links: ${parsedHTML.links?.total}
+- Internal Links: ${parsedHTML.links?.internalCount}
+- External Links: ${parsedHTML.links?.externalCount}
+- External Domains Linked: ${parsedHTML.links?.externalDomains?.slice(0, 5).join(", ") || "None"}
+
+IMAGES:
+- Total Images: ${parsedHTML.images?.total}
+- Missing Alt Text: ${parsedHTML.images?.withoutAlt} (${parsedHTML.images?.altCoverage}% alt coverage)
+- Missing Dimensions: ${parsedHTML.images?.withoutDimensions} (causes layout shift)
+- Lazy Loaded: ${parsedHTML.images?.lazyLoaded}
+
+CALLS TO ACTION:
+- Total Buttons: ${parsedHTML.ctas?.buttonCount}
+- CTA Buttons Found: ${parsedHTML.ctas?.ctaButtons?.slice(0, 5).join(" | ") || "NONE"}
+- CTA Links Found: ${parsedHTML.ctas?.ctaLinks?.slice(0, 5).join(" | ") || "NONE"}
+- Total Forms: ${parsedHTML.ctas?.forms}
+- Email Capture Forms: ${parsedHTML.ctas?.emailCaptureForms}
+
+TRUST SIGNALS:
+- SSL (HTTPS): ${parsedHTML.trustSignals?.hasSSL ? "YES ✓" : "NO ⚠️"}
+- Pricing Info: ${parsedHTML.trustSignals?.hasPricing ? "YES" : "NO"}
+- Testimonials: ${parsedHTML.trustSignals?.hasTestimonials ? "YES" : "NO"} ${parsedHTML.trustSignals?.hasBlockquotes ? "(blockquotes)" : ""} ${parsedHTML.trustSignals?.hasStarRatings ? "(star ratings)" : ""}
+- Team Section: ${parsedHTML.trustSignals?.hasTeam ? "YES" : "NO"}
+- FAQ Section: ${parsedHTML.trustSignals?.hasFAQ ? "YES" : "NO"}
+- Contact Info: ${parsedHTML.trustSignals?.hasContactInfo ? "YES" : "NO"} ${parsedHTML.trustSignals?.hasEmailInPage ? "(email)" : ""} ${parsedHTML.trustSignals?.hasPhoneNumber ? "(phone)" : ""}
+- Live Chat: ${parsedHTML.trustSignals?.hasLiveChat ? `YES (${parsedHTML.trustSignals?.activeChatWidgets?.join(", ")})` : "NO"}
+- Cookie Banner: ${parsedHTML.trustSignals?.hasCookieBanner ? "YES" : "NO"}
+
+SOCIAL PRESENCE:
+- Platforms Linked: ${parsedHTML.trustSignals?.socialLinksCount}/8
+${Object.entries(parsedHTML.trustSignals?.socialPlatforms || {}).map(([p, has]) => `  - ${p}: ${has ? "YES" : "NO"}`).join("\n")}
+
+ANALYTICS INSTALLED:
+${parsedHTML.analytics?.activeAnalytics?.length ? parsedHTML.analytics.activeAnalytics.map((a) => `- ${a}: YES`).join("\n") : "- NONE DETECTED"}
+
+MOBILE FRIENDLINESS:
+- Viewport Meta: ${parsedHTML.mobile?.hasViewportMeta ? "YES" : "NO"}
+- Correct Viewport (width=device-width): ${parsedHTML.mobile?.viewportHasWidth ? "YES" : "NO"}
+- Blocks Zoom: ${parsedHTML.mobile?.viewportBlocksZoom ? "YES ⚠️ (accessibility issue)" : "NO ✓"}
+- Responsive Images: ${parsedHTML.mobile?.hasResponsiveImages ? "YES" : "NO"}
+- Media Queries: ${parsedHTML.mobile?.hasMediaQueries ? "YES" : "NO"}
+
+ACCESSIBILITY:
+- Form Inputs Without Labels: ${parsedHTML.accessibility?.inputsWithoutLabels}
+- Buttons Without Text/Labels: ${parsedHTML.accessibility?.buttonsWithoutLabels}
+- Links Without Text: ${parsedHTML.accessibility?.linksWithoutText}
+
+CONTENT:
+- Word Count (main content): ${parsedHTML.content?.wordCount}
+- Paragraph Count: ${parsedHTML.content?.paragraphCount}
+- Avg Paragraph Length: ${parsedHTML.content?.avgParagraphLength} words
+- Content Sample: "${parsedHTML.content?.textContent?.slice(0, 500)}..."
+
+USER-PROVIDED MESSAGING APPS: ${messagingApps.length > 0 ? messagingApps.join(", ") : "None"}`
+    : `WEBSITE HTML: COULD NOT BE FETCHED. Do not invent structure data. Say "Unable to analyze HTML structure" for those categories.`;
 
   const competitorContext = competitorData.length > 0
-    ? `COMPETITORS ANALYZED:
-${competitorData.map((c, i) => `
+    ? `COMPETITORS ANALYZED (REAL DATA):
+${competitorData.map((c, i) => {
+  const d = c.data;
+  if (!d) return `Competitor ${i + 1} (${c.url}): Could not fetch`;
+  return `
 Competitor ${i + 1}: ${c.url}
-- Title: ${c.data?.meta?.title || "None"}
-- H1s: ${c.data?.headings?.h1s?.join(", ") || "None"}
-- Schema: ${c.data?.meta?.hasSchema}
-- Testimonials: ${c.data?.trustSignals?.hasTestimonials}
-- Pricing: ${c.data?.trustSignals?.hasPricing}
-- FAQ: ${c.data?.trustSignals?.hasFAQ}
-- Word Count: ${c.data?.content?.wordCount}
-- CTAs: ${c.data?.ctas?.ctaLinks?.join(", ") || "None"}`).join("\n")}`
-    : `COMPETITORS: ${competitors.length > 0 ? competitors.join(", ") : "None — use industry best practices"}`;
+- Platform: ${d.platform}
+- Title: "${d.meta?.title || "None"}" (${d.meta?.titleLength} chars)
+- Meta Description: ${d.meta?.descriptionLength} chars
+- H1: "${d.headings?.h1s?.[0] || "None"}"
+- Schema Types: ${d.meta?.schemaTypes?.join(", ") || "NONE"}
+- Word Count: ${d.content?.wordCount}
+- Trust Signals: Pricing=${d.trustSignals?.hasPricing}, Testimonials=${d.trustSignals?.hasTestimonials}, FAQ=${d.trustSignals?.hasFAQ}, Team=${d.trustSignals?.hasTeam}, LiveChat=${d.trustSignals?.hasLiveChat}
+- Social Platforms: ${d.trustSignals?.socialLinksCount}/8
+- Top CTAs: ${d.ctas?.ctaLinks?.slice(0, 3).join(", ") || "None"}
+- Analytics: ${d.analytics?.activeAnalytics?.join(", ") || "None"}`;
+}).join("\n")}`
+    : `COMPETITORS: ${competitors.length > 0 ? competitors.join(", ") + " (data not fetched)" : "None provided — use industry best practices"}`;
 
-  const baseContext = `URL: ${url}\n${speedContext}\n${htmlContext}`;
+  const dataQualityContext = dataQuality.warnings.length > 0
+    ? `\n⚠️ DATA QUALITY WARNINGS:\n${dataQuality.warnings.map((w) => `- ${w}`).join("\n")}\n\nCRITICAL: When data is missing above, EXPLICITLY state "data unavailable" in your response. DO NOT invent scores or details.\n`
+    : "";
 
-  // ── PASS 1: Core metrics (SEO, Performance, Mobile, Content) ────────────────
+  const baseContext = `URL: ${url}\n${dataQualityContext}\n${speedContext}\n${htmlContext}`;
 
-  const pass1Prompt = `You are an expert website auditor. Use ONLY the real data below. Be brutally specific.
+  // ─── PROMPTS ─────────────────────────────────────────────────────────────
+
+  const commonInstructions = `
+CRITICAL ACCURACY RULES:
+1. Use ONLY the real data provided above. Never invent scores, metrics, or details.
+2. When PageSpeed data says "NOT AVAILABLE", say "Performance data unavailable — could not measure" instead of guessing.
+3. When a trust signal shows "NO" in the data, treat it as confirmed absent.
+4. When counts are given (e.g. "H1 Count: 2"), reference exact numbers.
+5. Reference actual titles, actual H1s, actual button text — never invent copy.
+6. If Website HTML says "COULD NOT BE FETCHED", give the site a warning and skip HTML-based issues.
+7. Scores must reflect the actual data — if a site has 90+ PageSpeed AND full trust signals, score high. Do not lowball.
+8. CRITICAL: Return PLAIN TEXT ONLY in string values. No markdown. No asterisks. No hashes. No backticks.
+9. Return ONLY valid JSON. No markdown fences. No trailing commas.
+`;
+
+  const pass1Prompt = `You are an expert website auditor with 15 years of experience.
 
 ${baseContext}
+${commonInstructions}
 
-Return ONLY valid JSON. No markdown. No truncation. If space runs out, shorten text but never stop early.
-
+Return ONLY valid JSON:
 {
-  "websiteName": "detected name",
-  "websiteType": "Portfolio/SaaS/E-commerce/Agency/Blog/Restaurant/etc",
-  "websiteIntent": "One sentence — what this site does and who it helps.",
+  "websiteName": "detected business/website name",
+  "websiteType": "Portfolio | SaaS | E-commerce | Agency | Blog | Restaurant | Local Business | Personal | Marketplace | Other",
+  "websiteIntent": "One clear sentence: what this site does and who it serves.",
   "overallScore": 0-100,
   "overallGrade": "A/B/C/D/F",
-  "overallSummary": "3 honest sentences using real data.",
+  "overallSummary": "3 honest sentences using actual data references (real title, real scores, real gaps).",
   "categories": [
     {
       "id": "seo",
       "name": "SEO & Discoverability",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference actual title, meta, H1s, schema data.",
-      "passed": ["Specific working thing with actual data"],
+      "summary": "Reference exact title length, meta description length, H1 count, schema types found.",
+      "passed": ["Specific working thing with real data references"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific problem with actual data",
-          "impact": "Why this costs them rankings",
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific problem citing actual data (e.g. 'Meta description is 210 characters — will be truncated in Google search')",
+          "impact": "Concrete business/ranking impact",
           "fix": "Exact actionable fix"
         }
       ]
@@ -101,14 +293,14 @@ Return ONLY valid JSON. No markdown. No truncation. If space runs out, shorten t
       "name": "Speed & Loading",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference actual PageSpeed score and LCP/FCP values.",
-      "passed": ["Specific working thing"],
+      "summary": "Reference actual mobile + desktop PageSpeed scores and Core Web Vitals.",
+      "passed": ["Real working thing"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific issue with actual metric",
-          "impact": "Why this speed issue loses visitors",
-          "fix": "Specific fix referencing the actual opportunity"
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific PageSpeed issue with actual metric value",
+          "impact": "Why this loses visitors",
+          "fix": "Specific fix referencing the exact PageSpeed opportunity"
         }
       ]
     },
@@ -117,11 +309,11 @@ Return ONLY valid JSON. No markdown. No truncation. If space runs out, shorten t
       "name": "Phone & Tablet Experience",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference viewport meta, mobile score.",
+      "summary": "Reference viewport meta, mobile PageSpeed score, responsive signals.",
       "passed": ["Specific working thing"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
+          "severity": "Critical | High | Medium | Low",
           "issue": "Specific mobile issue",
           "impact": "Why mobile visitors leave",
           "fix": "Exactly what to fix"
@@ -133,12 +325,12 @@ Return ONLY valid JSON. No markdown. No truncation. If space runs out, shorten t
       "name": "Words & Messaging",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference actual H1s, word count, CTA text.",
-      "passed": ["Specific working thing with actual content"],
+      "summary": "Reference actual H1s, word count, paragraph structure, CTA text.",
+      "passed": ["Specific working thing with actual content quotes"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific issue referencing actual text found",
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific issue quoting actual text found",
           "impact": "Why this messaging gap loses customers",
           "fix": "Exact suggested copy or structural change"
         }
@@ -147,14 +339,12 @@ Return ONLY valid JSON. No markdown. No truncation. If space runs out, shorten t
   ]
 }`;
 
-  // ── PASS 2: Trust, Conversion, Brand, Social Proof ───────────────────────────
-
-  const pass2Prompt = `You are an expert website auditor. Use ONLY the real data below.
+  const pass2Prompt = `You are an expert website auditor.
 
 ${baseContext}
+${commonInstructions}
 
-Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but never stop early.
-
+Return ONLY valid JSON:
 {
   "categories": [
     {
@@ -162,12 +352,12 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "Trust & Credibility",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference actual trust signals — testimonials YES/NO, SSL YES/NO, team YES/NO.",
+      "summary": "Reference exact trust signals found — SSL YES/NO, testimonials YES/NO, team YES/NO, contact info YES/NO, live chat platform if detected.",
       "passed": ["Specific detected trust signal"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific missing trust signal",
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific missing trust signal (only flag signals that data confirms are missing)",
           "impact": "Why visitors do not trust this business",
           "fix": "Exactly what to add and where"
         }
@@ -178,11 +368,11 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "Getting People to Act",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference actual CTAs, buttons, forms found.",
-      "passed": ["Specific CTA or conversion element working"],
+      "summary": "Reference actual CTA buttons found, form count, email capture presence.",
+      "passed": ["Specific CTA element working — quote actual button/link text"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
+          "severity": "Critical | High | Medium | Low",
           "issue": "Specific conversion issue referencing actual buttons/forms",
           "impact": "Why visitors leave without acting",
           "fix": "Exact button text, placement, or section to add"
@@ -194,12 +384,12 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "Brand & First Impression",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference OG image, consistency signals, first impression.",
+      "summary": "Reference OG image presence, favicon, theme color, consistency signals.",
       "passed": ["Specific brand element working"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific brand issue",
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific brand issue with data reference",
           "impact": "Why this hurts perception",
           "fix": "Exactly what to create or fix"
         }
@@ -210,11 +400,11 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "Reviews & Social Proof",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference testimonials detected and social links.",
+      "summary": "Reference testimonial detection (blockquotes, star ratings) and social platforms found.",
       "passed": ["Specific social proof element found"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
+          "severity": "Critical | High | Medium | Low",
           "issue": "Specific missing social proof",
           "impact": "Why this gap loses sales",
           "fix": "Exactly what to add and where"
@@ -224,15 +414,13 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
   ]
 }`;
 
-  // ── PASS 3: AI Visibility, Messaging, Competitor, Recommendations ────────────
-
-  const pass3Prompt = `You are an expert website auditor. Use ONLY the real data below.
+  const pass3Prompt = `You are an expert website auditor.
 
 ${baseContext}
 ${competitorContext}
+${commonInstructions}
 
-Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but never stop early.
-
+Return ONLY valid JSON:
 {
   "categories": [
     {
@@ -240,14 +428,14 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "AI & Modern Search",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference schema count, content depth, structured data.",
+      "summary": "Reference exact schema count, schema types detected, content depth, word count.",
       "passed": ["Specific thing helping AI visibility"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
+          "severity": "Critical | High | Medium | Low",
           "issue": "Specific AI visibility gap with actual data",
-          "impact": "Why they are invisible to AI search",
-          "fix": "Exactly what schema to add and what content to create"
+          "impact": "Why they are invisible to AI search (ChatGPT, Gemini, Perplexity)",
+          "fix": "Exactly what schema to add (name the schema type) and what content to create"
         }
       ]
     },
@@ -256,12 +444,12 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "WhatsApp, Social & Messaging",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference social links detected and messaging apps provided.",
+      "summary": "Reference exact social platforms detected (list which ones YES/NO) and messaging apps provided.",
       "passed": ["Specific social element working"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific messaging gap",
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific messaging/social gap with data",
           "impact": "Why poor messaging presence loses customers",
           "fix": "Exactly what to set up or improve"
         }
@@ -272,12 +460,12 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
       "name": "What Competitors Are Doing Better",
       "score": 0-100,
       "grade": "A/B/C/D/F",
-      "summary": "Reference actual competitor data above.",
-      "passed": ["Specific area where this site beats competitors"],
+      "summary": "Reference specific competitor data above by URL. If no competitors provided, say 'No competitors provided for direct comparison'.",
+      "passed": ["Specific area where this site beats or matches competitors (with data)"],
       "issues": [
         {
-          "severity": "Critical/High/Medium/Low",
-          "issue": "Specific competitor advantage with actual data",
+          "severity": "Critical | High | Medium | Low",
+          "issue": "Specific competitor advantage with actual data (e.g. 'Competitor X has 5 schema types, this site has 0')",
           "impact": "Why this sends customers to competitors",
           "fix": "Exactly what to add to close this gap"
         }
@@ -285,26 +473,26 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
     }
   ],
   "priorityFixes": [
-    { "rank": 1, "severity": "Critical/High/Medium/Low", "category": "Category name", "issue": "Specific issue with actual data", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
-    { "rank": 2, "severity": "Critical/High/Medium/Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
-    { "rank": 3, "severity": "Critical/High/Medium/Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
-    { "rank": 4, "severity": "Critical/High/Medium/Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
-    { "rank": 5, "severity": "Critical/High/Medium/Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" }
+    { "rank": 1, "severity": "Critical | High | Medium | Low", "category": "Category name", "issue": "Specific issue with actual data", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
+    { "rank": 2, "severity": "Critical | High | Medium | Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
+    { "rank": 3, "severity": "Critical | High | Medium | Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
+    { "rank": 4, "severity": "Critical | High | Medium | Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" },
+    { "rank": 5, "severity": "Critical | High | Medium | Low", "category": "Category name", "issue": "Specific issue", "fix": "Specific fix", "estimatedImpact": "Measurable improvement" }
   ],
   "quickWins": [
-    { "title": "Specific quick win", "description": "Exact one-sentence action with real data.", "timeToFix": "10 minutes" },
-    { "title": "Specific quick win", "description": "Exact one-sentence action with real data.", "timeToFix": "15 minutes" },
-    { "title": "Specific quick win", "description": "Exact one-sentence action with real data.", "timeToFix": "5 minutes" }
+    { "title": "Specific quick win", "description": "Exact one-sentence action with real data reference.", "timeToFix": "10 minutes" },
+    { "title": "Specific quick win", "description": "Exact one-sentence action with real data reference.", "timeToFix": "15 minutes" },
+    { "title": "Specific quick win", "description": "Exact one-sentence action with real data reference.", "timeToFix": "5 minutes" }
   ],
   "innovativeIdeas": [
-    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy/Medium/Hard", "impact": "Specific growth impact" },
-    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy/Medium/Hard", "impact": "Specific growth impact" },
-    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy/Medium/Hard", "impact": "Specific growth impact" },
-    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy/Medium/Hard", "impact": "Specific growth impact" },
-    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy/Medium/Hard", "impact": "Specific growth impact" }
+    { "title": "Creative specific idea", "description": "Specific to this exact business and their detected industry.", "effort": "Easy | Medium | Hard", "impact": "Specific growth impact" },
+    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy | Medium | Hard", "impact": "Specific growth impact" },
+    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy | Medium | Hard", "impact": "Specific growth impact" },
+    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy | Medium | Hard", "impact": "Specific growth impact" },
+    { "title": "Creative specific idea", "description": "Specific to this exact business.", "effort": "Easy | Medium | Hard", "impact": "Specific growth impact" }
   ],
   "competitorComparison": {
-    "summary": "Specific comparison using actual competitor data",
+    "summary": "Specific comparison using actual competitor data (name URLs). If no competitors, say 'No competitors analyzed'.",
     "theyWinAt": ["Specific advantage based on actual data"],
     "competitorsWinAt": ["Specific competitor advantage based on actual data"],
     "biggestGap": "The single most important gap",
@@ -319,7 +507,7 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
   ]
 }`;
 
-  // ── Run all 3 passes in parallel ─────────────────────────────────────────────
+  // ─── RUN PASSES IN PARALLEL ──────────────────────────────────────────────
 
   async function runPass(prompt, passName) {
     try {
@@ -344,14 +532,10 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
     throw new Error("Audit failed: core analysis could not be completed. Please try again.");
   }
 
-  // ── Merge all passes into one response ───────────────────────────────────────
-
-  const pass2Categories = pass2Result?.categories || [];
-  const pass3Categories = pass3Result?.categories || [];
   const allCategories = [
     ...(pass1Result.categories || []),
-    ...pass2Categories,
-    ...pass3Categories,
+    ...(pass2Result?.categories || []),
+    ...(pass3Result?.categories || []),
   ];
 
   return {
@@ -367,8 +551,11 @@ Return ONLY valid JSON. No markdown. No truncation. Shorten text if needed but n
     innovativeIdeas: pass3Result?.innovativeIdeas || [],
     competitorComparison: pass3Result?.competitorComparison || null,
     missingElements: pass3Result?.missingElements || [],
+    dataQuality,
   };
 }
+
+// ─── SCREENSHOT UX ANALYSIS (unchanged, kept for compatibility) ─────────────
 
 export async function analyzeScreenshots(url, screenshots) {
   console.log(`[UX Audit] Analyzing ${screenshots.length} screenshots for ${url}`);
@@ -393,22 +580,9 @@ export async function analyzeScreenshots(url, screenshots) {
 SCREENSHOTS PROVIDED:
 ${labelList}
 
-Study every single pixel of these screenshots. Look at:
-- Exact layout and visual hierarchy — what the eye goes to first and why
-- Navigation structure — how easy or hard is it to find things
-- Every button — its label, color, size, placement, and whether it's clear
-- Typography — font sizes, contrast, readability
-- Whitespace and breathing room — cramped or spacious
-- Color usage — consistent or chaotic
-- Empty states — what happens when there's no data
-- Form design — how many fields, labels, error states
-- Mobile considerations — would this work on a small screen
-- Loading states and feedback — does the user know what's happening
-- Onboarding — would a brand new user know exactly what to do
-- Missing UI elements that the best products in this space always have
-- Anything confusing, frustrating, or impressive
+Study every single pixel. Look at layout, visual hierarchy, navigation, buttons, typography, whitespace, color, empty states, form design, mobile considerations, loading states, onboarding, missing UI elements, and anything confusing or impressive.
 
-Be brutally specific. Reference exactly what you see — actual button labels, actual colors, actual layout problems. Do not give generic advice.
+Be brutally specific. Reference exactly what you see. Do not give generic advice.
 
 Rules:
 - Plain English. Talk like a brilliant designer friend.
@@ -416,31 +590,23 @@ Rules:
 - Every issue: specific problem, why it frustrates users, exact fix
 - Ideas must be specific to this product
 
-Return ONLY STRICT VALID JSON.
-
-Never truncate.
-Never omit closing braces.
-Never use markdown.
-Never use trailing commas.
-If you approach the output limit, shorten descriptions instead of stopping. No markdown. No code blocks.
+Return ONLY STRICT VALID JSON. Never truncate. Never use markdown.
 
 {
   "uxScore": 0-100,
   "uxGrade": "A/B/C/D/F",
-  "uxSummary": "3 brutally honest sentences using specific observations. First impression. Biggest strength. Biggest problem.",
+  "uxSummary": "3 brutally honest sentences using specific observations.",
   "screenshotInsights": [
     {
       "label": "Exact screenshot label",
-      "whatWeSee": "Specific description of exactly what this screen shows — layout, key elements, colors, purpose",
-      "strengths": [
-        "Specific strength with exact reference e.g. 'The green Start button is large, centered, and immediately visible'"
-      ],
+      "whatWeSee": "Specific description of what this screen shows",
+      "strengths": ["Specific strength with exact reference"],
       "issues": [
         {
           "severity": "Critical/High/Medium/Low",
-          "issue": "Specific problem with exact reference e.g. 'The navigation has 8 items with no visual hierarchy — all look equally important'",
-          "impact": "Exactly how this frustrates or confuses real users",
-          "fix": "Exact change to make — specific label, color, position, or element"
+          "issue": "Specific problem with exact reference",
+          "impact": "Exactly how this frustrates users",
+          "fix": "Exact change to make"
         }
       ]
     }
@@ -448,40 +614,23 @@ If you approach the output limit, shorten descriptions instead of stopping. No m
   "uxIssues": [
     {
       "severity": "Critical/High/Medium/Low",
-      "issue": "Overall UX problem seen across multiple screens",
-      "impact": "Why this is costing them users or retention",
+      "issue": "Overall UX problem seen across screens",
+      "impact": "Why this is costing them users",
       "fix": "Exact systematic fix"
     }
   ],
   "uxQuickWins": [
-    {
-      "title": "Specific quick win referencing actual element seen",
-      "description": "Exactly what to change and what it currently says or looks like.",
-      "timeToFix": "e.g. 30 minutes"
-    }
+    { "title": "Specific quick win", "description": "Exactly what to change.", "timeToFix": "e.g. 30 minutes" }
   ],
   "uxInnovativeIdeas": [
-    {
-      "title": "Innovative idea specific to this product",
-      "description": "Detailed explanation of the idea and exactly why it would work for this specific product based on what we see.",
-      "effort": "Easy/Medium/Hard",
-      "impact": "Specific user or growth impact"
-    }
+    { "title": "Innovative idea specific to this product", "description": "Detailed explanation.", "effort": "Easy/Medium/Hard", "impact": "Specific impact" }
   ],
   "missingFeatures": [
-    "Specific feature missing — reference what the best competing products have that this one doesn't"
+    "Specific feature missing — reference what competing products have"
   ]
 }`;
 
-  const contents = [
-    {
-      role: "user",
-      parts: [
-        { text: prompt },
-        ...imageParts,
-      ],
-    },
-  ];
+  const contents = [{ role: "user", parts: [{ text: prompt }, ...imageParts] }];
 
   let response = null;
   let lastError = null;
@@ -493,13 +642,8 @@ If you approach the output limit, shorten descriptions instead of stopping. No m
         const aiClient = new GoogleGenAI({ apiKey: key });
         console.log(`[UX Audit] Trying model=${model}`);
         response = await aiClient.models.generateContent({
-          model,
-          contents,
-          config: {
-            maxOutputTokens: 16000,
-            temperature: 0.3,
-            responseMimeType: "application/json",
-          },
+          model, contents,
+          config: { maxOutputTokens: 16000, temperature: 0.3, responseMimeType: "application/json" },
         });
         console.log(`[UX Audit] Success with model=${model}`);
         break outer;
@@ -522,36 +666,20 @@ If you approach the output limit, shorten descriptions instead of stopping. No m
 
   const cleaned = String(text).replace(/```json/g, "").replace(/```/g, "").trim();
   try {
-  try {
-  return JSON.parse(cleaned);
-} catch (e) {
-  console.error(cleaned);
-  throw new Error("Gemini returned invalid JSON.");
-}
-} catch (e) {
-  console.error(cleaned);
-  throw new Error("Gemini returned invalid JSON.");
-}
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.error(cleaned);
+    throw new Error("Gemini returned invalid JSON.");
+  }
 }
 
 export function getGradeColor(grade) {
-  const colors = {
-    A: "#075a01",
-    B: "#0a8f01",
-    C: "#f59e0b",
-    D: "#f97316",
-    F: "#ef4444",
-  };
+  const colors = { A: "#075a01", B: "#0a8f01", C: "#f59e0b", D: "#f97316", F: "#ef4444" };
   return colors[grade] || "#6b7280";
 }
 
 export function getSeverityColor(severity) {
-  const colors = {
-    Critical: "#ef4444",
-    High: "#f97316",
-    Medium: "#f59e0b",
-    Low: "#6b7280",
-  };
+  const colors = { Critical: "#ef4444", High: "#f97316", Medium: "#f59e0b", Low: "#6b7280" };
   return colors[severity] || "#6b7280";
 }
 
