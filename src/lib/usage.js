@@ -15,7 +15,6 @@ const TOOL_LIMIT_KEY = {
   "ai-business-plan": "businessPlanPerDay",
   "ai-email-sequence": "emailSequencePerDay",
   "ai-social-media-post": "socialPostPerDay",
-  "ai-brand-kit": "brandKitPerDay",
   "ai-content-calendar": "contentCalendarPerDay",
 };
 
