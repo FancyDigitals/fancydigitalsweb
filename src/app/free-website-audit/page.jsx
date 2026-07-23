@@ -65,7 +65,7 @@ const EFFORT_STYLES = {
 };
 
 const SCREENSHOT_GUIDE = [
-  { label: "Homepage / Landing Page", desc: "Your main page — what visitors see first" },
+  { label: "Homepage / Landing Page", desc: "Your main page what visitors see first" },
   { label: "Dashboard / Main App Screen", desc: "The first screen after logging in" },
   { label: "Key Feature Screen", desc: "Your most important feature in action" },
   { label: "Pricing Page", desc: "How you present your plans and pricing" },
@@ -361,12 +361,12 @@ useEffect(() => {
     addLine(`Audited: ${new Date(result.meta.scannedAt).toLocaleDateString()}`, 9, false, [120, 120, 120]);
     gap();
 
-    addLine(`Overall Score: ${audit.overallScore}/100 — Grade ${audit.overallGrade}`, 14, true);
+    addLine(`Overall Score: ${audit.overallScore}/100 Grade ${audit.overallGrade}`, 14, true);
     addLine(audit.overallSummary, 10);
     gap();
 
     if (ux) {
-      addLine(`UX Score: ${ux.uxScore}/100 — Grade ${ux.uxGrade}`, 14, true);
+      addLine(`UX Score: ${ux.uxScore}/100 Grade ${ux.uxGrade}`, 14, true);
       addLine(ux.uxSummary, 10);
       gap();
     }
@@ -420,10 +420,6 @@ useEffect(() => {
       {/* HERO */}
       <section className="relative px-4 pt-20 pb-10 sm:pt-28 sm:pb-14 sm:px-6 lg:px-10">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#075a01]/20 bg-[#075a01]/5 px-3 py-1.5 mb-6">
-            <Search className="h-3.5 w-3.5 text-[#075a01]" />
-            <span className="text-xs font-bold text-[#075a01] uppercase tracking-wide">Free Website Audit Tool</span>
-          </div>
 
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
             Find out why your website{" "}
@@ -433,7 +429,7 @@ useEffect(() => {
           </h1>
 
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg">
-            Full audit across 11 categories — SEO, speed, content, trust, conversion, messaging, competitor gaps, innovative ideas, and deep in-app UX analysis from your screenshots.
+            Full audit across 11 categories - SEO, speed, content, trust, conversion, messaging, competitor gaps, innovative ideas, and deep in-app UX analysis from your screenshots.
           </p>
 
           {/* Form */}
@@ -568,7 +564,7 @@ useEffect(() => {
 
                   {screenshots.length > 0 && (
                     <p className="text-[11px] text-[#075a01] font-semibold">
-                      {screenshots.length} screenshot{screenshots.length > 1 ? "s" : ""} ready — AI will analyze each one in detail.
+                      {screenshots.length} screenshot{screenshots.length > 1 ? "s" : ""} ready  AI will analyze each one in detail.
                     </p>
                   )}
                 </div>
@@ -643,7 +639,7 @@ useEffect(() => {
             )}
 
             <p className="text-xs text-gray-400 text-center">
-              1 free audit · No sign-up required · Takes 30–90 seconds
+              Takes 30–90 seconds
             </p>
           </form>
 
@@ -1020,17 +1016,17 @@ useEffect(() => {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { icon: Search, title: "SEO & Discoverability", desc: "Page title, meta description, headings, schema markup, canonical tags — everything Google uses to rank your site." },
-            { icon: Zap, title: "Speed & Loading", desc: "Real Google PageSpeed scores, LCP, FCP, blocking time — and exactly what to fix to make your site faster." },
+            { icon: Search, title: "SEO & Discoverability", desc: "Page title, meta description, headings, schema markup, canonical tags everything Google uses to rank your site." },
+            { icon: Zap, title: "Speed & Loading", desc: "Real Google PageSpeed scores, LCP, FCP, blocking time, and exactly what to fix to make your site faster." },
             { icon: Smartphone, title: "Phone & Tablet Experience", desc: "Does your site work on mobile? We check viewport settings, mobile scores, and touch-friendliness." },
             { icon: MessageSquare, title: "Words & Messaging", desc: "Are your headlines clear? Does your copy explain what you do and why someone should care?" },
             { icon: Shield, title: "Trust & Credibility", desc: "Testimonials, team pages, SSL, contact info, FAQ — everything that makes a stranger trust your business." },
             { icon: TrendingUp, title: "Getting People to Act", desc: "CTAs, buttons, forms, and the flow that guides visitors from landing to contacting or buying." },
             { icon: Star, title: "Brand & First Impression", desc: "Does your site look professional? OG images, visual consistency, and whether it feels like a real business." },
-            { icon: Users, title: "Reviews & Social Proof", desc: "We check for testimonials, ratings, case studies, and client logos — proof that real people trust you." },
-            { icon: Eye, title: "AI & Modern Search", desc: "Schema markup, content depth, entity clarity — everything that makes ChatGPT, Gemini, and Perplexity recommend your business." },
+            { icon: Users, title: "Reviews & Social Proof", desc: "We check for testimonials, ratings, case studies, and client logos, proof that real people trust you." },
+            { icon: Eye, title: "AI & Modern Search", desc: "Schema markup, content depth, entity clarity everything that makes ChatGPT, Gemini, and Perplexity recommend your business." },
             { icon: MessageSquare, title: "WhatsApp & Social", desc: "Are you using WhatsApp, Instagram, or other platforms to connect with customers? We audit your social presence." },
-            { icon: BarChart2, title: "Competitor Gap Analysis", desc: "We fetch and analyze your competitor sites to show exactly what they do better — and how to beat them." },
+            { icon: BarChart2, title: "Competitor Gap Analysis", desc: "We fetch and analyze your competitor sites to show exactly what they do better and how to beat them." },
           ].map((item) => (
             <div key={item.title} className="rounded-xl bg-white border border-gray-100 p-5 shadow-sm">
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[#075a01]/10">
@@ -1054,12 +1050,12 @@ useEffect(() => {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { title: "Business owners", desc: "Find out why your website isn't bringing in customers — and get a clear plan to fix it." },
+            { title: "Business owners", desc: "Find out why your website isn't bringing in customers and get a clear plan to fix it." },
             { title: "Startup founders", desc: "Validate your site before launch. Get an honest score and fix the biggest problems first." },
             { title: "Marketing managers", desc: "Audit any site in seconds. Get data for your next strategy meeting or client presentation." },
             { title: "SEO professionals", desc: "Run a full technical and content audit with real PageSpeed data, schema checks, and competitor analysis." },
             { title: "Agencies", desc: "Audit client websites, generate shareable reports, and show the value of your work with before/after scores." },
-            { title: "App developers", desc: "Upload screenshots of your app for deep UX analysis — specific feedback on every screen from AI." },
+            { title: "App developers", desc: "Upload screenshots of your app for deep UX analysis specific feedback on every screen from AI." },
           ].map((u) => (
             <div key={u.title} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
               <CheckCircle2 className="h-5 w-5 text-[#075a01] shrink-0 mt-0.5" />
@@ -1089,11 +1085,11 @@ useEffect(() => {
             },
             {
               q: "How is this different from Google PageSpeed Insights?",
-              a: "Google PageSpeed only measures technical performance. Our tool audits 11 categories including content, trust, conversion, brand, social proof, competitor gaps, and innovative growth ideas — then explains everything in plain English with specific fixes.",
+              a: "Google PageSpeed only measures technical performance. Our tool audits 11 categories including content, trust, conversion, brand, social proof, competitor gaps, and innovative growth ideas then explains everything in plain English with specific fixes.",
             },
             {
               q: "How accurate is the audit?",
-              a: "Very accurate. We fetch your live website, extract real data — actual page titles, headings, trust signals, CTAs, images — and run Google PageSpeed in real time. The AI analysis is based on this real data, not guesses.",
+              a: "Very accurate. We fetch your live website, extract real data actual page titles, headings, trust signals, CTAs, images and run Google PageSpeed in real time. The AI analysis is based on this real data, not guesses.",
             },
             {
               q: "Can I audit competitor websites?",
@@ -1101,7 +1097,7 @@ useEffect(() => {
             },
             {
               q: "What is the screenshot UX analysis?",
-              a: "Upload screenshots of your app or website interior — dashboard, key features, pricing page, onboarding. Our AI analyzes every screen in detail and gives specific feedback on layout, buttons, messaging, missing features, and innovative ideas.",
+              a: "Upload screenshots of your app or website interior dashboard, key features, pricing page, onboarding. Our AI analyzes every screen in detail and gives specific feedback on layout, buttons, messaging, missing features, and innovative ideas.",
             },
             {
               q: "Can I share my audit report?",
